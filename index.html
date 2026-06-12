@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PetTwin | Pet Digital Personality & Behavior Insights</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="PetTwin navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">PT</div>
+          <div>
+            <strong>PetTwin</strong>
+            <span>Digital pet twin</span>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item active" data-view="dashboard">Dashboard</button>
+          <button class="nav-item" data-view="profile">Profile</button>
+          <button class="nav-item" data-view="checkin">Check-in</button>
+          <button class="nav-item" data-view="analysis">Insights</button>
+          <button class="nav-item" data-view="timeline">Timeline</button>
+          <button class="nav-item" data-view="community">Matches</button>
+        </nav>
+        <div class="notice">
+          <strong>Care boundary</strong>
+          <p>PetTwin tracks behavior trends. It does not provide medical diagnosis.</p>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Record who they are. Understand how they change.</p>
+            <h1 id="page-title">Today</h1>
+          </div>
+          <button class="primary-action" data-view-jump="checkin">30-sec check-in</button>
+        </header>
+
+        <section class="view active" id="dashboard">
+          <div class="dashboard-grid">
+            <section class="hero-panel">
+              <div class="pet-portrait" aria-hidden="true">
+                <div class="pet-head">
+                  <span></span>
+                  <span></span>
+                </div>
+                <div class="pet-body"></div>
+              </div>
+              <div>
+                <p class="eyebrow">Mochi today</p>
+                <h2><span id="state-label">Stable</span> · Activity <span id="activity-score">72</span></h2>
+                <p id="state-copy">Recent logs look steady. Keep the routine consistent and continue watching play frequency.</p>
+                <div class="metric-row">
+                  <span>Stress <strong id="stress-score">28</strong></span>
+                  <span>Bonding <strong id="bond-score">64</strong></span>
+                  <span>Routine <strong id="routine-score">76</strong></span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Personality Radar</h2>
+                <span>Dynamic model</span>
+              </div>
+              <canvas id="radar-chart" width="460" height="320" aria-label="Personality radar chart"></canvas>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Weekly Trends</h2>
+                <span>Behavior baseline</span>
+              </div>
+              <canvas id="trend-chart" width="460" height="260" aria-label="Weekly trend chart"></canvas>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Behavior Alerts</h2>
+                <span id="alert-count">2 items</span>
+              </div>
+              <div id="alerts" class="alert-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="profile">
+          <div class="content-grid">
+            <section class="panel profile-card">
+              <div class="pet-avatar">M</div>
+              <div>
+                <h2>Mochi</h2>
+                <p>Cat · 3 years old · Neutered · Indoor life · Multi-person home</p>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Pet Personality Card</h2>
+                <span>Onboarding quiz + daily logs</span>
+              </div>
+              <div id="trait-bars" class="trait-bars"></div>
+              <p class="insight" id="personality-summary"></p>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Living Context</h2>
+                <span>Influence factors</span>
+              </div>
+              <div class="tag-cloud">
+                <span>Indoor cat</span>
+                <span>Occasional guests</span>
+                <span>Noise-sensitive</span>
+                <span>Fixed feeding times</span>
+                <span>No known medical history</span>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="checkin">
+          <form class="panel checkin-form" id="checkin-form">
+            <div class="panel-heading">
+              <h2>Daily Check-in</h2>
+              <span>About 30 seconds</span>
+            </div>
+            <fieldset>
+              <legend>How are they overall today?</legend>
+              <div class="choice-grid" data-group="mood">
+                <label><input type="radio" name="mood" value="active" checked /> Very active</label>
+                <label><input type="radio" name="mood" value="normal" /> Normal</label>
+                <label><input type="radio" name="mood" value="quiet" /> Quiet</label>
+                <label><input type="radio" name="mood" value="anxious" /> Restless</label>
+                <label><input type="radio" name="mood" value="hiding" /> Hiding</label>
+                <label><input type="radio" name="mood" value="clingy" /> Clingy</label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Any unusual behavior?</legend>
+              <div class="choice-grid">
+                <label><input type="checkbox" name="symptoms" value="low-appetite" /> Ate less</label>
+                <label><input type="checkbox" name="symptoms" value="more-water" /> Drank more</label>
+                <label><input type="checkbox" name="symptoms" value="more-vocal" /> More vocal</label>
+                <label><input type="checkbox" name="symptoms" value="litter" /> Litter issue</label>
+                <label><input type="checkbox" name="symptoms" value="aggression" /> Aggression</label>
+                <label><input type="checkbox" name="symptoms" value="grooming" /> Over-grooming</label>
+                <label><input type="checkbox" name="symptoms" value="sleep" /> Slept more</label>
+                <label><input type="checkbox" name="symptoms" value="no-play" /> Less play</label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Any environmental changes?</legend>
+              <div class="choice-grid">
+                <label><input type="checkbox" name="events" value="guests" /> Guests</label>
+                <label><input type="checkbox" name="events" value="rain" /> Rain</label>
+                <label><input type="checkbox" name="events" value="noise" /> Noise</label>
+                <label><input type="checkbox" name="events" value="food-change" /> Food change</label>
+                <label><input type="checkbox" name="events" value="move" /> Moved home</label>
+                <label><input type="checkbox" name="events" value="away" /> Owner away longer</label>
+                <label><input type="checkbox" name="events" value="new-pet" /> New pet</label>
+                <label><input type="checkbox" name="events" value="none" /> No change</label>
+              </div>
+            </fieldset>
+            <button class="primary-action" type="submit">Update today’s model</button>
+            <p class="form-result" id="form-result" role="status"></p>
+          </form>
+        </section>
+
+        <section class="view" id="analysis">
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Behavior Trends</h2>
+                <span>Past 14 days</span>
+              </div>
+              <div class="trend-list" id="trend-list"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>AI Explanation</h2>
+                <span>Observation guidance</span>
+              </div>
+              <p class="insight" id="ai-explanation"></p>
+              <ul class="recommendations" id="recommendations"></ul>
+            </section>
+            <section class="panel upload-panel">
+              <div class="panel-heading">
+                <h2>Video / Audio Analysis</h2>
+                <span>Next MVP phase</span>
+              </div>
+              <div class="upload-box">
+                <span>Future uploads can capture behavior tags, stress score, activity score, and baseline deviation.</span>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="timeline">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Pet Personality Timeline</h2>
+              <span>Life archive</span>
+            </div>
+            <div class="timeline" id="timeline-list"></div>
+          </section>
+        </section>
+
+        <section class="view" id="community">
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Similar Personality Pets</h2>
+                <span>Similar profile ratio: 6.8%</span>
+              </div>
+              <div class="match-list">
+                <article>
+                  <strong>Luna</strong>
+                  <span>High curiosity · Low sociability · High independence</span>
+                </article>
+                <article>
+                  <strong>Milo</strong>
+                  <span>High independence · Moderate activity · Guest-sensitive</span>
+                </article>
+                <article>
+                  <strong>Cookie</strong>
+                  <span>Low sociability · High routine · Night-sensitive</span>
+                </article>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h2>Shared Care Topics</h2>
+                <span>Topics</span>
+              </div>
+              <div class="tag-cloud">
+                <span>Helping anxious cats adapt to moving</span>
+                <span>Should low-social pets be forced to interact?</span>
+                <span>Reducing stress after guests visit</span>
+                <span>Scent games for high-activity pets</span>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
