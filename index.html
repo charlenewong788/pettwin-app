@@ -6,8 +6,9 @@
     <meta name="theme-color" content="#f5f7f2" />
     <title>PetTwin | Your pet, understood</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://unpkg.com/three@0.160.0/build/three.min.js" defer></script>
-    <script src="app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
+    <script src="app.js?v=3" defer></script>
   </head>
   <body>
     <canvas id="pet-world" aria-label="Roaming 3D pet"></canvas>
@@ -84,8 +85,19 @@
 
         <section class="view" id="avatar">
           <div class="studio-grid">
-            <section class="surface studio-copy"><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Build a 3D twin that looks like your pet</h2><p data-i18n="studioCopy">Upload clear photos or use a guided phone scan. Images stay local in this prototype.</p><div class="studio-methods"><label class="upload-method"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Upload photos</strong><span data-i18n="uploadHint">Front, side and coat detail</span></label><button class="scan-method" id="start-scan"><strong data-i18n="guidedScan">Guided scan</strong><span data-i18n="scanHint">Follow a 20-second capture guide</span></button></div><div class="scan-progress" id="scan-progress"><i></i><span data-i18n="waitingInput">Waiting for photos or scan</span></div><div class="coat-editor"><span data-i18n="coatColour">Detected coat colour</span><input id="coat-color" type="color" value="#77bed2"><div class="pattern-picker"><button class="active" data-pattern="solid" data-i18n="solid">Solid</button><button data-pattern="tuxedo" data-i18n="tuxedo">Tuxedo</button><button data-pattern="tabby" data-i18n="tabby">Tabby</button></div></div><button class="primary-action" id="generate-twin" data-i18n="generateTwin">Generate 3D twin</button><p class="result-line" id="studio-result"></p></section>
-            <section class="studio-stage"><div class="studio-orbit"><span>Mochi 3D</span><small data-i18n="dragRotate">Drag to rotate in the production version</small></div></section>
+            <section class="surface studio-copy">
+              <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a high-fidelity digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">capture ready</span></div></div>
+              <p data-i18n="studioCopy">Use six clear views or a guided video scan. PetTwin checks every capture before reconstruction.</p>
+              <div class="capture-tabs"><button class="active" data-capture-mode="photos" data-i18n="photoSet">Photo set</button><button data-capture-mode="scan" data-i18n="videoScan">Video scan</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
+              <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add pet photos</strong><span data-i18n="uploadHint">Select 6-40 images. Keep the whole pet visible in even light.</span></label>
+              <div class="capture-slots" id="capture-slots"></div>
+              <button class="scan-method full" id="start-scan"><strong data-i18n="guidedScan">Start guided scan</strong><span data-i18n="scanHint">A 45-second route around your pet</span></button>
+              <div class="quality-panel"><div><span data-i18n="captureQuality">Capture quality</span><strong id="quality-summary">0 / 6</strong></div><div class="quality-checks" id="quality-checks"></div></div>
+              <div class="scan-progress" id="scan-progress"><i></i><span data-i18n="waitingInput">Add the six required views to begin</span></div>
+              <div class="pipeline" id="reconstruction-pipeline"><span class="active" data-i18n="stageCapture">Capture</span><span data-i18n="stageShape">Shape</span><span data-i18n="stageTexture">Texture</span><span data-i18n="stageRig">Rig</span><span data-i18n="stageReview">Review</span></div>
+              <button class="primary-action full" id="generate-twin" disabled data-i18n="generateTwin">Generate high-fidelity twin</button><p class="result-line" id="studio-result"></p>
+            </section>
+            <section class="studio-stage"><div class="studio-badge"><strong data-i18n="liveModel">LIVE MODEL</strong><span id="model-source" data-i18n="proceduralPreview">Capture preview</span></div><div class="studio-orbit"><span>Mochi 3D</span><small data-i18n="dragRotate">Move the pointer to inspect the twin</small></div></section>
           </div>
         </section>
       </main>
