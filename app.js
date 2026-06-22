@@ -1,166 +1,56 @@
-const translations = {
-  en: {
-    brandSub: "Digital pet twin", navDashboard: "Dashboard", navProfile: "Profile", navCheckin: "Check-in", navInsights: "Insights", navTimeline: "Timeline", navMatches: "Matches", language: "Language", careBoundaryTitle: "Care boundary", careBoundaryBody: "PetTwin tracks behavior trends. It does not provide medical diagnosis.", tagline: "Record who they are. Understand how they change.", pageToday: "Today", resetDemo: "Reset demo", checkinCta: "30-sec check-in", mochiToday: "Mochi today", activity: "Activity", stress: "Stress", bonding: "Bonding", routine: "Routine", moodCalm: "Calm", moodCurious: "Curious", moodPlayful: "Playful", radarTitle: "Personality Radar", dynamicModel: "Dynamic model", weeklyTrends: "Weekly Trends", behaviorBaseline: "Behavior baseline", alertsTitle: "Behavior Alerts", profileMeta: "Cat · 3 years old · Neutered · Indoor life · Multi-person home", personalityCard: "Pet Personality Card", quizDaily: "Onboarding quiz + daily logs", livingContext: "Living Context", influenceFactors: "Influence factors", dailyCheckin: "Daily Check-in", aboutThirty: "About 30 seconds", overallQuestion: "How are they overall today?", unusualQuestion: "Any unusual behavior?", environmentQuestion: "Any environmental changes?", updateModel: "Update today’s model", behaviorTrends: "Behavior Trends", pastFourteen: "Past 14 days", aiExplanation: "AI Explanation", observationGuidance: "Observation guidance", videoAudio: "Video / Audio Analysis", nextPhase: "Next MVP phase", futureUpload: "Select to simulate a behavior analysis upload.", timelineTitle: "Pet Personality Timeline", lifeArchive: "Life archive", similarPets: "Similar Personality Pets", similarRatio: "Similar profile ratio: 6.8%", sharedTopics: "Shared Care Topics", topics: "Topics"
-  },
-  zh: {
-    brandSub: "宠物数字孪生", navDashboard: "总览", navProfile: "档案", navCheckin: "打卡", navInsights: "分析", navTimeline: "时间轴", navMatches: "匹配", language: "语言", careBoundaryTitle: "医疗边界", careBoundaryBody: "PetTwin 只追踪行为趋势，不提供疾病诊断。", tagline: "记录它是谁，理解它如何变化。", pageToday: "今日状态", resetDemo: "重置演示", checkinCta: "30 秒打卡", mochiToday: "Mochi 今天", activity: "活跃度", stress: "压力", bonding: "亲人程度", routine: "规律性", moodCalm: "平静", moodCurious: "好奇", moodPlayful: "爱玩", radarTitle: "人格雷达", dynamicModel: "动态模型", weeklyTrends: "本周趋势", behaviorBaseline: "行为基线", alertsTitle: "行为提醒", profileMeta: "猫 · 3 岁 · 已绝育 · 室内生活 · 多人家庭", personalityCard: "宠物人格卡片", quizDaily: "初始问卷 + 日常记录", livingContext: "生活环境", influenceFactors: "影响因素", dailyCheckin: "今日打卡", aboutThirty: "约 30 秒", overallQuestion: "今天它整体怎么样？", unusualQuestion: "今天有没有异常？", environmentQuestion: "今天有什么环境变化？", updateModel: "更新今日人格数据", behaviorTrends: "行为趋势", pastFourteen: "过去 14 天", aiExplanation: "AI 解读", observationGuidance: "观察建议", videoAudio: "视频 / 声音分析", nextPhase: "MVP 下一阶段", futureUpload: "点击模拟上传一段行为分析素材。", timelineTitle: "宠物人格时间轴", lifeArchive: "生命档案", similarPets: "相似人格宠物", similarRatio: "相似人格比例：6.8%", sharedTopics: "同人格养护话题", topics: "话题"
-  }
-};
+const copy={
+en:{brandSub:"Your pet, understood",catMeta:"Cat · 3 years",navToday:"Today",navHome:"Home mode",navDevices:"Devices",navCare:"Care plan",navInsights:"Insights",navTimeline:"Timeline",navAvatar:"3D twin studio",language:"Language",hideTwin:"Hide digital twin",showTwin:"Show digital twin",synced:"All sources synced",quickCheck:"Quick check",stableToday:"Stable today",hello:"Hello,",wellbeing:"Wellbeing",seeHome:"See what happened at home",addObservation:"Add observation",activity:"Activity",stress:"Stress",litterVisits:"Litter visits",water:"Water",baseline:"Baseline",worthKnowing:"Worth knowing",smartFinding:"One useful finding",addCareTask:"Add care task",viewEvidence:"View evidence",todayPlan:"Today’s plan",smallActions:"Small actions that help",workdayCompanion:"Workday Companion",homeWithoutWatching:"Know what matters without watching all day",homeModeCopy:"PetTwin turns device events into a calm, useful home diary.",quietMode:"Quiet",companionMode:"Companion",observeMode:"Observe",liveDiary:"Live home diary",todayAtHome:"Today at home",simulateEvent:"Simulate new event",remoteCare:"Remote care",connectGently:"Connect gently",playVoice:"Play a familiar message",smallPortion:"Dispense a limited portion",startToy:"Start a safe toy session",openCamera:"Check the living room",beforeHome:"Before you get home",deviceIntro:"Connect passive data sources so owners do less recording.",discoverDevices:"Discover devices",catOnly:"Cat intelligence",litterAnalysis:"Smart litter-box analysis",connected:"Connected",visitsToday:"Visits today",averageDuration:"Average duration",latestWeight:"Latest weight",repeatEntries:"Repeat entries",observeNotDiagnose:"Observation, not diagnosis",careIntro:"Turn insights into actions, then learn what works for this pet.",newTask:"New care task",activePlan:"Active plan",thisWeek:"This week",personalPlaybook:"Personal care playbook",behaviorBaseline:"Behavior baseline",linkedSignals:"Linked signals",environmentLinks:"Environment links",likelyTriggers:"Likely triggers",lifeArchive:"Life archive",personalityTimeline:"Personality timeline",exportReport:"Export report",digitalTwinStudio:"Digital Twin Studio",buildLookalike:"Build a 3D twin that looks like your pet",studioCopy:"Upload clear photos or use a guided phone scan. Images stay local in this prototype.",uploadPhotos:"Upload photos",uploadHint:"Front, side and coat detail",guidedScan:"Guided scan",scanHint:"Follow a 20-second capture guide",waitingInput:"Waiting for photos or scan",coatColour:"Detected coat colour",solid:"Solid",tuxedo:"Tuxedo",tabby:"Tabby",generateTwin:"Generate 3D twin",dragRotate:"The twin can roam across every page",yes:"Yes",no:"No"},
+zh:{brandSub:"更懂你的宠物",catMeta:"猫 · 3 岁",navToday:"今日",navHome:"居家模式",navDevices:"设备中心",navCare:"照护计划",navInsights:"行为洞察",navTimeline:"成长档案",navAvatar:"3D 分身工作室",language:"语言",hideTwin:"隐藏数字分身",showTwin:"显示数字分身",synced:"数据源已同步",quickCheck:"快速确认",stableToday:"今日状态稳定",hello:"你好，",wellbeing:"综合状态",seeHome:"看看今天在家发生了什么",addObservation:"添加观察",activity:"活跃度",stress:"压力",litterVisits:"猫砂盆次数",water:"饮水",baseline:"接近基线",worthKnowing:"值得了解",smartFinding:"一个有用的发现",addCareTask:"加入照护任务",viewEvidence:"查看依据",todayPlan:"今日计划",smallActions:"能带来帮助的小行动",workdayCompanion:"上班陪伴模式",homeWithoutWatching:"不用一直盯着，也能知道重要变化",homeModeCopy:"PetTwin 将设备事件整理成安静而有用的居家日记。",quietMode:"安静",companionMode:"陪伴",observeMode:"密切观察",liveDiary:"实时居家日记",todayAtHome:"今天在家",simulateEvent:"模拟新事件",remoteCare:"远程照护",connectGently:"温和地保持连接",playVoice:"播放熟悉的语音",smallPortion:"投放限量零食",startToy:"开启安全玩具",openCamera:"查看客厅",beforeHome:"回家之前",deviceIntro:"连接被动数据源，让主人少记录、获得更多理解。",discoverDevices:"发现设备",catOnly:"猫咪智能分析",litterAnalysis:"智能猫砂盆分析",connected:"已连接",visitsToday:"今日次数",averageDuration:"平均停留",latestWeight:"最新体重",repeatEntries:"重复进入",observeNotDiagnose:"只做观察，不作诊断",careIntro:"把洞察变成行动，再学习什么方法真正适合它。",newTask:"新建任务",activePlan:"正在执行",thisWeek:"本周计划",personalPlaybook:"专属照护手册",behaviorBaseline:"行为基线",linkedSignals:"联动信号",environmentLinks:"环境关联",likelyTriggers:"可能的触发因素",lifeArchive:"生命档案",personalityTimeline:"人格时间轴",exportReport:"导出报告",digitalTwinStudio:"数字分身工作室",buildLookalike:"创建一只像它的 3D 数字分身",studioCopy:"上传清晰照片或使用手机引导扫描。本原型中的图片仅在本地处理。",uploadPhotos:"上传照片",uploadHint:"正面、侧面和毛色细节",guidedScan:"引导扫描",scanHint:"按照 20 秒拍摄指引操作",waitingInput:"等待照片或扫描",coatColour:"识别出的毛色",solid:"纯色",tuxedo:"燕尾服",tabby:"虎斑",generateTwin:"生成 3D 分身",dragRotate:"数字分身可以在所有页面自由活动",yes:"是的",no:"没有"}}
+let lang=localStorage.getItem("pt-lang")||"en";
+const defaultState={activity:72,stress:28,litter:5,repeat:2,mode:"companion",twinVisible:true,coat:"#77bed2",pattern:"solid",tasks:[{id:"play",done:false,en:"10-minute play session",zh:"互动玩耍 10 分钟",whyEn:"Activity is 8% below the evening baseline",whyZh:"晚间活跃度比基线低 8%"},{id:"water",done:true,en:"Check water level",zh:"检查饮水量",whyEn:"Completed at 12:30",whyZh:"已于 12:30 完成"},{id:"safe",done:false,en:"Prepare a quiet hiding space",zh:"准备安静的躲藏空间",whyEn:"Visitors are expected tonight",whyZh:"今晚预计有客人来访"}]};
+let state=JSON.parse(localStorage.getItem("pt-state")||"null")||structuredClone(defaultState);
+let coatMaterial,petGroup,headMesh,tailMesh,legs=[],worldRenderer,worldCamera,worldScene,mouseX=0,activeView="today",roam=0;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],t=k=>copy[lang][k]||k,save=()=>localStorage.setItem("pt-state",JSON.stringify(state));
 
-const localized = {
-  en: {
-    traits: ["Sociability", "Curiosity", "Independence", "Emotional Stability", "Activity Level", "Routine Stability"],
-    moods: [["active", "Very active"], ["normal", "Normal"], ["quiet", "Quiet"], ["anxious", "Restless"], ["hiding", "Hiding"], ["clingy", "Clingy"]],
-    symptoms: [["low-appetite", "Ate less"], ["more-water", "Drank more"], ["more-vocal", "More vocal"], ["litter", "Litter issue"], ["aggression", "Aggression"], ["grooming", "Over-grooming"], ["sleep", "Slept more"], ["no-play", "Less play"]],
-    events: [["guests", "Guests"], ["rain", "Rain"], ["noise", "Noise"], ["food-change", "Food change"], ["move", "Moved home"], ["away", "Owner away longer"], ["new-pet", "New pet"], ["none", "No change"]],
-    context: ["Indoor cat", "Occasional guests", "Noise-sensitive", "Fixed feeding times", "No known medical history"],
-    topics: ["Helping anxious cats adapt to moving", "Should low-social pets be forced to interact?", "Reducing stress after guests visit", "Scent games for high-activity pets"]
-  },
-  zh: {
-    traits: ["社交性", "好奇心", "独立性", "情绪稳定度", "活跃度", "规律性"],
-    moods: [["active", "很活跃"], ["normal", "正常"], ["quiet", "安静"], ["anxious", "焦躁"], ["hiding", "躲藏"], ["clingy", "粘人"]],
-    symptoms: [["low-appetite", "吃得少"], ["more-water", "喝水多"], ["more-vocal", "叫得多"], ["litter", "排便异常"], ["aggression", "攻击"], ["grooming", "频繁舔毛"], ["sleep", "睡太多"], ["no-play", "不爱玩"]],
-    events: [["guests", "来客"], ["rain", "下雨"], ["noise", "噪音"], ["food-change", "换粮"], ["move", "搬家"], ["away", "主人外出较久"], ["new-pet", "新宠物"], ["none", "无变化"]],
-    context: ["室内猫", "偶尔来客", "对噪音敏感", "固定喂食", "无既往疾病记录"],
-    topics: ["高焦虑猫如何适应搬家", "低社交宠物是否需要强行陪伴", "来客后如何降低压力", "高活跃宠物的嗅闻游戏"]
-  }
-};
+const eventsEn=[{time:"14:42",icon:"L",title:"Litter-box visit",detail:"54 seconds · weight 4.62 kg"},{time:"13:18",icon:"Z",title:"Nap ended",detail:"Rested for 2h 06m"},{time:"11:07",icon:"A",title:"Living-room activity",detail:"Movement returned to normal"},{time:"09:36",icon:"W",title:"Drank water",detail:"Within the usual morning range"}];
+const eventsZh=[{time:"14:42",icon:"砂",title:"猫砂盆记录",detail:"停留 54 秒 · 体重 4.62 kg"},{time:"13:18",icon:"眠",title:"午睡结束",detail:"休息了 2 小时 06 分钟"},{time:"11:07",icon:"动",title:"客厅活动",detail:"活动量恢复到正常范围"},{time:"09:36",icon:"水",title:"饮水记录",detail:"处于日常早间范围"}];
+const deviceData=[{icon:"LB",en:"Smart litter box",zh:"智能猫砂盆",enD:"Visits, weight and duration",zhD:"次数、体重和停留时间",connected:true},{icon:"CM",en:"Home camera",zh:"家庭摄像头",enD:"Movement and rest zones",zhD:"活动和休息区域",connected:true},{icon:"FD",en:"Smart feeder",zh:"智能喂食器",enD:"Meals and portion limits",zhD:"进食和份量限制",connected:true},{icon:"CL",en:"Activity collar",zh:"活动项圈",enD:"Activity and sleep",zhD:"活动量和睡眠",connected:false}];
 
-const defaults = {
-  traits: [42, 86, 74, 68, 72, 76],
-  history: [
-    { dayEn: "Mon", dayZh: "周一", activity: 68, stress: 30, routine: 72 },
-    { dayEn: "Tue", dayZh: "周二", activity: 74, stress: 28, routine: 78 },
-    { dayEn: "Wed", dayZh: "周三", activity: 71, stress: 32, routine: 76 },
-    { dayEn: "Thu", dayZh: "周四", activity: 64, stress: 42, routine: 68 },
-    { dayEn: "Fri", dayZh: "周五", activity: 70, stress: 35, routine: 74 },
-    { dayEn: "Sat", dayZh: "周六", activity: 79, stress: 24, routine: 80 },
-    { dayEn: "Today", dayZh: "今天", activity: 72, stress: 28, routine: 76 }
-  ]
-};
+function applyLanguage(){document.documentElement.lang=lang==="zh"?"zh-CN":"en";$$('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));$$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));renderAll()}
+function renderAll(){renderSummary();renderTasks();renderEvents();renderDevices();renderInsights();renderTimeline();renderPlaybook();updatePetMessage();}
+function renderSummary(){const score=Math.max(45,Math.round(100-state.stress*.45-Math.max(0,70-state.activity)*.25-Math.max(0,state.litter-5)*2));$('#wellbeing-score').textContent=score;$('#activity-value').textContent=state.activity;$('#stress-value').textContent=state.stress;$('#litter-value').textContent=state.litter;$('#visits-today').textContent=state.litter;$('#repeat-entries').textContent=state.repeat;$('#daily-summary').textContent=lang==='en'?`Activity and routine are close to Mochi’s baseline. Litter-box visits are ${state.litter>5?'higher':'slightly higher'} than usual.`:`Mochi 的活动和作息接近日常基线，猫砂盆次数${state.litter>5?'明显高于':'略高于'}平时。`;$('#smart-finding').textContent=lang==='en'?"4 of Mochi’s last 5 hiding events happened after visitors arrived. Recovery usually took around 2 hours.":"Mochi 最近 5 次躲藏中，有 4 次发生在来客之后，通常需要约 2 小时恢复。";$('#litter-note').textContent=lang==='en'?"Visits are slightly above Mochi’s baseline. Continue observing drinking, appetite and repeated short visits.":"如厕次数略高于 Mochi 的日常基线，建议继续观察饮水、食欲和短时间重复进入。";$('#workday-summary').textContent=lang==='en'?"Mochi slept for 5h 48m, used the litter box several times, and played less than usual. Try a 10-minute play session tonight.":"Mochi 今天睡了约 5 小时 48 分钟，多次使用猫砂盆，玩耍比平时少。今晚可以安排 10 分钟互动。";}
+function taskHTML(task,compact=false){return `<div class="task-item ${task.done?'done':''}" data-task="${task.id}"><button aria-label="Complete task">${task.done?'✓':''}</button><div><strong>${lang==='en'?task.en:task.zh}</strong><small>${lang==='en'?task.whyEn:task.whyZh}</small></div>${compact?'':`<span>${task.done?(lang==='en'?'Done':'完成'):(lang==='en'?'Planned':'计划中')}</span>`}</div>`}
+function renderTasks(){const done=state.tasks.filter(x=>x.done).length;$('#task-progress').textContent=`${done}/${state.tasks.length}`;$('#compact-tasks').innerHTML=state.tasks.map(x=>taskHTML(x,true)).join('');$('#care-list').innerHTML=state.tasks.map(x=>taskHTML(x)).join('');$$('[data-task] button').forEach(btn=>btn.onclick=()=>{const task=state.tasks.find(x=>x.id===btn.parentElement.dataset.task);task.done=!task.done;if(task.done){state.activity=Math.min(100,state.activity+3);state.stress=Math.max(0,state.stress-2);petReaction('happy')}save();renderAll()})}
+function renderEvents(){const data=lang==='en'?eventsEn:eventsZh;$('#event-feed').innerHTML=data.map(e=>`<div class="event-item"><span class="event-icon">${e.icon}</span><div><strong>${e.title}</strong><small>${e.time} · ${e.detail}</small></div></div>`).join('')}
+function renderDevices(){$('#device-grid').innerHTML=deviceData.map((d,i)=>`<article class="device-card"><div class="device-top"><i>${d.icon}</i><span class="device-online">${d.connected?t('connected'):(lang==='en'?'Available':'可连接')}</span></div><h3>${lang==='en'?d.en:d.zh}</h3><p>${lang==='en'?d.enD:d.zhD}</p><button data-device="${i}">${d.connected?(lang==='en'?'Manage':'管理'):(lang==='en'?'Connect':'连接')}</button></article>`).join('');$$('[data-device]').forEach(b=>b.onclick=()=>{const d=deviceData[+b.dataset.device];d.connected=!d.connected;renderDevices();petReaction('curious')})}
+function renderInsights(){const data=lang==='en'?[['Visitors → hiding','80% link'],['Rain → lower activity','62% link'],['Late return → vocalising','54% link'],['Clean litter → normal visits','71% link']]:[['来客 → 躲藏','关联度 80%'],['下雨 → 活跃度下降','关联度 62%'],['主人晚归 → 叫声增加','关联度 54%'],['清理猫砂 → 如厕恢复','关联度 71%']];$('#correlation-list').innerHTML=data.map(x=>`<div class="correlation-item"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('');drawTrend()}
+function renderTimeline(){const data=lang==='en'?[['Today','Workday pattern learned','Lower afternoon play may improve with a short evening session.'],['June 2026','Routine became more stable','Night vocalisation decreased and play frequency increased.'],['March 2026','Initial personality model','High curiosity, moderate sociability and strong independence.']]:[['今天','识别出新的上班日规律','下午玩耍偏少，晚间短时互动可能有帮助。'],['2026 年 6 月','作息变得更稳定','夜间叫声减少，玩耍频率增加。'],['2026 年 3 月','建立初始人格模型','高好奇、中等社交和较高独立性。']];$('#timeline-list').innerHTML=data.map(x=>`<article class="timeline-item"><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join('')}
+function renderPlaybook(){const data=lang==='en'?[['Quiet hiding space','Helps'],['10-minute evening play','Helps'],['Owner voice playback','Mixed'],['Forced visitor interaction','Avoid']]:[['安静躲藏空间','有效'],['晚间玩耍 10 分钟','有效'],['播放主人语音','效果不定'],['强迫接触来客','避免']];$('#playbook').innerHTML=data.map(x=>`<div class="playbook-item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join('')}
+function updatePetMessage(){const text=state.stress>40?(lang==='en'?"I have been a little unsettled. Could we keep tonight calm?":"我今天有一点不安，今晚可以安静一点吗？"):(lang==='en'?"I seem quieter than usual today. Does that feel right?":"我今天好像比平时安静，你也这样觉得吗？");$('#pet-message-text').textContent=text}
 
-let lang = localStorage.getItem("pettwin-lang") || "en";
-let state = JSON.parse(localStorage.getItem("pettwin-state-v2") || "null") || structuredClone(defaults);
-let petMood = "calm";
-let petRig = null;
+function navigate(view){activeView=view;$$('.view').forEach(v=>v.classList.toggle('active',v.id===view));$$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===view));const nav=$(`[data-view="${view}"]`);$('#page-title').textContent=nav?nav.textContent:view;$('#section-eyebrow').textContent=view==='home'?'WORKDAY COMPANION':'PETTWIN';$('#pet-message').classList.toggle('hidden',view==='avatar'||!state.twinVisible);if(view==='avatar')petReaction('studio')}
+$$('[data-view], [data-view-jump]').forEach(b=>b.onclick=()=>navigate(b.dataset.view||b.dataset.viewJump));$$('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;localStorage.setItem('pt-lang',lang);applyLanguage()});
+$$('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));save();$('#remote-result').textContent=lang==='en'?`${b.textContent} notifications are now active.`:`已开启${b.textContent}通知。`});
+$$('[data-signal]').forEach(b=>b.onclick=()=>{$$('[data-signal]').forEach(x=>x.classList.toggle('active',x===b));navigate(b.dataset.signal==='litter'?'devices':'insights')});
+$$('[data-answer]').forEach(b=>b.onclick=()=>{state.stress=Math.max(0,state.stress+(b.dataset.answer==='yes'?2:-2));save();renderAll();petReaction(b.dataset.answer==='yes'?'calm':'curious');$('#pet-message').classList.add('hidden')});
+$('#add-home-event').onclick=()=>{state.litter++;state.repeat++;eventsEn.unshift({time:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),icon:'L',title:'Short repeat litter visit',detail:'32 seconds · worth observing'});eventsZh.unshift({time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),icon:'砂',title:'短时间重复进入猫砂盆',detail:'停留 32 秒 · 值得继续观察'});state.stress+=3;save();renderAll();petReaction('alert')};
+$$('[data-remote]').forEach(b=>b.onclick=()=>{const action=b.dataset.remote;const messages={voice:['Familiar voice played once. Mochi looked toward the speaker.','已播放一次熟悉语音，Mochi 看向了扬声器。'],treat:['A 4g portion was dispensed. Daily limit: 1 remaining.','已投放 4 克零食，今日剩余限额 1 次。'],toy:['A safe 5-minute toy session has started.','已开启 5 分钟安全玩具互动。'],camera:['Camera preview would open here after device authorisation.','设备授权后将在这里打开摄像头画面。']};$('#remote-result').textContent=messages[action][lang==='en'?0:1];petReaction(action==='toy'?'happy':'curious')});
+$('#discover-devices').onclick=()=>{$('#discover-devices').textContent=lang==='en'?'3 devices found':'发现 3 台设备';petReaction('curious')};
+$('#new-task').onclick=()=>{const id='task'+Date.now();state.tasks.push({id,done:false,en:'Observe evening litter visits',zh:'观察今晚猫砂盆使用情况',whyEn:'Suggested after today’s repeat entries',whyZh:'根据今日重复进入记录生成'});save();renderTasks()};
+$$('[data-task-add]').forEach(b=>b.onclick=()=>{if(!state.tasks.some(x=>x.id==='guest'))state.tasks.push({id:'guest',done:false,en:'Set up a visitor-safe room',zh:'准备来客时的安全房间',whyEn:'Based on hiding correlation',whyZh:'根据躲藏关联生成'});save();renderTasks();navigate('care')});
+$$('[data-range]').forEach(b=>b.onclick=()=>{$$('[data-range]').forEach(x=>x.classList.toggle('active',x===b));drawTrend(+b.dataset.range)});
 
-const clamp = value => Math.max(0, Math.min(100, Math.round(value)));
-const current = () => state.history[state.history.length - 1];
-const t = key => translations[lang][key] || key;
+function drawTrend(range=7){const c=$('#trend-chart');if(!c)return;const x=c.getContext('2d'),pad=42,w=c.width-pad*2,h=c.height-pad*2;x.clearRect(0,0,c.width,c.height);x.strokeStyle='#dce5e3';for(let i=0;i<5;i++){const y=pad+i*h/4;x.beginPath();x.moveTo(pad,y);x.lineTo(c.width-pad,y);x.stroke()}const count=range===7?7:range===30?12:18;[['#75bdd0',state.activity],['#e88470',state.stress],['#84c5a1',76]].forEach(([color,base],line)=>{x.beginPath();for(let i=0;i<count;i++){const value=base+Math.sin(i*.8+line)*8+(line===1?Math.cos(i*.45)*5:0),px=pad+i*w/(count-1),py=pad+h-value*h/100;i?x.lineTo(px,py):x.moveTo(px,py)}x.strokeStyle=color;x.lineWidth=3;x.stroke()});x.lineWidth=1}
 
-function applyLanguage() {
-  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll("[data-lang]").forEach(el => el.classList.toggle("active", el.dataset.lang === lang));
-  renderOptions();
-  renderAll();
-  localStorage.setItem("pettwin-lang", lang);
+function initTwin(){const canvas=$('#pet-world');if(!window.THREE){canvas.style.display='none';return}worldScene=new THREE.Scene();worldCamera=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,100);worldCamera.position.set(0,1.2,9);worldRenderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true});worldRenderer.setPixelRatio(Math.min(devicePixelRatio,2));worldRenderer.shadowMap.enabled=true;petGroup=new THREE.Group();worldScene.add(petGroup);coatMaterial=new THREE.MeshStandardMaterial({color:state.coat,roughness:.78});const white=new THREE.MeshStandardMaterial({color:0xf7f7f1,roughness:.82}),dark=new THREE.MeshStandardMaterial({color:0x202a32,roughness:.55}),pink=new THREE.MeshStandardMaterial({color:0xc98282,roughness:.72});const sphere=(s,p,m=coatMaterial)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(1,36,26),m);o.scale.set(...s);o.position.set(...p);o.castShadow=true;petGroup.add(o);return o};sphere([.9,.54,.52],[0,0,0]);sphere([.46,.5,.39],[.58,.08,-.08]);headMesh=sphere([.55,.5,.47],[-.7,.4,.08]);[-1,1].forEach(side=>{const ear=new THREE.Mesh(new THREE.ConeGeometry(.23,.52,4),coatMaterial);ear.position.set(-.72+side*.33,.9,.04);ear.rotation.z=side*-.14;petGroup.add(ear);sphere([.058,.078,.045],[-.72+side*.19,.49,.49],dark)});sphere([.18,.12,.08],[-.84,.24,.46],white);sphere([.18,.12,.08],[-.56,.24,.46],white);sphere([.055,.04,.04],[-.7,.28,.54],pink);sphere([.05,.018,.018],[-.7,.17,.53],dark);[[-.44,.15],[.48,.16],[-.35,-.18],[.57,-.16]].forEach(([px,pz],i)=>{const leg=sphere([.17,.36,.17],[px,-.48,pz],white);legs.push(leg);sphere([.2,.1,.2],[px,-.78,pz+.02],white)});[-1,1].forEach(side=>{for(let i=0;i<3;i++){const whisker=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.5,8),white);whisker.position.set(-.7+side*.28,.24-i*.06,.51);whisker.rotation.z=Math.PI/2+side*(i-1)*.08;petGroup.add(whisker)}});tailMesh=new THREE.Mesh(new THREE.TorusGeometry(.47,.09,16,40,Math.PI*1.45),coatMaterial);tailMesh.position.set(.83,.2,-.08);tailMesh.rotation.set(1.4,.1,-.45);petGroup.add(tailMesh);worldScene.add(new THREE.HemisphereLight(0xffffff,0x536f68,2.8));const light=new THREE.DirectionalLight(0xffffff,3.2);light.position.set(-3,6,5);worldScene.add(light);resizeWorld();addEventListener('resize',resizeWorld);addEventListener('mousemove',e=>mouseX=(e.clientX/innerWidth-.5)*2);animateTwin()}
+function resizeWorld(){if(!worldRenderer)return;worldRenderer.setSize(innerWidth,innerHeight,false);worldCamera.aspect=innerWidth/innerHeight;worldCamera.updateProjectionMatrix()}
+function animateTwin(){roam+=.012;const studio=activeView==='avatar';const aspect=innerWidth/innerHeight;const span=studio?1.1:Math.min(3.9,Math.max(1.15,2.8*aspect));const targetX=studio?Math.min(2.35,3.1*aspect):Math.sin(roam*.38)*span;petGroup.position.x+=(targetX-petGroup.position.x)*.025;petGroup.position.y=studio?-.65:-2.45+Math.abs(Math.sin(roam*1.7))*.07;petGroup.scale.setScalar(studio?1.12:.72);petGroup.rotation.y=studio?Math.sin(roam*.4)*.5:(Math.cos(roam*.38)>0?0:Math.PI);headMesh.rotation.y+=(mouseX*.28-headMesh.rotation.y)*.04;tailMesh.rotation.z=-.45+Math.sin(roam*5)*.2;legs.forEach((l,i)=>l.rotation.z=Math.sin(roam*7+i*Math.PI)*.18);worldRenderer.render(worldScene,worldCamera);requestAnimationFrame(animateTwin)}
+function petReaction(type){if(!petGroup)return;if(type==='happy'){state.activity=Math.min(100,state.activity+1);petGroup.rotation.z=.12;setTimeout(()=>petGroup.rotation.z=0,600)}if(type==='alert'){petGroup.scale.multiplyScalar(.9)}if(type==='studio')$('#pet-message').classList.add('hidden')}
+$('#pet-toggle').onclick=()=>{state.twinVisible=!state.twinVisible;$('#pet-world').style.display=state.twinVisible?'block':'none';$('#pet-message').classList.toggle('hidden',!state.twinVisible);$('#pet-toggle').textContent=state.twinVisible?t('hideTwin'):t('showTwin');save()};
+
+$('#pet-photo').onchange=event=>{const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=40;const cx=c.getContext('2d');cx.drawImage(img,0,0,40,40);const data=cx.getImageData(8,8,24,24).data;let r=0,g=0,b=0,n=0;for(let i=0;i<data.length;i+=16){r+=data[i];g+=data[i+1];b+=data[i+2];n++}const hex='#'+[r/n,g/n,b/n].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');$('#coat-color').value=hex;state.coat=hex;if(coatMaterial)coatMaterial.color.set(hex);$('#scan-progress').style.setProperty('--progress','100%');$('#scan-progress span').textContent=lang==='en'?`${event.target.files.length} photo(s) analysed locally`:`已在本地分析 ${event.target.files.length} 张照片`;save()};img.src=e.target.result};reader.readAsDataURL(file)};
+$('#start-scan').onclick=()=>{let p=0;$('#scan-progress span').textContent=lang==='en'?'Scanning shape and coat…':'正在扫描体型和毛色…';const timer=setInterval(()=>{p+=20;$('#scan-progress').style.setProperty('--progress',p+'%');if(p>=100){clearInterval(timer);$('#scan-progress span').textContent=lang==='en'?'Guided scan complete':'引导扫描完成';petReaction('studio')}},280)};
+$('#coat-color').oninput=e=>{state.coat=e.target.value;if(coatMaterial)coatMaterial.color.set(state.coat);save()};$$('[data-pattern]').forEach(b=>b.onclick=()=>{state.pattern=b.dataset.pattern;$$('[data-pattern]').forEach(x=>x.classList.toggle('active',x===b));if(coatMaterial){coatMaterial.roughness=state.pattern==='solid'?.7:.52;coatMaterial.metalness=state.pattern==='tabby'?.05:0}save()});$('#generate-twin').onclick=()=>{$('#studio-result').textContent=lang==='en'?'3D twin updated. Mochi can now roam across every page.':'3D 分身已更新，Mochi 现在会在所有页面自由活动。';petReaction('happy')};
+
+applyLanguage();initTwin();
+if(!state.twinVisible){
+  $('#pet-world').style.display='none';
+  $('#pet-message').classList.add('hidden');
+  $('#pet-toggle').textContent=t('showTwin');
 }
-
-function renderOptions() {
-  const groups = [["mood-options", localized[lang].moods, "mood", "radio"], ["symptom-options", localized[lang].symptoms, "symptoms", "checkbox"], ["event-options", localized[lang].events, "events", "checkbox"]];
-  groups.forEach(([id, items, name, type]) => {
-    document.getElementById(id).innerHTML = items.map(([value, label], index) => `<label><input type="${type}" name="${name}" value="${value}" ${type === "radio" && index === 1 ? "checked" : ""}> ${label}</label>`).join("");
-  });
-  document.getElementById("context-tags").innerHTML = localized[lang].context.map(x => `<span>${x}</span>`).join("");
-  document.getElementById("topic-tags").innerHTML = localized[lang].topics.map(x => `<span>${x}</span>`).join("");
-  document.getElementById("match-list").innerHTML = [
-    ["Luna", lang === "en" ? "High curiosity · Low sociability · High independence" : "高好奇 · 低社交 · 高独立"],
-    ["Milo", lang === "en" ? "High independence · Moderate activity · Guest-sensitive" : "高独立 · 中等活跃 · 对来客敏感"],
-    ["Cookie", lang === "en" ? "Low sociability · High routine · Night-sensitive" : "低社交 · 高规律 · 夜间较敏感"]
-  ].map(x => `<article><strong>${x[0]}</strong><span>${x[1]}</span></article>`).join("");
-}
-
-function renderAll() {
-  const now = current();
-  const stable = now.stress <= 55;
-  document.getElementById("state-label").textContent = lang === "en" ? (stable ? "Stable" : "Worth watching") : (stable ? "稳定" : "值得观察");
-  document.getElementById("state-copy").textContent = lang === "en"
-    ? (stable ? "Recent logs look steady. Keep the routine consistent and continue watching play frequency." : "Stress-related signals are elevated. Reduce stimulation and observe for 3 to 5 days.")
-    : (stable ? "最近记录较为平稳，建议保持固定作息并继续观察玩耍频率。" : "近期压力相关信号升高，建议减少环境刺激并继续观察 3 至 5 天。");
-  document.getElementById("activity-score").textContent = now.activity;
-  document.getElementById("stress-score").textContent = now.stress;
-  document.getElementById("routine-score").textContent = now.routine;
-  document.getElementById("bond-score").textContent = clamp(100 - state.traits[2] + state.traits[0] / 2);
-  renderAlerts(); renderTraits(); renderAnalysis(); renderTimeline(); drawRadar(); drawTrend();
-}
-
-function renderAlerts() {
-  const now = current();
-  const alerts = [];
-  if (now.stress > 45) alerts.push(lang === "en" ? ["Stress signals increased", "Watch for guests, noise, routine shifts, and environmental triggers."] : ["压力信号升高", "建议观察来客、噪音、作息变化等环境因素。"]);
-  if (now.activity < 66) alerts.push(lang === "en" ? ["Activity decreased", "Reduced play and movement are worth tracking."] : ["活跃度下降", "玩耍和移动减少值得持续记录。"]);
-  if (!alerts.length) alerts.push(lang === "en" ? ["Stable baseline", "No major behavior changes are deviating from the usual baseline."] : ["状态平稳", "当前没有明显偏离日常基线的行为变化。"]);
-  document.getElementById("alert-count").textContent = lang === "en" ? `${alerts.length} ${alerts.length === 1 ? "item" : "items"}` : `${alerts.length} 项`;
-  document.getElementById("alerts").innerHTML = alerts.map(x => `<article class="alert"><strong>${x[0]}</strong><span>${x[1]}</span></article>`).join("");
-}
-
-function renderTraits() {
-  document.getElementById("trait-bars").innerHTML = state.traits.map((value, index) => `<div class="bar"><div class="bar-top"><strong>${localized[lang].traits[index]}</strong><span>${value}</span></div><div class="bar-track"><div class="bar-fill" style="width:${value}%"></div></div></div>`).join("");
-  document.getElementById("personality-summary").textContent = lang === "en" ? "Mochi is highly curious, fairly independent, and socially cautious. They prefer to choose the distance and timing of interaction." : "Mochi 是一只高好奇、中高独立、社交偏谨慎的猫，更喜欢由自己决定互动距离和时间。";
-}
-
-function renderAnalysis() {
-  const now = current(); const before = state.history.at(-2) || now;
-  const labels = lang === "en" ? ["Hiding / stress behavior", "Play / active behavior", "Sleep / routine stability"] : ["躲藏 / 压力行为", "玩耍 / 活跃行为", "睡眠 / 作息规律"];
-  const changes = [now.stress - before.stress, now.activity - before.activity, now.routine - before.routine];
-  document.getElementById("trend-list").innerHTML = labels.map((x, i) => `<div class="trend-item"><span>${x}</span><strong>${changes[i] >= 0 ? "+" : ""}${changes[i]}%</strong></div>`).join("");
-  document.getElementById("ai-explanation").textContent = lang === "en" ? "The past week looks stable overall. Daily check-ins can continue building a more reliable long-term personality baseline." : "过去一周整体较为稳定。持续完成每日打卡，可以建立更可靠的长期人格基线。";
-  const recs = lang === "en" ? ["Keep feeding times and rest areas consistent.", "Avoid forced interaction when hiding appears.", "Consult a veterinarian if health-related changes continue."] : ["保持固定喂食时间和安静休息区。", "出现躲藏时避免强行互动。", "如健康相关变化持续出现，建议咨询兽医。"];
-  document.getElementById("recommendations").innerHTML = recs.map(x => `<li>${x}</li>`).join("");
-}
-
-function renderTimeline() {
-  const items = lang === "en" ? [["June 2026", "Routine became more stable", "Night vocalization decreased and play frequency increased."], ["March 2026", "Initial personality model created", "High curiosity, moderate sociability, and high independence."]] : [["2026 年 6 月", "作息更稳定", "夜间叫声减少，玩耍频率增加。"], ["2026 年 3 月", "初始人格建立", "高好奇心、中等社交性和高独立性。"]];
-  document.getElementById("timeline-list").innerHTML = items.map(x => `<article class="timeline-item"><strong>${x[0]} · ${x[1]}</strong><p>${x[2]}</p></article>`).join("");
-}
-
-function drawRadar() {
-  const canvas = document.getElementById("radar-chart"); const ctx = canvas.getContext("2d"); const center = { x: canvas.width / 2, y: canvas.height / 2 + 6 }; const radius = 110; const count = 6;
-  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = "#dbe5e7"; ctx.fillStyle = "#65727d"; ctx.font = "13px Arial";
-  const point = (r, i) => ({ x: center.x + Math.cos(-Math.PI / 2 + i * Math.PI * 2 / count) * r, y: center.y + Math.sin(-Math.PI / 2 + i * Math.PI * 2 / count) * r });
-  for (let ring = 1; ring <= 4; ring++) { ctx.beginPath(); for (let i = 0; i < count; i++) { const p = point(radius * ring / 4, i); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); } ctx.closePath(); ctx.stroke(); }
-  localized[lang].traits.forEach((label, i) => { const p = point(radius + 30, i); ctx.textAlign = p.x < center.x - 8 ? "right" : p.x > center.x + 8 ? "left" : "center"; ctx.fillText(label, p.x, p.y); });
-  ctx.beginPath(); state.traits.forEach((value, i) => { const p = point(radius * value / 100, i); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }); ctx.closePath(); ctx.fillStyle = "rgba(119,190,210,.34)"; ctx.strokeStyle = "#4f94a8"; ctx.lineWidth = 3; ctx.fill(); ctx.stroke(); ctx.lineWidth = 1;
-}
-
-function drawTrend() {
-  const canvas = document.getElementById("trend-chart"); const ctx = canvas.getContext("2d"); const pad = 44; const w = canvas.width - pad * 2; const h = canvas.height - pad * 2;
-  ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = "#dbe5e7"; ctx.fillStyle = "#65727d"; ctx.font = "12px Arial";
-  for (let i = 0; i <= 4; i++) { const y = pad + h * i / 4; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(canvas.width - pad, y); ctx.stroke(); }
-  [["activity", "#77bed2"], ["stress", "#e7816e"], ["routine", "#8dc49a"]].forEach(([key, color]) => { ctx.beginPath(); state.history.forEach((item, i) => { const x = pad + w * i / (state.history.length - 1); const y = pad + h - item[key] * h / 100; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke(); });
-  state.history.forEach((item, i) => ctx.fillText(lang === "en" ? item.dayEn : item.dayZh, pad + w * i / (state.history.length - 1) - 14, canvas.height - 12)); ctx.lineWidth = 1;
-}
-
-function initPet() {
-  const canvas = document.getElementById("pet-canvas");
-  if (!window.THREE) { document.getElementById("css-pet").style.display = "block"; return; }
-  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100); camera.position.set(0, 1.6, 6.6);
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.shadowMap.enabled = true;
-  const group = new THREE.Group(); scene.add(group);
-  const white = new THREE.MeshStandardMaterial({ color: 0xf7fbfa, roughness: 0.52 }); const accent = new THREE.MeshStandardMaterial({ color: 0x77bed2, roughness: 0.48 }); const dark = new THREE.MeshStandardMaterial({ color: 0x202a32, roughness: 0.4 });
-  const sphere = (scale, pos, material = white) => { const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 28), material); mesh.scale.set(...scale); mesh.position.set(...pos); mesh.castShadow = true; group.add(mesh); return mesh; };
-  const body = sphere([1.28, .78, .82], [.28, -.25, 0]); const head = sphere([.82, .76, .7], [-.78, .45, .05]);
-  const earGeo = new THREE.ConeGeometry(.34, .72, 4); [-1, 1].forEach(side => { const ear = new THREE.Mesh(earGeo, accent); ear.position.set(-.82 + side * .48, 1.16, .02); ear.rotation.z = side * -.12; group.add(ear); });
-  [-1, 1].forEach(side => sphere([.09, .12, .07], [-.8 + side * .28, .55, .68], dark)); sphere([.08, .06, .06], [-.8, .31, .72], accent);
-  const tail = new THREE.Mesh(new THREE.TorusGeometry(.64, .12, 18, 45, Math.PI * 1.35), accent); tail.position.set(1.45, .02, -.08); tail.rotation.set(1.45, .15, -.35); group.add(tail);
-  [-.45, .72].forEach(x => sphere([.28, .52, .28], [x, -.86, .25]));
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x7b9c98, 2.2)); const key = new THREE.DirectionalLight(0xffffff, 3); key.position.set(-3, 5, 4); key.castShadow = true; scene.add(key);
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(2.2, 64), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: .42, roughness: 1 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -1.4; floor.receiveShadow = true; scene.add(floor);
-  const resize = () => { const rect = canvas.parentElement.getBoundingClientRect(); renderer.setSize(rect.width, rect.height, false); camera.aspect = rect.width / rect.height; camera.updateProjectionMatrix(); };
-  resize(); addEventListener("resize", resize); let tick = 0;
-  function animate() { tick += .018; group.position.y = Math.sin(tick * 1.8) * .08; group.rotation.y = Math.sin(tick * .75) * .18; head.rotation.z = Math.sin(tick * (petMood === "playful" ? 4 : 1.5)) * (petMood === "curious" ? .13 : .045); tail.rotation.z = -.35 + Math.sin(tick * (petMood === "playful" ? 8 : 3)) * .24; if (petMood === "playful") group.rotation.x = Math.sin(tick * 3) * .035; renderer.render(scene, camera); requestAnimationFrame(animate); }
-  petRig = group; animate();
-}
-
-document.querySelectorAll("[data-lang]").forEach(btn => btn.addEventListener("click", () => { lang = btn.dataset.lang; applyLanguage(); }));
-document.querySelectorAll("[data-view], [data-view-jump]").forEach(btn => btn.addEventListener("click", () => { const view = btn.dataset.view || btn.dataset.viewJump; document.querySelectorAll(".view").forEach(x => x.classList.toggle("active", x.id === view)); document.querySelectorAll(".nav-item").forEach(x => x.classList.toggle("active", x.dataset.view === view)); document.getElementById("page-title").textContent = btn.dataset.view ? btn.textContent.trim() : t("navCheckin"); }));
-document.querySelectorAll("[data-pet-mood]").forEach(btn => btn.addEventListener("click", () => { petMood = btn.dataset.petMood; document.querySelectorAll("[data-pet-mood]").forEach(x => x.classList.toggle("active", x === btn)); if (petRig) petRig.rotation.z = petMood === "curious" ? -.08 : 0; }));
-document.querySelectorAll("[data-metric]").forEach(btn => btn.addEventListener("click", () => { document.querySelectorAll("[data-metric]").forEach(x => x.classList.toggle("active", x === btn)); }));
-document.getElementById("simulate-upload").addEventListener("click", () => { document.getElementById("upload-result").textContent = lang === "en" ? "Demo analysis complete: curious posture, low stress, normal movement." : "演示分析完成：姿态好奇、压力较低、活动正常。"; });
-document.getElementById("reset-demo").addEventListener("click", () => { state = structuredClone(defaults); localStorage.removeItem("pettwin-state-v2"); renderAll(); });
-document.getElementById("checkin-form").addEventListener("submit", event => { event.preventDefault(); const form = new FormData(event.currentTarget); const mood = form.get("mood"); const symptoms = form.getAll("symptoms"); const events = form.getAll("events"); const before = current(); const next = { dayEn: "Today", dayZh: "今天", activity: before.activity, stress: before.stress, routine: before.routine }; if (mood === "active") next.activity += 8; if (["quiet", "hiding"].includes(mood)) next.activity -= 6; if (["anxious", "hiding"].includes(mood)) next.stress += 12; if (symptoms.length) next.stress += symptoms.length * 3; if (events.some(x => ["guests", "noise", "move", "new-pet"].includes(x))) next.stress += 7; if (events.includes("none")) next.routine += 5; next.activity = clamp(next.activity); next.stress = clamp(next.stress); next.routine = clamp(next.routine); state.history.push(next); state.history = state.history.slice(-7); state.traits[4] = clamp((state.traits[4] * 2 + next.activity) / 3); state.traits[3] = clamp(100 - next.stress); state.traits[5] = clamp((state.traits[5] * 2 + next.routine) / 3); localStorage.setItem("pettwin-state-v2", JSON.stringify(state)); renderAll(); document.getElementById("form-result").textContent = lang === "en" ? "Mochi’s personality model has been updated." : "Mochi 今日人格数据已更新。"; });
-
-applyLanguage();
-initPet();
 
