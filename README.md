@@ -10,7 +10,8 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 
 - Bilingual English / Chinese interface
 - Roaming interactive 3D digital pet
-- Photo upload and guided-scan avatar studio prototype
+- Six-view capture workflow with resolution, lighting, sharpness, and coverage checks
+- Guided scan flow, reconstruction pipeline status, and textured/animated GLB loading
 - Workday Companion with quiet, companion, and observation modes
 - Smart litter-box, camera, feeder, and collar device hub
 - Litter-box baseline and repeat-entry observations
@@ -25,7 +26,7 @@ PetTwin does not provide medical diagnosis. It only tracks behavior trends, high
 
 ## How To Run
 
-This is a zero-dependency static project. Open `index.html` in a browser.
+The interface is a zero-dependency static project. Open `index.html` in a browser. The optional reconstruction API requires Node.js and lives in `server/`.
 
 ## File Structure
 
@@ -35,13 +36,16 @@ pettwin-app/
   styles.css
   app.js
   README.md
+  server/
+    src/index.mjs
+    src/providers/mock-provider.mjs
 ```
 
 ## Suggested Next Steps
 
-1. Add real accounts and multi-pet profiles.
-2. Replace browser local storage with a cloud database.
-3. Add monthly and yearly report export.
-4. Integrate video and audio behavior analysis.
-5. Design family sharing and privacy permission flows.
+1. Connect private object storage and a production 3D reconstruction provider.
+2. Add a review step for eye, ear, muzzle, body proportion, and coat corrections.
+3. Add real accounts, multi-pet profiles, and family permissions.
+4. Replace browser local storage with a cloud database.
+5. Integrate video and audio behavior analysis.
 
