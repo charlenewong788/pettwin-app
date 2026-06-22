@@ -1,5 +1,9 @@
 # PetTwin
 
+## Live Demo
+
+[Open PetTwin](https://charlenewong788.github.io/pettwin-app/)
+
 PetTwin is a static MVP prototype for a pet digital personality and behavior insights app. It turns daily behavior logs into a dynamic pet personality profile, trend view, alert system, and long-term life archive.
 
 ## Current Features
@@ -39,3 +43,4 @@ pettwin-app/
 3. Add monthly and yearly report export.
 4. Integrate video and audio behavior analysis.
 5. Design family sharing and privacy permission flows.
+
