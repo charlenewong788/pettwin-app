@@ -8,15 +8,16 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 
 ## Current Features
 
-- Pet status dashboard
-- Dynamic personality radar chart
-- 30-second daily behavior check-in
-- Behavior trend chart
-- Behavior alert cards
-- Pet personality profile
-- AI-style observation guidance
-- Pet personality timeline
-- Similar-personality pet matching concept
+- Bilingual English / Chinese interface
+- Roaming interactive 3D digital pet
+- Photo upload and guided-scan avatar studio prototype
+- Workday Companion with quiet, companion, and observation modes
+- Smart litter-box, camera, feeder, and collar device hub
+- Litter-box baseline and repeat-entry observations
+- Remote voice, treat, toy, and camera interaction prototypes
+- Linked behavior, environment, and care recommendations
+- Care tasks with outcome feedback and a personal care playbook
+- Pet status, home diary, insights, and personality timeline
 
 ## Product Boundary
 
