@@ -30,7 +30,7 @@ const server = http.createServer(async (request, response) => {
   if (request.method === "POST" && request.url === "/api/v1/reconstruction/jobs") {
     try {
       const input = await readJson(request);
-      if (!Array.isArray(input.assets) || input.assets.length < 6) return send(response, 422, { error: "At least six signed asset URLs are required" });
+      if (!Array.isArray(input.assets) || input.assets.length < 4) return send(response, 422, { error: "At least four signed asset URLs are required" });
       return send(response, 202, await provider.createJob(input));
     } catch (error) {
       return send(response, 400, { error: error.message });
