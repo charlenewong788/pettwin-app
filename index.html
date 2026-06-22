@@ -5,81 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PetTwin | Pet Digital Personality & Behavior Insights</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
+    <div class="ambient-layer" aria-hidden="true"></div>
     <div class="app-shell">
       <aside class="sidebar" aria-label="PetTwin navigation">
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">PT</div>
           <div>
             <strong>PetTwin</strong>
-            <span>Digital pet twin</span>
+            <span data-i18n="brandSub">Digital pet twin</span>
           </div>
         </div>
+
         <nav class="nav">
-          <button class="nav-item active" data-view="dashboard">Dashboard</button>
-          <button class="nav-item" data-view="profile">Profile</button>
-          <button class="nav-item" data-view="checkin">Check-in</button>
-          <button class="nav-item" data-view="analysis">Insights</button>
-          <button class="nav-item" data-view="timeline">Timeline</button>
-          <button class="nav-item" data-view="community">Matches</button>
+          <button class="nav-item active" data-view="dashboard" data-i18n="navDashboard">Dashboard</button>
+          <button class="nav-item" data-view="profile" data-i18n="navProfile">Profile</button>
+          <button class="nav-item" data-view="checkin" data-i18n="navCheckin">Check-in</button>
+          <button class="nav-item" data-view="analysis" data-i18n="navInsights">Insights</button>
+          <button class="nav-item" data-view="timeline" data-i18n="navTimeline">Timeline</button>
+          <button class="nav-item" data-view="community" data-i18n="navMatches">Matches</button>
         </nav>
+
+        <div class="language-card">
+          <span data-i18n="language">Language</span>
+          <div class="segmented" role="group" aria-label="Language switch">
+            <button class="segment active" data-lang="en">EN</button>
+            <button class="segment" data-lang="zh">中文</button>
+          </div>
+        </div>
+
         <div class="notice">
-          <strong>Care boundary</strong>
-          <p>PetTwin tracks behavior trends. It does not provide medical diagnosis.</p>
+          <strong data-i18n="careBoundaryTitle">Care boundary</strong>
+          <p data-i18n="careBoundaryBody">PetTwin tracks behavior trends. It does not provide medical diagnosis.</p>
         </div>
       </aside>
 
       <main>
         <header class="topbar">
           <div>
-            <p class="eyebrow">Record who they are. Understand how they change.</p>
-            <h1 id="page-title">Today</h1>
+            <p class="eyebrow" data-i18n="tagline">Record who they are. Understand how they change.</p>
+            <h1 id="page-title" data-i18n="pageToday">Today</h1>
           </div>
-          <button class="primary-action" data-view-jump="checkin">30-sec check-in</button>
+          <div class="top-actions">
+            <button class="ghost-action" id="reset-demo" data-i18n="resetDemo">Reset demo</button>
+            <button class="primary-action" data-view-jump="checkin" data-i18n="checkinCta">30-sec check-in</button>
+          </div>
         </header>
 
         <section class="view active" id="dashboard">
           <div class="dashboard-grid">
             <section class="hero-panel">
-              <div class="pet-portrait" aria-hidden="true">
-                <div class="pet-head">
-                  <span></span>
-                  <span></span>
-                </div>
-                <div class="pet-body"></div>
-              </div>
-              <div>
-                <p class="eyebrow">Mochi today</p>
-                <h2><span id="state-label">Stable</span> · Activity <span id="activity-score">72</span></h2>
+              <div class="hero-copy">
+                <p class="eyebrow" data-i18n="mochiToday">Mochi today</p>
+                <h2><span id="state-label">Stable</span> · <span data-i18n="activity">Activity</span> <span id="activity-score">72</span></h2>
                 <p id="state-copy">Recent logs look steady. Keep the routine consistent and continue watching play frequency.</p>
                 <div class="metric-row">
-                  <span>Stress <strong id="stress-score">28</strong></span>
-                  <span>Bonding <strong id="bond-score">64</strong></span>
-                  <span>Routine <strong id="routine-score">76</strong></span>
+                  <button class="metric-pill" data-metric="stress"><span data-i18n="stress">Stress</span><strong id="stress-score">28</strong></button>
+                  <button class="metric-pill" data-metric="bond"><span data-i18n="bonding">Bonding</span><strong id="bond-score">64</strong></button>
+                  <button class="metric-pill" data-metric="routine"><span data-i18n="routine">Routine</span><strong id="routine-score">76</strong></button>
+                </div>
+              </div>
+              <div class="pet-stage" aria-label="Animated 3D pet">
+                <canvas id="pet-canvas"></canvas>
+                <div class="css-pet" id="css-pet" aria-hidden="true">
+                  <div class="css-pet-body"></div>
+                  <div class="css-pet-head"><span></span><span></span></div>
+                  <div class="css-pet-tail"></div>
+                </div>
+                <div class="mood-controls" role="group" aria-label="Pet mood controls">
+                  <button data-pet-mood="calm" class="active" data-i18n="moodCalm">Calm</button>
+                  <button data-pet-mood="curious" data-i18n="moodCurious">Curious</button>
+                  <button data-pet-mood="playful" data-i18n="moodPlayful">Playful</button>
                 </div>
               </div>
             </section>
 
             <section class="panel">
               <div class="panel-heading">
-                <h2>Personality Radar</h2>
-                <span>Dynamic model</span>
+                <h2 data-i18n="radarTitle">Personality Radar</h2>
+                <span data-i18n="dynamicModel">Dynamic model</span>
               </div>
-              <canvas id="radar-chart" width="460" height="320" aria-label="Personality radar chart"></canvas>
+              <canvas id="radar-chart" width="520" height="340" aria-label="Personality radar chart"></canvas>
             </section>
 
             <section class="panel">
               <div class="panel-heading">
-                <h2>Weekly Trends</h2>
-                <span>Behavior baseline</span>
+                <h2 data-i18n="weeklyTrends">Weekly Trends</h2>
+                <span data-i18n="behaviorBaseline">Behavior baseline</span>
               </div>
-              <canvas id="trend-chart" width="460" height="260" aria-label="Weekly trend chart"></canvas>
+              <canvas id="trend-chart" width="520" height="280" aria-label="Weekly trend chart"></canvas>
+              <div class="chart-legend">
+                <span><i class="legend-blue"></i><b data-i18n="activity">Activity</b></span>
+                <span><i class="legend-coral"></i><b data-i18n="stress">Stress</b></span>
+                <span><i class="legend-green"></i><b data-i18n="routine">Routine</b></span>
+              </div>
             </section>
 
             <section class="panel">
               <div class="panel-heading">
-                <h2>Behavior Alerts</h2>
+                <h2 data-i18n="alertsTitle">Behavior Alerts</h2>
                 <span id="alert-count">2 items</span>
               </div>
               <div id="alerts" class="alert-list"></div>
@@ -93,29 +120,23 @@
               <div class="pet-avatar">M</div>
               <div>
                 <h2>Mochi</h2>
-                <p>Cat · 3 years old · Neutered · Indoor life · Multi-person home</p>
+                <p data-i18n="profileMeta">Cat · 3 years old · Neutered · Indoor life · Multi-person home</p>
               </div>
             </section>
             <section class="panel">
               <div class="panel-heading">
-                <h2>Pet Personality Card</h2>
-                <span>Onboarding quiz + daily logs</span>
+                <h2 data-i18n="personalityCard">Pet Personality Card</h2>
+                <span data-i18n="quizDaily">Onboarding quiz + daily logs</span>
               </div>
               <div id="trait-bars" class="trait-bars"></div>
               <p class="insight" id="personality-summary"></p>
             </section>
             <section class="panel">
               <div class="panel-heading">
-                <h2>Living Context</h2>
-                <span>Influence factors</span>
+                <h2 data-i18n="livingContext">Living Context</h2>
+                <span data-i18n="influenceFactors">Influence factors</span>
               </div>
-              <div class="tag-cloud">
-                <span>Indoor cat</span>
-                <span>Occasional guests</span>
-                <span>Noise-sensitive</span>
-                <span>Fixed feeding times</span>
-                <span>No known medical history</span>
-              </div>
+              <div class="tag-cloud" id="context-tags"></div>
             </section>
           </div>
         </section>
@@ -123,47 +144,22 @@
         <section class="view" id="checkin">
           <form class="panel checkin-form" id="checkin-form">
             <div class="panel-heading">
-              <h2>Daily Check-in</h2>
-              <span>About 30 seconds</span>
+              <h2 data-i18n="dailyCheckin">Daily Check-in</h2>
+              <span data-i18n="aboutThirty">About 30 seconds</span>
             </div>
             <fieldset>
-              <legend>How are they overall today?</legend>
-              <div class="choice-grid" data-group="mood">
-                <label><input type="radio" name="mood" value="active" checked /> Very active</label>
-                <label><input type="radio" name="mood" value="normal" /> Normal</label>
-                <label><input type="radio" name="mood" value="quiet" /> Quiet</label>
-                <label><input type="radio" name="mood" value="anxious" /> Restless</label>
-                <label><input type="radio" name="mood" value="hiding" /> Hiding</label>
-                <label><input type="radio" name="mood" value="clingy" /> Clingy</label>
-              </div>
+              <legend data-i18n="overallQuestion">How are they overall today?</legend>
+              <div class="choice-grid" id="mood-options"></div>
             </fieldset>
             <fieldset>
-              <legend>Any unusual behavior?</legend>
-              <div class="choice-grid">
-                <label><input type="checkbox" name="symptoms" value="low-appetite" /> Ate less</label>
-                <label><input type="checkbox" name="symptoms" value="more-water" /> Drank more</label>
-                <label><input type="checkbox" name="symptoms" value="more-vocal" /> More vocal</label>
-                <label><input type="checkbox" name="symptoms" value="litter" /> Litter issue</label>
-                <label><input type="checkbox" name="symptoms" value="aggression" /> Aggression</label>
-                <label><input type="checkbox" name="symptoms" value="grooming" /> Over-grooming</label>
-                <label><input type="checkbox" name="symptoms" value="sleep" /> Slept more</label>
-                <label><input type="checkbox" name="symptoms" value="no-play" /> Less play</label>
-              </div>
+              <legend data-i18n="unusualQuestion">Any unusual behavior?</legend>
+              <div class="choice-grid" id="symptom-options"></div>
             </fieldset>
             <fieldset>
-              <legend>Any environmental changes?</legend>
-              <div class="choice-grid">
-                <label><input type="checkbox" name="events" value="guests" /> Guests</label>
-                <label><input type="checkbox" name="events" value="rain" /> Rain</label>
-                <label><input type="checkbox" name="events" value="noise" /> Noise</label>
-                <label><input type="checkbox" name="events" value="food-change" /> Food change</label>
-                <label><input type="checkbox" name="events" value="move" /> Moved home</label>
-                <label><input type="checkbox" name="events" value="away" /> Owner away longer</label>
-                <label><input type="checkbox" name="events" value="new-pet" /> New pet</label>
-                <label><input type="checkbox" name="events" value="none" /> No change</label>
-              </div>
+              <legend data-i18n="environmentQuestion">Any environmental changes?</legend>
+              <div class="choice-grid" id="event-options"></div>
             </fieldset>
-            <button class="primary-action" type="submit">Update today’s model</button>
+            <button class="primary-action" type="submit" data-i18n="updateModel">Update today’s model</button>
             <p class="form-result" id="form-result" role="status"></p>
           </form>
         </section>
@@ -172,27 +168,28 @@
           <div class="content-grid">
             <section class="panel">
               <div class="panel-heading">
-                <h2>Behavior Trends</h2>
-                <span>Past 14 days</span>
+                <h2 data-i18n="behaviorTrends">Behavior Trends</h2>
+                <span data-i18n="pastFourteen">Past 14 days</span>
               </div>
               <div class="trend-list" id="trend-list"></div>
             </section>
             <section class="panel">
               <div class="panel-heading">
-                <h2>AI Explanation</h2>
-                <span>Observation guidance</span>
+                <h2 data-i18n="aiExplanation">AI Explanation</h2>
+                <span data-i18n="observationGuidance">Observation guidance</span>
               </div>
               <p class="insight" id="ai-explanation"></p>
               <ul class="recommendations" id="recommendations"></ul>
             </section>
             <section class="panel upload-panel">
               <div class="panel-heading">
-                <h2>Video / Audio Analysis</h2>
-                <span>Next MVP phase</span>
+                <h2 data-i18n="videoAudio">Video / Audio Analysis</h2>
+                <span data-i18n="nextPhase">Next MVP phase</span>
               </div>
-              <div class="upload-box">
-                <span>Future uploads can capture behavior tags, stress score, activity score, and baseline deviation.</span>
-              </div>
+              <button class="upload-box" type="button" id="simulate-upload">
+                <span data-i18n="futureUpload">Future uploads can capture behavior tags, stress score, activity score, and baseline deviation.</span>
+              </button>
+              <p class="form-result" id="upload-result" role="status"></p>
             </section>
           </div>
         </section>
@@ -200,8 +197,8 @@
         <section class="view" id="timeline">
           <section class="panel">
             <div class="panel-heading">
-              <h2>Pet Personality Timeline</h2>
-              <span>Life archive</span>
+              <h2 data-i18n="timelineTitle">Pet Personality Timeline</h2>
+              <span data-i18n="lifeArchive">Life archive</span>
             </div>
             <div class="timeline" id="timeline-list"></div>
           </section>
@@ -211,41 +208,22 @@
           <div class="content-grid">
             <section class="panel">
               <div class="panel-heading">
-                <h2>Similar Personality Pets</h2>
-                <span>Similar profile ratio: 6.8%</span>
+                <h2 data-i18n="similarPets">Similar Personality Pets</h2>
+                <span data-i18n="similarRatio">Similar profile ratio: 6.8%</span>
               </div>
-              <div class="match-list">
-                <article>
-                  <strong>Luna</strong>
-                  <span>High curiosity · Low sociability · High independence</span>
-                </article>
-                <article>
-                  <strong>Milo</strong>
-                  <span>High independence · Moderate activity · Guest-sensitive</span>
-                </article>
-                <article>
-                  <strong>Cookie</strong>
-                  <span>Low sociability · High routine · Night-sensitive</span>
-                </article>
-              </div>
+              <div class="match-list" id="match-list"></div>
             </section>
             <section class="panel">
               <div class="panel-heading">
-                <h2>Shared Care Topics</h2>
-                <span>Topics</span>
+                <h2 data-i18n="sharedTopics">Shared Care Topics</h2>
+                <span data-i18n="topics">Topics</span>
               </div>
-              <div class="tag-cloud">
-                <span>Helping anxious cats adapt to moving</span>
-                <span>Should low-social pets be forced to interact?</span>
-                <span>Reducing stress after guests visit</span>
-                <span>Scent games for high-activity pets</span>
-              </div>
+              <div class="tag-cloud" id="topic-tags"></div>
             </section>
           </div>
         </section>
       </main>
     </div>
-
-    <script src="app.js"></script>
   </body>
 </html>
+
