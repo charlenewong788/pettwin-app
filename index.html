@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f7f2" />
     <title>PetTwin | Your pet, understood</title>
-    <link rel="stylesheet" href="styles.css?v=3" />
-    <link rel="stylesheet" href="pet-fix.css?v=6" />
+    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="pet-fix.css?v=7" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=8" defer></script>
-    <script src="pet-fix.js?v=12" defer></script>
+    <script src="app.js?v=9" defer></script>
+    <script src="pet-fix.js?v=13" defer></script>
     <style>
-      .model-library{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:-8px 0 12px}.model-library button{min-height:38px;padding:0 8px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font-size:11px;font-weight:900}.model-library button.active{border-color:#6fbf92;background:#edf7f0;color:#285d43;box-shadow:0 7px 15px rgba(64,132,93,.12)}@media(max-width:560px){.model-library{grid-template-columns:1fr}}
+      #pet-world{display:none!important}.model-library{display:none}.twin-generator{display:grid;gap:12px;margin:-6px 0 12px}.model-lock{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #cfe2d7;border-radius:13px;background:#f1faf4;color:#295b42}.model-lock strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em}.model-lock span{color:#557066;font-size:12px;font-weight:800;text-align:right}.prompt-box{display:grid;gap:7px}.prompt-box span,.custom-controls span{color:var(--muted);font-size:11px;font-weight:900}.prompt-box textarea{width:100%;resize:vertical;min-height:78px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);line-height:1.45}.custom-controls{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:8px}.custom-controls label{display:grid;gap:7px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff}.custom-controls input,.custom-controls select{width:100%;height:34px;border:1px solid var(--line);border-radius:9px;background:#f8faf7;color:var(--ink);font-weight:800}.custom-controls input{padding:3px}.interaction-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.interaction-bar button{min-height:38px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-size:12px;font-weight:900}.interaction-bar button.active,.interaction-bar button:hover{border-color:#6fbf92;background:#edf7f0;color:#285d43;box-shadow:0 8px 15px rgba(64,132,93,.1)}@media(max-width:560px){.custom-controls,.interaction-bar{grid-template-columns:1fr}.model-lock{align-items:flex-start;flex-direction:column}.model-lock span{text-align:left}}
     </style>
   </head>
   <body>
@@ -99,12 +99,22 @@
             <section class="surface studio-copy">
               <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a photo-matched digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">photo quality</span></div></div>
               <p data-i18n="studioCopy">Use four clear views or a guided 3D scan. PetTwin adapts shape and proportions to each pet.</p>
-              <div class="capture-tabs"><button class="active" data-capture-mode="photos" data-i18n="photoSet">Photo set</button><button data-capture-mode="scan" data-i18n="videoScan">Video scan</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
-              <div class="model-library" aria-label="3D model library">
-                <button class="active" data-model-url="assets/Dingus%20the%20cat.glb" data-model-name="Dingus" data-model-mode="walk">Dingus</button>
-                <button data-model-url="assets/cat.glb" data-model-name="Classic" data-model-mode="walk">Classic</button>
-                <button data-model-url="assets/sitting_blue_cat.glb" data-model-name="Sitting" data-model-mode="static">Sitting</button>
-                <button data-model-url="assets/low_poly_cat.glb" data-model-name="Low Poly" data-model-mode="walk">Low Poly</button>
+              <div class="capture-tabs"><button class="active" data-capture-mode="photos" data-i18n="photoSet">Photo set</button><button data-capture-mode="scan" data-i18n="videoScan">3D scan</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
+              <div class="twin-generator">
+                <div class="model-lock"><strong>Base model / 基础模型</strong><span>Sitting cat only / 只保留这只坐姿猫</span></div>
+                <label class="prompt-box"><span>Describe the pet / 描述宠物外形</span><textarea id="pet-prompt" rows="3" placeholder="Grey British shorthair, round face, pale chest, calm personality"></textarea></label>
+                <div class="custom-controls">
+                  <label><span>Fur colour / 毛发颜色</span><input id="coat-picker" type="color" value="#9b9690"></label>
+                  <label><span>Light marking / 浅色花纹</span><input id="cream-picker" type="color" value="#f5f1e8"></label>
+                  <label><span>Motion style / 动作风格</span><select id="motion-style"><option value="calm">Calm</option><option value="curious">Curious</option><option value="playful">Playful</option></select></label>
+                </div>
+                <div class="interaction-bar" aria-label="Pet interactions">
+                  <button type="button" data-pet-action="feed">Feed 喂食</button>
+                  <button type="button" data-pet-action="shake">Paw 握手</button>
+                  <button type="button" data-pet-action="play">Play 玩耍</button>
+                  <button type="button" data-pet-action="calm">Calm 安静</button>
+                  <button type="button" data-pet-action="spin">360 查看</button>
+                </div>
               </div>
               <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add four pet photos</strong><span data-i18n="uploadHint">Front, left side, right side and back in even light.</span></label>
               <div class="capture-slots" id="capture-slots"></div>
