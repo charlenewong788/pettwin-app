@@ -6,6 +6,8 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hexRgb=h=>{h=(h||"#999999").replace("#","");return{r:parseInt(h.slice(0,2),16)||153,g:parseInt(h.slice(2,4),16)||153,b:parseInt(h.slice(4,6),16)||153}};
 const rgbHex=({r,g,b})=>"#"+[r,g,b].map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,"0")).join("");
 const mix=(a,b,t)=>({r:a.r+(b.r-a.r)*t,g:a.g+(b.g-a.g)*t,b:a.b+(b.b-a.b)*t});
+const cuteTone=(c,amount=.28)=>mix(c,{r:246,g:238,b:222},amount);
+const softDark=(dark,base)=>mix(cuteTone(dark,.34),cuteTone(base,.22),.38);
 const lum=c=>(c.r+c.g+c.b)/3;
 const sat=c=>(Math.max(c.r,c.g,c.b)-Math.min(c.r,c.g,c.b))/255;
 const mat=(c,r=.66)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:0});
@@ -55,8 +57,8 @@ function recolorTexture(m){
     const tabby=Math.max(0,Math.sin(u*58+v*34)+Math.sin(u*24-v*70)-.72);
     const tiger=Math.max(0,Math.sin(v*92+u*18)-.48);
     let target=nearlyWhite?light:base;
-    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.55,0,.55));
-    if(look.pattern==="ginger")target=mix(target,warm,.28);
+    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.38,0,.34));
+    if(look.pattern==="ginger")target=mix(target,warm,.18);
     target=mix(target,light,clamp(bellyMask+faceMask+(nearlyWhite?.45:0),0,.82));
     const shade=clamp((l+76)/170,.6,1.34);
     a[i]=clamp(target.r*shade,0,255);
@@ -89,9 +91,9 @@ function applyVertexCoat(root){
     c=mix(c,light,clamp((underside+chest+muzzle)*look.whiteRatio*1.7,0,.8));
     if(look.pattern==="tabby"||look.pattern==="ginger"){
       const stripe=(Math.max(0,Math.sin(ny*44+nx*16)-.36)+Math.max(0,Math.sin(nx*50+ny*9)-.52)*clamp(.36-ny,0,.36)*2.2)*look.stripe;
-      c=mix(c,dark,clamp(stripe,0,.42));
+      c=mix(c,dark,clamp(stripe,0,.28));
     }
-    if(look.pattern==="ginger")c=mix(c,warm,.22);
+    if(look.pattern==="ginger")c=mix(c,warm,.15);
     const hex=rgbHex(c);
     (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.color&&m.color.isColor)m.color.set(hex);m.vertexColors=false;m.needsUpdate=true});
   });
@@ -206,7 +208,7 @@ function promptColor(text){
   if(v.includes("curious")||v.includes("好奇"))motion="curious";
   if(v.includes("calm")||v.includes("quiet")||v.includes("安静"))motion="calm";
   const s=$("#motion-style");if(s)s.value=motion;setLabel((document.documentElement.lang||"en").startsWith("zh")?"定制坐姿猫":"Custom sitting cat")}
-function readPhoto(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=120;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,dr=0,dg=0,db=0,dn=0,wr=0,wg=0,wb=0,wn=0,orange=0,striped=0;for(let i=0;i<d.length;i+=12){const rr=d[i],gg=d[i+1],bb=d[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb),warm=rr>gg*1.04&&gg>bb*1.08;if(l>35&&l<232&&!(rr>238&&gg>238&&bb>238)){r+=rr;g+=gg;b+=bb;n++;if(warm)orange++}if(l>158&&l<248&&spread<86){lr+=rr;lg+=gg;lb+=bb;ln++}if(l>35&&l<122){dr+=rr;dg+=gg;db+=bb;dn++}if(warm&&l>80&&l<225){wr+=rr;wg+=gg;wb+=bb;wn++}if(l>38&&l<118&&spread>22)striped++}URL.revokeObjectURL(url);if(!n)return res(null);const base={r:r/n,g:g/n,b:b/n},warmAvg=wn?{r:wr/wn,g:wg/wn,b:wb/wn}:base;const isGinger=orange/n>.18&&warmAvg.r>warmAvg.b*1.38;res({coat:rgbHex({r:clamp((isGinger?warmAvg.r:base.r)*.98,55,215),g:clamp((isGinger?warmAvg.g:base.g)*.98,52,190),b:clamp((isGinger?warmAvg.b:base.b)*.98,38,165)}),cream:ln?rgbHex({r:clamp(lr/ln,160,248),g:clamp(lg/ln,150,244),b:clamp(lb/ln,130,235)}):null,dark:dn?rgbHex({r:dr/dn,g:dg/dn,b:db/dn}):null,warm:rgbHex(warmAvg),whiteRatio:clamp(ln/(n||1)*3.2,.12,.82),pattern:isGinger?"ginger":striped/n>.08?"tabby":"solid",stripe:clamp((striped/n)*4.5,.16,.62)})};img.onerror=()=>res(null);img.src=url})}
+function readPhoto(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=120;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,dr=0,dg=0,db=0,dn=0,wr=0,wg=0,wb=0,wn=0,orange=0,striped=0;for(let i=0;i<d.length;i+=12){const rr=d[i],gg=d[i+1],bb=d[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb),warm=rr>gg*1.04&&gg>bb*1.08;if(l>35&&l<232&&!(rr>238&&gg>238&&bb>238)){r+=rr;g+=gg;b+=bb;n++;if(warm)orange++}if(l>158&&l<248&&spread<86){lr+=rr;lg+=gg;lb+=bb;ln++}if(l>35&&l<122){dr+=rr;dg+=gg;db+=bb;dn++}if(warm&&l>80&&l<225){wr+=rr;wg+=gg;wb+=bb;wn++}if(l>38&&l<118&&spread>22)striped++}URL.revokeObjectURL(url);if(!n)return res(null);const base={r:r/n,g:g/n,b:b/n},warmAvg=wn?{r:wr/wn,g:wg/wn,b:wb/wn}:base;const isGinger=orange/n>.18&&warmAvg.r>warmAvg.b*1.38,rawCoat=isGinger?warmAvg:base,softCoat=cuteTone(rawCoat,isGinger?.24:.31),softWarm=cuteTone(warmAvg,.2),rawDark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:rawCoat;res({coat:rgbHex({r:clamp(softCoat.r,88,228),g:clamp(softCoat.g,78,218),b:clamp(softCoat.b,58,205)}),cream:ln?rgbHex(cuteTone({r:lr/ln,g:lg/ln,b:lb/ln},.14)):rgbHex(cuteTone(rawCoat,.48)),dark:rgbHex(softDark(rawDark,softCoat)),warm:rgbHex(softWarm),whiteRatio:clamp(ln/(n||1)*3.2,.16,.72),pattern:isGinger?"ginger":striped/n>.08?"tabby":"solid",stripe:clamp((striped/n)*3.4,.12,.46)})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
   const all=(await Promise.all([...files].slice(0,4).map(readPhoto))).filter(Boolean);
   if(!all.length)return null;
