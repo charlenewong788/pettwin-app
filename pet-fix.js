@@ -1,171 +1,112 @@
 (()=>{
 const $=s=>document.querySelector(s);
-let ready=false,state=null,coat="#8f8980",cream="#f7f1e8",modelUrl="assets/Dingus%20the%20cat.glb",modelMode="walk";
-function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
-function mix(hex,amt){const n=parseInt(hex.slice(1),16),rgb=[n>>16&255,n>>8&255,n&255].map(v=>Math.round(clamp(v+(amt>0?(255-v)*amt:v*amt),0,255)));return"#"+rgb.map(v=>v.toString(16).padStart(2,"0")).join("")}
-function material(color,rough=.64,metal=0){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal})}
-function ellipsoid(scene,mat,pos,scale,segments=48){const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,segments,segments/2),mat);mesh.position.set(...pos);mesh.scale.set(...scale);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);return mesh}
-function makePetModel(){
-  const group=new THREE.Group();
-  group.rotation.set(-.08,.55,0);
-  const coatMat=material(coat,.58),coatDark=material(mix(coat,-.18),.62),coatLight=material(mix(coat,.24),.5);
-  const creamMat=material(cream,.52),pinkMat=material("#f5a7aa",.55),eyeMat=material("#070707",.38),noseMat=material("#6a3c2f",.48);
-
-  ellipsoid(group,coatMat,[.35,.38,0],[1.36,.78,.68]);
-  ellipsoid(group,creamMat,[.08,.2,.38],[.78,.48,.16],40);
-  ellipsoid(group,coatLight,[.07,.78,.22],[.95,.13,.035],32);
-
-  ellipsoid(group,coatMat,[-.88,.63,.05],[.72,.64,.58]);
-  ellipsoid(group,creamMat,[-1.16,.48,.42],[.48,.34,.18],40);
-  ellipsoid(group,creamMat,[-1.33,.43,.52],[.32,.22,.18],40);
-  ellipsoid(group,noseMat,[-1.58,.5,.62],[.095,.07,.065],32);
-  ellipsoid(group,eyeMat,[-.98,.75,.55],[.105,.14,.05],40);
-  ellipsoid(group,material("#ffffff",.2),[-1.02,.81,.59],[.03,.035,.012],24);
-  ellipsoid(group,eyeMat,[-.73,.74,.41],[.055,.09,.025],32);
-  ellipsoid(group,pinkMat,[-1.16,.28,.62],[.15,.06,.04],24);
-
-  const earGeo=new THREE.ConeGeometry(.22,.56,48);
-  const earA=new THREE.Mesh(earGeo,coatMat);earA.position.set(-1.12,1.22,.1);earA.rotation.set(.08,0,-.24);earA.castShadow=true;group.add(earA);
-  const earB=new THREE.Mesh(earGeo,coatMat);earB.position.set(-.62,1.18,-.02);earB.rotation.set(.12,.16,.24);earB.castShadow=true;group.add(earB);
-  const innerA=new THREE.Mesh(new THREE.ConeGeometry(.13,.35,36),pinkMat);innerA.position.set(-1.1,1.18,.18);innerA.rotation.copy(earA.rotation);group.add(innerA);
-  const innerB=new THREE.Mesh(new THREE.ConeGeometry(.1,.28,36),pinkMat);innerB.position.set(-.61,1.14,.06);innerB.rotation.copy(earB.rotation);group.add(innerB);
-
-  [[-.55,-.32,.38],[-.05,-.34,.4],[.62,-.33,.35],[.98,-.32,.22]].forEach((p,i)=>{
-    const leg=ellipsoid(group,i%2?coatMat:creamMat,p,[.18,.38,.18],32);
-    leg.userData.walk=i%2?1:-1;
-    ellipsoid(group,creamMat,[p[0],-.72,p[2]+.03],[.26,.09,.19],32);
+let ready=false,ctx=null,coat="#9b9690",cream="#f5f1e8",action="idle",actionUntil=0,spinUntil=0,motion="calm";
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const mat=(c,r=.66)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:0});
+function eachMat(root,fn){root.traverse(o=>{if(!o.isMesh||!o.material)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m&&fn(m,o))})}
+function tint(root){
+  eachMat(root,m=>{
+    const name=(m.name||"").toLowerCase();
+    if(name.includes("eye")||name.includes("nose")||name.includes("mouth")||name.includes("whisker"))return;
+    if(!m.userData.baseColor&&m.color)m.userData.baseColor=m.color.clone();
+    if(m.color)m.color.set(coat);
+    m.roughness=.82;m.metalness=0;m.needsUpdate=true;
   });
-  ellipsoid(group,coatDark,[1.48,.38,-.05],[.2,.54,.24],32).rotation.z=-.35;
-
-  const whiskerMat=new THREE.LineBasicMaterial({color:0x6b5c55,transparent:true,opacity:.42});
-  [[[-1.35,.47,.64],[-1.78,.45,.72]],[[-1.35,.39,.64],[-1.76,.32,.7]],[[-1.12,.43,.63],[-.76,.38,.66]]].forEach(points=>{
-    const geo=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p)));
-    group.add(new THREE.Line(geo,whiskerMat));
-  });
-  return group;
 }
-function forEachMaterial(root,fn){root.traverse(obj=>{if(!obj.isMesh||!obj.material)return;const list=Array.isArray(obj.material)?obj.material:[obj.material];list.forEach(mat=>mat&&fn(mat,obj))})}
-function recolorTexture(mat){
-  if(!mat.map||!mat.map.image)return false;
-  const img=mat.userData.sourceImage||mat.map.image;
-  mat.userData.sourceImage=img;
-  const canvas=document.createElement("canvas"),w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
-  if(!w||!h)return false;
-  canvas.width=w;canvas.height=h;
-  const ctx=canvas.getContext("2d",{willReadFrequently:true});
-  ctx.drawImage(img,0,0,w,h);
-  const data=ctx.getImageData(0,0,w,h),px=data.data,n=parseInt(coat.slice(1),16),base=[n>>16&255,n>>8&255,n&255];
-  for(let i=0;i<px.length;i+=4){
-    const r=px[i],g=px[i+1],b=px[i+2],a=px[i+3],l=(r+g+b)/3;
-    if(a<20||l<18||l>236)continue;
-    const warmth=Math.max(r,g,b)-Math.min(r,g,b),keepPink=r>120&&g<105&&b<115&&warmth>40;
-    if(keepPink)continue;
-    const shade=clamp(l/132,.38,1.42),soft=l>178?.18:0;
-    px[i]=Math.round(clamp(base[0]*shade+(255-base[0])*soft,0,255));
-    px[i+1]=Math.round(clamp(base[1]*shade+(255-base[1])*soft,0,255));
-    px[i+2]=Math.round(clamp(base[2]*shade+(255-base[2])*soft,0,255));
+function prop(type){
+  const g=new THREE.Group();g.name="action-prop";
+  if(type==="feed"){
+    const bowl=new THREE.Mesh(new THREE.CylinderGeometry(.38,.48,.16,48),mat("#e88470",.48));
+    bowl.position.set(-.82,-.78,.72);bowl.scale.z=.62;g.add(bowl);
+    const food=new THREE.Mesh(new THREE.SphereGeometry(.18,32,16),mat("#8a5635",.78));
+    food.position.set(-.82,-.62,.72);food.scale.set(1,.32,.72);g.add(food);
   }
-  ctx.putImageData(data,0,0);
-  mat.map=new THREE.CanvasTexture(canvas);
-  mat.map.flipY=false;
-  mat.map.needsUpdate=true;
-  return true;
+  if(type==="shake"){
+    const paw=new THREE.Mesh(new THREE.SphereGeometry(1,32,16),mat(cream,.7));
+    paw.name="action-paw";paw.position.set(-.78,-.44,.78);paw.scale.set(.22,.09,.18);paw.rotation.z=-.25;g.add(paw);
+    const hand=new THREE.Mesh(new THREE.SphereGeometry(1,32,16),mat("#f4c6a7",.6));
+    hand.position.set(-1.15,-.38,.86);hand.scale.set(.16,.08,.13);g.add(hand);
+  }
+  if(type==="play"){
+    const ball=new THREE.Mesh(new THREE.SphereGeometry(.2,40,20),mat("#75bdd0",.42));
+    ball.name="action-ball";ball.position.set(-.78,-.65,.86);g.add(ball);
+  }
+  return g;
 }
-function tintModel(root){forEachMaterial(root,(mat)=>{const name=(mat.name||"").toLowerCase();if(name.includes("whisker"))return;const textured=recolorTexture(mat);if(mat.color)mat.color.set(textured?"#ffffff":coat);mat.roughness=.78;mat.metalness=0;mat.needsUpdate=true})}
-function makeWalkRig(){
-  const rig=new THREE.Group(),pawMat=material(mix(coat,.38),.72);pawMat.name="walk-paw";
-  [[-.52,-.83,.34,0],[-.18,-.84,.3,Math.PI],[.38,-.84,.24,Math.PI],[.72,-.84,.12,0]].forEach(p=>{
-    const paw=new THREE.Mesh(new THREE.SphereGeometry(1,24,12),pawMat);
-    paw.position.set(p[0],p[1],p[2]);paw.scale.set(.17,.08,.14);paw.castShadow=true;paw.receiveShadow=true;paw.userData.phase=p[3];rig.add(paw);
-  });
-  rig.visible=false;
-  return rig;
+function clearProps(){if(ctx&&ctx.model)[...ctx.model.children].forEach(c=>c.name==="action-prop"&&ctx.model.remove(c))}
+function setLabel(name){
+  const el=$("#model-source");if(!el)return;
+  el.textContent=(document.documentElement.lang||"en").startsWith("zh")?name:`${name} model selected`;
 }
-function updateWalkRig(root){root.traverse(obj=>{if(obj.material&&obj.material.name==="walk-paw"){obj.material.color.set(mix(coat,.38));obj.material.needsUpdate=true}})}
-function setSourceLabel(name){
-  const label=$("#model-source");
-  if(label)label.textContent=(document.documentElement.lang||"en").startsWith("zh")?`已选择 ${name}`:`${name} model selected`;
-}
-function fitModel(root,mode=modelMode){
+function fit(root){
   const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
   box.getSize(size);box.getCenter(center);root.position.sub(center);
-  const max=Math.max(size.x,size.y,size.z)||1;
-  root.scale.setScalar(2.15/max);
+  root.scale.setScalar(2.42/(Math.max(size.x,size.y,size.z)||1));
   root.rotation.set(-.08,.55,0);
-  root.traverse(obj=>{if(obj.isMesh){obj.castShadow=true;obj.receiveShadow=true;if(obj.material&&!Array.isArray(obj.material))obj.material=obj.material.clone();if(Array.isArray(obj.material))obj.material=obj.material.map(m=>m.clone())}});
-  root.userData.isGltf=true;
-  root.userData.canWalk=mode!=="static";
-  if(root.userData.canWalk)root.add(makeWalkRig());
-  tintModel(root);
-  return root;
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.material&&!Array.isArray(o.material))o.material=o.material.clone();if(Array.isArray(o.material))o.material=o.material.map(m=>m.clone())}});
+  tint(root);return root;
 }
-function replaceModel(root,mode=modelMode){
-  if(!state)return;
-  const fitted=fitModel(root,mode);
-  if(state.model)state.scene.remove(state.model);
-  state.model=fitted;
-  state.scene.add(state.model);
-}
-function loadModel(url=modelUrl,name="Dingus",mode=modelMode){
-  modelUrl=url;
-  modelMode=mode||"walk";
-  if(!state||!window.THREE||!THREE.GLTFLoader)return;
+function load(url="assets/sitting_blue_cat.glb"){
+  if(!ctx||!window.THREE||!THREE.GLTFLoader)return;
   const src=url+(url.includes("?")?"&":"?")+"cache="+Date.now();
-  new THREE.GLTFLoader().load(src,gltf=>{
-    replaceModel(gltf.scene,modelMode);
-    setSourceLabel(name);
-    movePet(innerWidth*.7,innerHeight*.52,state.model&&state.model.userData.canWalk);
-  },undefined,()=>setSourceLabel("Fallback"));
+  new THREE.GLTFLoader().load(src,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false)},undefined,()=>setLabel("Fallback"));
 }
-function initThree(pet){
-  if(state||!window.THREE)return state;
+function init(pet){
+  if(ctx||!window.THREE)return;
   pet.innerHTML="";
   const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(pet.clientWidth,pet.clientHeight,false);
-  renderer.shadowMap.enabled=true;
-  renderer.outputEncoding=THREE.sRGBEncoding;
-  pet.appendChild(renderer.domElement);
-
-  const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(33,pet.clientWidth/pet.clientHeight,.1,100);
-  camera.position.set(0,.35,5.2);
-  scene.add(new THREE.AmbientLight(0xffffff,.68));
-  const key=new THREE.DirectionalLight(0xffffff,1.45);key.position.set(-3,4,5);key.castShadow=true;scene.add(key);
-  const rim=new THREE.DirectionalLight(0xcce8ff,.7);rim.position.set(3,2,-3);scene.add(rim);
-  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.8,64),new THREE.ShadowMaterial({opacity:.18}));
-  floor.position.y=-.86;floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
-  const model=makePetModel();scene.add(model);
-  state={renderer,scene,camera,model,drag:false,lastX:0,lastY:0,spin:0,walkUntil:0};
-  loadModel(modelUrl,"Dingus","walk");
-
-  function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;pet.appendChild(renderer.domElement);
+  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(33,1,.1,100);camera.position.set(0,.35,5.2);
+  scene.add(new THREE.AmbientLight(0xffffff,.72));
+  const key=new THREE.DirectionalLight(0xffffff,1.5);key.position.set(-3,4,5);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xcce8ff,.65);rim.position.set(3,2,-3);scene.add(rim);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.8,64),new THREE.ShadowMaterial({opacity:.16}));floor.position.y=-.86;floor.rotation.x=-Math.PI/2;scene.add(floor);
+  ctx={renderer,scene,camera,model:null,drag:false,lastX:0,lastY:0,w:0,h:0};
+  function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;ctx.w=w;ctx.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
   addEventListener("resize",resize);
-  pet.addEventListener("pointerdown",e=>{state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;state.spin=0;pet.setPointerCapture(e.pointerId)});
-  pet.addEventListener("pointermove",e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.model.rotation.y+=dx*.018;state.model.rotation.x=clamp(state.model.rotation.x+dy*.012,-.65,.55)});
-  pet.addEventListener("pointerup",e=>{state.drag=false;state.spin=0;try{pet.releasePointerCapture(e.pointerId)}catch(_){}});
+  pet.addEventListener("pointerdown",e=>{ctx.drag=true;ctx.lastX=e.clientX;ctx.lastY=e.clientY;pet.setPointerCapture(e.pointerId)});
+  pet.addEventListener("pointermove",e=>{if(!ctx.drag||!ctx.model)return;const dx=e.clientX-ctx.lastX,dy=e.clientY-ctx.lastY;ctx.lastX=e.clientX;ctx.lastY=e.clientY;ctx.model.rotation.y+=dx*.018;ctx.model.rotation.x=clamp(ctx.model.rotation.x+dy*.012,-.65,.55)});
+  pet.addEventListener("pointerup",e=>{ctx.drag=false;try{pet.releasePointerCapture(e.pointerId)}catch(_){}});
   function frame(t){
-    const active=state.model,walking=t<state.walkUntil&&active.userData.canWalk!==false;
-    active.rotation.y+=state.drag?0:state.spin;
-    active.position.y=Math.sin(t*.003)*.025+(walking?Math.abs(Math.sin(t*.012))*.035:0);
-    active.rotation.z=walking?Math.sin(t*.01)*.035:0;
-    active.children.forEach(child=>{
-      if(child.userData.walk)child.position.y+=Math.sin(t*.008+child.userData.walk)*.00045;
-      if(child.children&&child.children.length&&child.children.every(c=>c.userData.phase!==undefined)){
-        child.visible=walking;
-        child.children.forEach(paw=>{paw.position.x+=Math.sin(t*.012+paw.userData.phase)*.0012;paw.position.y=-.84+Math.max(0,Math.sin(t*.012+paw.userData.phase))*.09});
-      }
-    });
-    renderer.render(scene,camera);requestAnimationFrame(frame)
+    if(pet.clientWidth!==ctx.w||pet.clientHeight!==ctx.h)resize();
+    if(ctx.model){
+      const live=t<actionUntil,spin=t<spinUntil,energy=motion==="playful"?1.55:motion==="curious"?1.2:.78;
+      ctx.model.rotation.y+=ctx.drag?0:(spin?0.028:0);
+      ctx.model.position.y=Math.sin(t*.003)*.018*energy+(action==="feed"&&live?Math.sin(t*.01)*.012:0);
+      const tx=(action==="feed"&&live)?0.18:(action==="calm"&&live)?-0.04:0,tz=(action==="shake"&&live)?Math.sin(t*.018)*.045:0;
+      ctx.model.rotation.x+=(tx-ctx.model.rotation.x)*.035;ctx.model.rotation.z+=(tz-ctx.model.rotation.z)*.045;
+      ctx.model.children.forEach(c=>{if(c.name==="action-prop"){const b=c.getObjectByName("action-ball"),p=c.getObjectByName("action-paw");if(b){b.position.x=-.78+Math.sin(t*.009)*.18;b.position.y=-.65+Math.abs(Math.sin(t*.012))*.12}if(p)p.position.y=-.44+Math.sin(t*.02)*.055}});
+      if(!live&&action!=="idle"){action="idle";clearProps()}
+    }
+    renderer.render(scene,camera);requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
-  return state;
+  load();requestAnimationFrame(frame);
 }
-function ensurePet(){let pet=$("#pet-sprite");if(!pet){pet=document.createElement("div");pet.id="pet-sprite";pet.setAttribute("aria-hidden","true");document.body.prepend(pet)}initThree(pet);return pet}
-function movePet(x,y,animate=true){const pet=ensurePet();pet.classList.remove("hidden");pet.classList.toggle("walking",!!animate);if(state)state.walkUntil=animate?performance.now()+1800:0;pet.style.left=clamp(x,115,innerWidth-115)+"px";pet.style.top=clamp(y,135,innerHeight-100)+"px";clearTimeout(movePet.timer);movePet.timer=setTimeout(()=>pet.classList.remove("walking"),1800)}
-function setCoat(hex,light=true){coat=hex;cream=light?"#f7f1e8":mix(hex,.48);if(state){if(state.model.userData.isGltf){tintModel(state.model);updateWalkRig(state.model)}else{state.scene.remove(state.model);state.model=makePetModel();state.scene.add(state.model)}}}
-function readPhotoColour(file){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,light=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}if(l>184)light++}URL.revokeObjectURL(url);if(!n)return resolve(null);resolve({hex:"#"+[r/n,g/n,b/n].map(v=>Math.round(clamp(v*.86,46,190)).toString(16).padStart(2,"0")).join(""),light:light>n*.1})};img.onerror=()=>resolve(null);img.src=url})}
-function polishResult(){const line=$("#studio-result");if(line)line.textContent=document.documentElement.lang.startsWith("zh")?"真正的 3D 数字宠物预览已生成。按住它可以 360 度旋转，点击页面会移动。":"True 3D desktop pet preview created. Drag it to rotate 360 degrees, or click the page to move it."}
-function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a,#pet-sprite"))return;movePet(e.clientX,e.clientY,state&&state.model&&state.model.userData.canWalk!==false)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52,state&&state.model&&state.model.userData.canWalk!==false)});document.querySelectorAll("[data-model-url]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-model-url]").forEach(b=>b.classList.toggle("active",b===btn));loadModel(btn.dataset.modelUrl,btn.dataset.modelName||btn.textContent.trim(),btn.dataset.modelMode||"walk")}));const glb=$("#glb-file");if(glb)glb.addEventListener("change",e=>{const file=e.target.files&&e.target.files[0];if(!file)return;loadModel(URL.createObjectURL(file),file.name.replace(/\.glb$/i,""),"walk")});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52,state&&state.model&&state.model.userData.canWalk!==false)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}
-document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()
+function ensure(){let p=$("#pet-sprite");if(!p){p=document.createElement("div");p.id="pet-sprite";p.setAttribute("aria-hidden","true");document.body.prepend(p)}init(p);return p}
+function move(x,y){const p=ensure();p.classList.remove("hidden");p.style.left=clamp(x,115,innerWidth-115)+"px";p.style.top=clamp(y,135,innerHeight-100)+"px"}
+function setCoat(hex){coat=hex;if(ctx&&ctx.model)tint(ctx.model)}
+function setCream(hex){cream=hex||cream}
+function setAction(type){
+  action=type||"idle";actionUntil=performance.now()+2700;clearProps();
+  if(ctx&&ctx.model&&(type==="feed"||type==="shake"||type==="play"))ctx.model.add(prop(type));
+  if(type==="spin")spinUntil=performance.now()+4300;
+  const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");
+  if(line){const msg={feed:["Feeding preview: bowl placed and the twin leans toward food.","喂食预览：食盆出现，数字猫会靠近食物。"],shake:["Handshake preview: a front paw reaches toward the owner.","握手预览：前爪会伸向主人。"],play:["Play preview: toy ball appears and the twin reacts curiously.","玩耍预览：玩具球出现，数字猫会好奇互动。"],calm:["Calm mode: softer breathing and slower motion.","安静模式：呼吸和动作变得更柔和。"],spin:["360 view: the complete model rotates for inspection.","360 查看：完整模型会旋转展示。"]}[type]||["Interactive preview ready.","互动预览已准备好。"];line.textContent=msg[zh?1:0]}}
+function promptColor(text){
+  const v=(text||"").toLowerCase(),m=[["orange","#d99545"],["ginger","#d99545"],["golden","#d7a85c"],["black","#2f3132"],["white","#d9d7d0"],["grey","#9b9690"],["gray","#9b9690"],["blue","#8c98a6"],["brown","#8d6855"],["tabby","#8b8075"]].find(([w])=>v.includes(w));
+  if(m){setCoat(m[1]);const p=$("#coat-picker");if(p)p.value=m[1]}if(v.includes("playful"))motion="playful";if(v.includes("curious"))motion="curious";if(v.includes("calm")||v.includes("quiet"))motion="calm";const s=$("#motion-style");if(s)s.value=motion;setLabel((document.documentElement.lang||"en").startsWith("zh")?"定制坐姿猫":"Custom sitting cat")}
+function readPhoto(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}}URL.revokeObjectURL(url);res(n?"#"+[r/n,g/n,b/n].map(v=>Math.round(clamp(v*.86,46,190)).toString(16).padStart(2,"0")).join(""):null)};img.onerror=()=>res(null);img.src=url})}
+function bind(){
+  if(ready)return;ready=true;ensure();move(innerWidth*.7,innerHeight*.52);
+  document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,textarea,select,label,a,#pet-sprite"))return;move(e.clientX,e.clientY)});
+  $("#coat-picker")?.addEventListener("input",e=>setCoat(e.target.value));
+  $("#cream-picker")?.addEventListener("input",e=>setCream(e.target.value));
+  $("#motion-style")?.addEventListener("change",e=>{motion=e.target.value;setAction(motion==="playful"?"play":motion==="curious"?"shake":"calm")});
+  $("#pet-prompt")?.addEventListener("input",e=>promptColor(e.target.value));
+  $("#pet-photo")?.addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const c=await readPhoto(f);if(c){setCoat(c);const p=$("#coat-picker");if(p)p.value=c}setLabel((document.documentElement.lang||"en").startsWith("zh")?"照片定制坐姿猫":"Photo-custom sitting cat")});
+  document.querySelectorAll("[data-pet-action]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-pet-action]").forEach(x=>x.classList.toggle("active",x===b));setAction(b.dataset.petAction)}));
+  $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
+  $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>{promptColor($("#pet-prompt")?.value);setAction("spin")},700));
+}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();
