@@ -1,7 +1,7 @@
-#pet-sprite{--pet-coat:#8b8780;--pet-coat-light:#aaa59d;--pet-coat-dark:#625e59;--pet-cream:#f7f1e8;position:fixed;left:72%;top:54%;z-index:40;width:178px;height:132px;pointer-events:none;filter:drop-shadow(0 22px 24px rgba(32,44,48,.2));transform:translate3d(-50%,-50%,0) scale(.82);transition:opacity .2s,left 1.35s ease,top 1.35s ease}
+#pet-sprite{--pet-coat:#8f8980;--pet-coat-light:#bbb5aa;--pet-coat-dark:#5d5750;--pet-cream:#f7f1e8;position:fixed;left:72%;top:54%;z-index:40;width:196px;height:142px;pointer-events:none;filter:drop-shadow(0 24px 28px rgba(32,44,48,.22));transform:translate3d(-50%,-50%,0) scale(.78);transition:opacity .2s,left 1.45s ease,top 1.45s ease}
 #pet-sprite svg{display:block;width:100%;height:100%;overflow:visible}
-#pet-sprite .pet-bob{transform-origin:110px 92px}
-#pet-sprite .pet-tail{transform-origin:172px 78px;animation:petTail 2.7s ease-in-out infinite}
+#pet-sprite .pet-bob{transform-origin:125px 100px}
+#pet-sprite .pet-tail{transform-origin:198px 108px;animation:petTail 2.7s ease-in-out infinite}
 #pet-sprite.walking .pet-bob{animation:petBob 1.5s ease-in-out infinite}
 #pet-sprite.walking .pet-leg-a{animation:petStep 1.05s ease-in-out infinite}
 #pet-sprite.walking .pet-leg-b{animation:petStep 1.05s ease-in-out infinite reverse}
