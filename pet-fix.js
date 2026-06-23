@@ -6,6 +6,30 @@ const hexRgb=h=>{h=(h||"#999999").replace("#","");return{r:parseInt(h.slice(0,2)
 const rgbHex=({r,g,b})=>"#"+[r,g,b].map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,"0")).join("");
 const mat=(c,r=.66)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:0});
 function eachMat(root,fn){root.traverse(o=>{if(!o.isMesh||!o.material)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m&&fn(m,o))})}
+function standardMaterial(m){
+  const base=(m&&m.color&&m.color.isColor)?m.color.clone():new THREE.Color(coat);
+  const nm=new THREE.MeshStandardMaterial({
+    name:m&&m.name||"",
+    color:base,
+    map:m&&m.map||null,
+    normalMap:m&&m.normalMap||null,
+    transparent:!!(m&&m.transparent),
+    opacity:m&&typeof m.opacity==="number"?m.opacity:1,
+    alphaTest:m&&typeof m.alphaTest==="number"?m.alphaTest:0,
+    side:m&&m.side!==undefined?m.side:THREE.FrontSide,
+    roughness:.82,
+    metalness:0
+  });
+  return nm;
+}
+function normalizeMaterials(root){
+  root.traverse(o=>{
+    if(!o.isMesh||!o.material)return;
+    const list=Array.isArray(o.material)?o.material:[o.material];
+    const next=list.map(m=>standardMaterial(m));
+    o.material=Array.isArray(o.material)?next:next[0];
+  });
+}
 function recolorTexture(m){
   const source=m.userData.sourceMap||m.map;
   const img=source&&source.image;
@@ -77,7 +101,8 @@ function fit(root){
   root.scale.setScalar(1.76/(Math.max(size.x,size.y,size.z)||1));
   root.position.y-=.06;
   root.rotation.set(-.08,.55,0);
-  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.material&&!Array.isArray(o.material))o.material=o.material.clone();if(Array.isArray(o.material))o.material=o.material.map(m=>m.clone())}});
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  normalizeMaterials(root);
   tint(root);return root;
 }
 function load(url="assets/sitting_blue_cat.glb"){
