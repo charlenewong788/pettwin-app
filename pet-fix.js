@@ -44,6 +44,19 @@ function makePetModel(){
   });
   return group;
 }
+function forEachMaterial(root,fn){root.traverse(obj=>{if(!obj.isMesh||!obj.material)return;const list=Array.isArray(obj.material)?obj.material:[obj.material];list.forEach(mat=>mat&&fn(mat,obj))})}
+function tintModel(root){forEachMaterial(root,(mat)=>{const name=(mat.name||"").toLowerCase();if(name.includes("whisker"))return;mat.color&&mat.color.set(coat);mat.roughness=.62;mat.metalness=0;mat.needsUpdate=true})}
+function fitModel(root){
+  const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
+  box.getSize(size);box.getCenter(center);root.position.sub(center);
+  const max=Math.max(size.x,size.y,size.z)||1;
+  root.scale.setScalar(2.15/max);
+  root.rotation.set(-.08,.55,0);
+  root.traverse(obj=>{if(obj.isMesh){obj.castShadow=true;obj.receiveShadow=true;if(obj.material&&!Array.isArray(obj.material))obj.material=obj.material.clone();if(Array.isArray(obj.material))obj.material=obj.material.map(m=>m.clone())}});
+  root.userData.isGltf=true;
+  tintModel(root);
+  return root;
+}
 function initThree(pet){
   if(state||!window.THREE)return state;
   pet.innerHTML="";
@@ -64,6 +77,14 @@ function initThree(pet){
   floor.position.y=-.86;floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
   const model=makePetModel();scene.add(model);
   state={renderer,scene,camera,model,drag:false,lastX:0,lastY:0,spin:.006};
+  if(THREE.GLTFLoader){
+    new THREE.GLTFLoader().load("assets/dingus-the-cat.glb",gltf=>{
+      const fitted=fitModel(gltf.scene);
+      scene.remove(state.model);
+      state.model=fitted;
+      scene.add(state.model);
+    },undefined,()=>{});
+  }
 
   function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
   addEventListener("resize",resize);
@@ -76,7 +97,7 @@ function initThree(pet){
 }
 function ensurePet(){let pet=$("#pet-sprite");if(!pet){pet=document.createElement("div");pet.id="pet-sprite";pet.setAttribute("aria-hidden","true");document.body.prepend(pet)}initThree(pet);return pet}
 function movePet(x,y){const pet=ensurePet();pet.classList.remove("hidden");pet.classList.add("walking");pet.style.left=clamp(x,115,innerWidth-115)+"px";pet.style.top=clamp(y,135,innerHeight-100)+"px";clearTimeout(movePet.timer);movePet.timer=setTimeout(()=>pet.classList.remove("walking"),1700)}
-function setCoat(hex,light=true){coat=hex;cream=light?"#f7f1e8":mix(hex,.48);if(state){state.scene.remove(state.model);state.model=makePetModel();state.scene.add(state.model)}}
+function setCoat(hex,light=true){coat=hex;cream=light?"#f7f1e8":mix(hex,.48);if(state){if(state.model.userData.isGltf)tintModel(state.model);else{state.scene.remove(state.model);state.model=makePetModel();state.scene.add(state.model)}}}
 function readPhotoColour(file){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,light=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}if(l>184)light++}URL.revokeObjectURL(url);if(!n)return resolve(null);resolve({hex:"#"+[r/n,g/n,b/n].map(v=>Math.round(clamp(v*.86,46,190)).toString(16).padStart(2,"0")).join(""),light:light>n*.1})};img.onerror=()=>resolve(null);img.src=url})}
 function polishResult(){const line=$("#studio-result");if(line)line.textContent=document.documentElement.lang.startsWith("zh")?"真正的 3D 数字宠物预览已生成。按住它可以 360 度旋转，点击页面会移动。":"True 3D desktop pet preview created. Drag it to rotate 360 degrees, or click the page to move it."}
 function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a,#pet-sprite"))return;movePet(e.clientX,e.clientY)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52)});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}
