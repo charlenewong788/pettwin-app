@@ -11,7 +11,7 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 - Bilingual English / Chinese interface
 - Roaming interactive 3D digital pet
 - Four-view capture workflow with resolution, lighting, sharpness, and coverage checks
-- Adaptive chibi preview with photo-derived body proportions and click-to-run interaction
+- Adaptive chibi preview with photo-derived body proportions, primary coat colour, light markings, and click-to-run interaction
 - Guided scan flow, reconstruction pipeline status, and textured/animated GLB loading
 - Workday Companion with quiet, companion, and observation modes
 - Smart litter-box, camera, feeder, and collar device hub
@@ -24,6 +24,8 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 ## Product Boundary
 
 PetTwin does not provide medical diagnosis. It only tracks behavior trends, highlights unusual changes, and offers care suggestions. If drinking, appetite, litter, pain, energy, or other health-related changes continue, users should consult a veterinarian.
+
+The browser-generated chibi is a stylized preview, not a claim of geometric reconstruction accuracy. A pet-specific textured mesh requires the optional reconstruction API and a production 3D provider. The percentage in the studio measures capture quality only.
 
 ## How To Run
 
