@@ -77,30 +77,23 @@ function applyVertexCoat(root){
   root.updateMatrixWorld(true);
   const box=new THREE.Box3().setFromObject(root),min=box.min,max=box.max,span=new THREE.Vector3().subVectors(max,min);
   const base=hexRgb(look.coat||coat),light=hexRgb(look.cream||cream),dark=hexRgb(look.dark||coat),warm=hexRgb(look.warm||coat);
-  const world=new THREE.Vector3(),pos=new THREE.Vector3();
+  const meshBox=new THREE.Box3(),center=new THREE.Vector3();
   root.traverse(o=>{
-    if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;
-    if(!o.geometry.userData.coatClone){o.geometry=o.geometry.clone();o.geometry.userData.coatClone=true}
-    const p=o.geometry.attributes.position,colors=[];
-    for(let i=0;i<p.count;i++){
-      pos.fromBufferAttribute(p,i);o.localToWorld(world.copy(pos));
-      const nx=(world.x-min.x)/(span.x||1),ny=(world.y-min.y)/(span.y||1),nz=(world.z-min.z)/(span.z||1);
-      let c={...base};
-      const underside=clamp((.42-ny)*2.7,0,1)*clamp(1-Math.abs(nx-.5)*2.6,0,1);
-      const chest=clamp((.58-ny)*2.1,0,1)*clamp((nz-.42)*2.1,0,1);
-      const muzzle=clamp((ny-.58)*2.4,0,1)*clamp((nz-.52)*2.2,0,1)*clamp(1-Math.abs(nx-.5)*3.2,0,1);
-      const lightMask=clamp((underside+chest+muzzle)*look.whiteRatio*1.8,0,.88);
-      c=mix(c,light,lightMask);
-      if(look.pattern==="tabby"||look.pattern==="ginger"){
-        const sideStripe=Math.max(0,Math.sin(ny*42+nx*14)-.38)*clamp(1-Math.abs(nz-.5)*1.4,0,1);
-        const tailRing=Math.max(0,Math.sin(nx*58+ny*9)-.42)*clamp(.34-ny,0,.34)*2.5;
-        c=mix(c,dark,clamp((sideStripe+tailRing)*look.stripe,0,.48));
-      }
-      if(look.pattern==="ginger")c=mix(c,warm,.24);
-      colors.push(c.r/255,c.g/255,c.b/255);
+    if(!o.isMesh)return;
+    meshBox.setFromObject(o);meshBox.getCenter(center);
+    const nx=(center.x-min.x)/(span.x||1),ny=(center.y-min.y)/(span.y||1),nz=(center.z-min.z)/(span.z||1);
+    let c={...base};
+    const underside=clamp((.43-ny)*2.5,0,1)*clamp(1-Math.abs(nx-.5)*2.5,0,1);
+    const chest=clamp((.6-ny)*2,0,1)*clamp((nz-.42)*2,0,1);
+    const muzzle=clamp((ny-.58)*2.4,0,1)*clamp((nz-.5)*2.2,0,1)*clamp(1-Math.abs(nx-.5)*3,0,1);
+    c=mix(c,light,clamp((underside+chest+muzzle)*look.whiteRatio*1.7,0,.8));
+    if(look.pattern==="tabby"||look.pattern==="ginger"){
+      const stripe=(Math.max(0,Math.sin(ny*44+nx*16)-.36)+Math.max(0,Math.sin(nx*50+ny*9)-.52)*clamp(.36-ny,0,.36)*2.2)*look.stripe;
+      c=mix(c,dark,clamp(stripe,0,.42));
     }
-    o.geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
-    (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.vertexColors=true;m.needsUpdate=true});
+    if(look.pattern==="ginger")c=mix(c,warm,.22);
+    const hex=rgbHex(c);
+    (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.color&&m.color.isColor)m.color.set(hex);m.vertexColors=false;m.needsUpdate=true});
   });
 }
 function tint(root){
