@@ -1,40 +1,84 @@
-(()=>{const $=s=>document.querySelector(s),petMarkup=`<svg viewBox="0 0 250 180" role="img" aria-label="PetTwin desktop pet">
-<defs>
-  <radialGradient id="floorShadow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#172226" stop-opacity=".30"/><stop offset=".55" stop-color="#172226" stop-opacity=".13"/><stop offset="1" stop-color="#172226" stop-opacity="0"/></radialGradient>
-  <radialGradient id="coat3d" cx="35%" cy="18%" r="88%"><stop offset="0" stop-color="var(--pet-coat-light)"/><stop offset=".42" stop-color="var(--pet-coat)"/><stop offset=".78" stop-color="var(--pet-coat)"/><stop offset="1" stop-color="var(--pet-coat-dark)"/></radialGradient>
-  <radialGradient id="cream3d" cx="35%" cy="20%" r="82%"><stop offset="0" stop-color="#ffffff"/><stop offset=".48" stop-color="var(--pet-cream)"/><stop offset="1" stop-color="#ded8cf"/></radialGradient>
-  <radialGradient id="nose3d" cx="38%" cy="24%" r="75%"><stop offset="0" stop-color="#9a6b57"/><stop offset=".62" stop-color="#5a3328"/><stop offset="1" stop-color="#2d1b17"/></radialGradient>
-  <radialGradient id="eye3d" cx="34%" cy="25%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset=".13" stop-color="#ffffff"/><stop offset=".16" stop-color="#3b302b"/><stop offset=".68" stop-color="#090807"/><stop offset="1" stop-color="#000000"/></radialGradient>
-  <filter id="softToy" x="-20%" y="-25%" width="145%" height="155%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.6" result="blur"/><feOffset dx="-2.2" dy="-3" result="offset"/><feComposite in="offset" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inner"/><feColorMatrix in="inner" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .33 0"/><feComposite in2="SourceGraphic" operator="over"/></filter>
-  <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2"/></filter>
-</defs>
-<ellipse cx="139" cy="152" rx="86" ry="18" fill="url(#floorShadow)"/>
-<g class="pet-bob">
-  <path class="pet-tail" d="M201 96c19 3 27 16 20 29-4 8-13 12-24 11" fill="none" stroke="url(#coat3d)" stroke-width="21" stroke-linecap="round"/>
-  <ellipse cx="143" cy="91" rx="65" ry="45" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <path d="M91 74c23-18 66-24 99-2" fill="none" stroke="#ffffff" stroke-width="13" stroke-linecap="round" opacity=".22" filter="url(#softGlow)"/>
-  <ellipse cx="123" cy="108" rx="40" ry="31" fill="url(#cream3d)" opacity=".98"/>
-  <rect class="pet-leg-b" x="167" y="113" width="25" height="39" rx="13" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <ellipse cx="181" cy="149" rx="17" ry="8" fill="url(#cream3d)"/>
-  <rect class="pet-leg-a" x="134" y="112" width="24" height="42" rx="13" fill="url(#cream3d)" filter="url(#softToy)"/>
-  <ellipse cx="146" cy="151" rx="17" ry="8" fill="#fffdf7"/>
-  <rect class="pet-leg-b" x="98" y="114" width="25" height="40" rx="13" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <ellipse cx="110" cy="151" rx="17" ry="8" fill="url(#cream3d)"/>
-  <rect class="pet-leg-a" x="72" y="111" width="25" height="43" rx="13" fill="url(#cream3d)" filter="url(#softToy)"/>
-  <ellipse cx="84" cy="151" rx="17" ry="8" fill="#fffdf7"/>
-  <path d="M69 56c-6-26 7-44 24-24l11 29z" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <path d="M111 55c8-27 25-38 31-10l-11 30z" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <path d="M80 39l10 20-16 1zM126 43l-9 22 17-5z" fill="#ffcfc8" opacity=".92"/>
-  <ellipse cx="81" cy="83" rx="47" ry="43" fill="url(#coat3d)" filter="url(#softToy)"/>
-  <ellipse cx="61" cy="94" rx="38" ry="27" fill="url(#cream3d)" filter="url(#softToy)"/>
-  <path d="M57 92c-14-1-27 2-38 9M58 99c-14 4-25 11-33 20" fill="none" stroke="#6b5c55" stroke-width="2.2" stroke-linecap="round" opacity=".28"/>
-  <path d="M83 65c8-4 17-4 25 1" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity=".35"/>
-  <ellipse cx="80" cy="78" rx="10" ry="11" fill="url(#eye3d)"/>
-  <circle cx="77" cy="74" r="3" fill="#ffffff"/>
-  <path d="M107 78c7 4 11 10 12 18" fill="none" stroke="var(--pet-coat-dark)" stroke-width="4.2" stroke-linecap="round" opacity=".12"/>
-  <ellipse cx="44" cy="92" rx="8" ry="6" fill="url(#nose3d)"/>
-  <path d="M51 99c11 9 25 9 36 0" fill="none" stroke="#61463f" stroke-width="3" stroke-linecap="round" opacity=".42"/>
-  <path d="M52 107c6 6 15 7 23 2" fill="none" stroke="#df7380" stroke-width="4" stroke-linecap="round" opacity=".7"/>
-  <ellipse cx="65" cy="102" rx="9" ry="5" fill="#f2a5ad" opacity=".82"/>
-</g>
-</svg>`;let ready=false;function mix(hex,amt){const n=parseInt(hex.slice(1),16),rgb=[n>>16&255,n>>8&255,n&255].map(v=>Math.round(Math.max(0,Math.min(255,v+(amt>0?(255-v)*amt:v*amt)))));return"#"+rgb.map(v=>v.toString(16).padStart(2,"0")).join("")}function ensurePet(){let pet=$("#pet-sprite");if(!pet){pet=document.createElement("div");pet.id="pet-sprite";pet.setAttribute("aria-hidden","true");document.body.prepend(pet)}if(!pet.querySelector("svg"))pet.innerHTML=petMarkup;return pet}function movePet(x,y){const pet=ensurePet();pet.classList.remove("hidden");pet.classList.add("walking");pet.style.left=Math.max(115,Math.min(innerWidth-115,x))+"px";pet.style.top=Math.max(135,Math.min(innerHeight-100,y))+"px";clearTimeout(movePet.timer);movePet.timer=setTimeout(()=>pet.classList.remove("walking"),1700)}function setCoat(hex,light=true){const pet=ensurePet();pet.style.setProperty("--pet-coat",hex);pet.style.setProperty("--pet-coat-light",mix(hex,.28));pet.style.setProperty("--pet-coat-dark",mix(hex,-.28));pet.style.setProperty("--pet-cream",light?"#f7f1e8":mix(hex,.48))}function readPhotoColour(file){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,light=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}if(l>184)light++}URL.revokeObjectURL(url);if(!n)return resolve(null);resolve({hex:"#"+[r/n,g/n,b/n].map(v=>Math.round(Math.max(46,Math.min(190,v*.86))).toString(16).padStart(2,"0")).join(""),light:light>n*.1})};img.onerror=()=>resolve(null);img.src=url})}function polishResult(){const line=$("#studio-result");if(line)line.textContent=document.documentElement.lang.startsWith("zh")?"桌面宠物预览已生成。它现在采用 PawPal 式角色素材风格，会根据你的点击慢慢移动。":"Desktop pet preview created. It now uses a PawPal-style character asset and gently follows your clicks."}function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a"))return;movePet(e.clientX,e.clientY)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52)});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()})();
+(()=>{
+const $=s=>document.querySelector(s);
+let ready=false,state=null,coat="#8f8980",cream="#f7f1e8";
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function mix(hex,amt){const n=parseInt(hex.slice(1),16),rgb=[n>>16&255,n>>8&255,n&255].map(v=>Math.round(clamp(v+(amt>0?(255-v)*amt:v*amt),0,255)));return"#"+rgb.map(v=>v.toString(16).padStart(2,"0")).join("")}
+function material(color,rough=.64,metal=0){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal})}
+function ellipsoid(scene,mat,pos,scale,segments=48){const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,segments,segments/2),mat);mesh.position.set(...pos);mesh.scale.set(...scale);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);return mesh}
+function makePetModel(){
+  const group=new THREE.Group();
+  group.rotation.set(-.08,.55,0);
+  const coatMat=material(coat,.58),coatDark=material(mix(coat,-.18),.62),coatLight=material(mix(coat,.24),.5);
+  const creamMat=material(cream,.52),pinkMat=material("#f5a7aa",.55),eyeMat=material("#070707",.38),noseMat=material("#6a3c2f",.48);
+
+  ellipsoid(group,coatMat,[.35,.38,0],[1.36,.78,.68]);
+  ellipsoid(group,creamMat,[.08,.2,.38],[.78,.48,.16],40);
+  ellipsoid(group,coatLight,[.07,.78,.22],[.95,.13,.035],32);
+
+  ellipsoid(group,coatMat,[-.88,.63,.05],[.72,.64,.58]);
+  ellipsoid(group,creamMat,[-1.16,.48,.42],[.48,.34,.18],40);
+  ellipsoid(group,creamMat,[-1.33,.43,.52],[.32,.22,.18],40);
+  ellipsoid(group,noseMat,[-1.58,.5,.62],[.095,.07,.065],32);
+  ellipsoid(group,eyeMat,[-.98,.75,.55],[.105,.14,.05],40);
+  ellipsoid(group,material("#ffffff",.2),[-1.02,.81,.59],[.03,.035,.012],24);
+  ellipsoid(group,eyeMat,[-.73,.74,.41],[.055,.09,.025],32);
+  ellipsoid(group,pinkMat,[-1.16,.28,.62],[.15,.06,.04],24);
+
+  const earGeo=new THREE.ConeGeometry(.22,.56,48);
+  const earA=new THREE.Mesh(earGeo,coatMat);earA.position.set(-1.12,1.22,.1);earA.rotation.set(.08,0,-.24);earA.castShadow=true;group.add(earA);
+  const earB=new THREE.Mesh(earGeo,coatMat);earB.position.set(-.62,1.18,-.02);earB.rotation.set(.12,.16,.24);earB.castShadow=true;group.add(earB);
+  const innerA=new THREE.Mesh(new THREE.ConeGeometry(.13,.35,36),pinkMat);innerA.position.set(-1.1,1.18,.18);innerA.rotation.copy(earA.rotation);group.add(innerA);
+  const innerB=new THREE.Mesh(new THREE.ConeGeometry(.1,.28,36),pinkMat);innerB.position.set(-.61,1.14,.06);innerB.rotation.copy(earB.rotation);group.add(innerB);
+
+  [[-.55,-.32,.38],[-.05,-.34,.4],[.62,-.33,.35],[.98,-.32,.22]].forEach((p,i)=>{
+    const leg=ellipsoid(group,i%2?coatMat:creamMat,p,[.18,.38,.18],32);
+    leg.userData.walk=i%2?1:-1;
+    ellipsoid(group,creamMat,[p[0],-.72,p[2]+.03],[.26,.09,.19],32);
+  });
+  ellipsoid(group,coatDark,[1.48,.38,-.05],[.2,.54,.24],32).rotation.z=-.35;
+
+  const whiskerMat=new THREE.LineBasicMaterial({color:0x6b5c55,transparent:true,opacity:.42});
+  [[[-1.35,.47,.64],[-1.78,.45,.72]],[[-1.35,.39,.64],[-1.76,.32,.7]],[[-1.12,.43,.63],[-.76,.38,.66]]].forEach(points=>{
+    const geo=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p)));
+    group.add(new THREE.Line(geo,whiskerMat));
+  });
+  return group;
+}
+function initThree(pet){
+  if(state||!window.THREE)return state;
+  pet.innerHTML="";
+  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(pet.clientWidth,pet.clientHeight,false);
+  renderer.shadowMap.enabled=true;
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  pet.appendChild(renderer.domElement);
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(33,pet.clientWidth/pet.clientHeight,.1,100);
+  camera.position.set(0,.35,5.2);
+  scene.add(new THREE.AmbientLight(0xffffff,.68));
+  const key=new THREE.DirectionalLight(0xffffff,1.45);key.position.set(-3,4,5);key.castShadow=true;scene.add(key);
+  const rim=new THREE.DirectionalLight(0xcce8ff,.7);rim.position.set(3,2,-3);scene.add(rim);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.8,64),new THREE.ShadowMaterial({opacity:.18}));
+  floor.position.y=-.86;floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+  const model=makePetModel();scene.add(model);
+  state={renderer,scene,camera,model,drag:false,lastX:0,lastY:0,spin:.006};
+
+  function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+  addEventListener("resize",resize);
+  pet.addEventListener("pointerdown",e=>{state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;state.spin=0;pet.setPointerCapture(e.pointerId)});
+  pet.addEventListener("pointermove",e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.model.rotation.y+=dx*.018;state.model.rotation.x=clamp(state.model.rotation.x+dy*.012,-.65,.55)});
+  pet.addEventListener("pointerup",e=>{state.drag=false;state.spin=.004;try{pet.releasePointerCapture(e.pointerId)}catch(_){}});
+  function frame(t){const active=state.model;active.rotation.y+=state.drag?0:state.spin;active.position.y=Math.sin(t*.003)*.055;active.children.forEach(child=>{if(child.userData.walk)child.position.y+=Math.sin(t*.008+child.userData.walk)*.0007});renderer.render(scene,camera);requestAnimationFrame(frame)}
+  requestAnimationFrame(frame);
+  return state;
+}
+function ensurePet(){let pet=$("#pet-sprite");if(!pet){pet=document.createElement("div");pet.id="pet-sprite";pet.setAttribute("aria-hidden","true");document.body.prepend(pet)}initThree(pet);return pet}
+function movePet(x,y){const pet=ensurePet();pet.classList.remove("hidden");pet.classList.add("walking");pet.style.left=clamp(x,115,innerWidth-115)+"px";pet.style.top=clamp(y,135,innerHeight-100)+"px";clearTimeout(movePet.timer);movePet.timer=setTimeout(()=>pet.classList.remove("walking"),1700)}
+function setCoat(hex,light=true){coat=hex;cream=light?"#f7f1e8":mix(hex,.48);if(state){state.scene.remove(state.model);state.model=makePetModel();state.scene.add(state.model)}}
+function readPhotoColour(file){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,light=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}if(l>184)light++}URL.revokeObjectURL(url);if(!n)return resolve(null);resolve({hex:"#"+[r/n,g/n,b/n].map(v=>Math.round(clamp(v*.86,46,190)).toString(16).padStart(2,"0")).join(""),light:light>n*.1})};img.onerror=()=>resolve(null);img.src=url})}
+function polishResult(){const line=$("#studio-result");if(line)line.textContent=document.documentElement.lang.startsWith("zh")?"真正的 3D 数字宠物预览已生成。按住它可以 360 度旋转，点击页面会移动。":"True 3D desktop pet preview created. Drag it to rotate 360 degrees, or click the page to move it."}
+function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a,#pet-sprite"))return;movePet(e.clientX,e.clientY)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52)});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()
+})();
