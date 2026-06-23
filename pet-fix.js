@@ -20,8 +20,9 @@
   <path d="M51 39l9 15-12 1zM91 43l-6 16 13-3z" fill="#ffd6d0" opacity=".9"/>
   <path d="M29 67c7-25 38-37 63-25 27 13 30 47 7 64-20 15-52 7-65-10-8-10-9-20-5-29z" fill="url(#coat)" filter="url(#innerSoft)"/>
   <path d="M22 82c10-17 39-21 55-6 11 10 8 25-8 31-20 8-44-2-49-14-1-4-1-8 2-11z" fill="url(#cream)"/>
-  <circle cx="54" cy="68" r="8" fill="url(#eye)"/>
-  <circle cx="82" cy="73" r="8" fill="url(#eye)"/>
+  <ellipse cx="55" cy="69" rx="8.5" ry="10" fill="url(#eye)"/>
+  <ellipse cx="82" cy="73" rx="3.6" ry="6.5" fill="#151312" opacity=".72"/>
+  <path d="M78 64c10 3 16 10 17 18" fill="none" stroke="var(--pet-coat-dark)" stroke-width="7" stroke-linecap="round" opacity=".18"/>
   <ellipse cx="64" cy="89" rx="7" ry="5" fill="#df8d95"/>
   <path d="M58 99c8 5 18 5 26-1" fill="none" stroke="#5b4946" stroke-width="3" stroke-linecap="round" opacity=".42"/>
   <path d="M26 91c-12-1-20 1-26 5M27 98c-11 3-18 7-23 13M83 94c12 0 21 3 29 9" fill="none" stroke="#5b4946" stroke-width="2.2" stroke-linecap="round" opacity=".32"/>
