@@ -45,7 +45,7 @@ function makePetModel(){
   return group;
 }
 function forEachMaterial(root,fn){root.traverse(obj=>{if(!obj.isMesh||!obj.material)return;const list=Array.isArray(obj.material)?obj.material:[obj.material];list.forEach(mat=>mat&&fn(mat,obj))})}
-function tintModel(root){forEachMaterial(root,(mat)=>{const name=(mat.name||"").toLowerCase();if(name.includes("whisker"))return;mat.color&&mat.color.set(coat);mat.roughness=.62;mat.metalness=0;mat.needsUpdate=true})}
+function tintModel(root){forEachMaterial(root,(mat)=>{const name=(mat.name||"").toLowerCase();if(name.includes("whisker"))return;mat=mat;mat.color&&mat.color.set(coat);mat.roughness=.62;mat.metalness=0;mat.needsUpdate=true})}
 function fitModel(root){
   const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
   box.getSize(size);box.getCenter(center);root.position.sub(center);
@@ -78,7 +78,7 @@ function initThree(pet){
   const model=makePetModel();scene.add(model);
   state={renderer,scene,camera,model,drag:false,lastX:0,lastY:0,spin:.006};
   if(THREE.GLTFLoader){
-    new THREE.GLTFLoader().load("assets/dingus-the-cat.glb",gltf=>{
+    new THREE.GLTFLoader().load("assets/Dingus%20the%20cat.glb",gltf=>{
       const fitted=fitModel(gltf.scene);
       scene.remove(state.model);
       state.model=fitted;
