@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=4" defer></script>
+    <script src="app.js?v=6" defer></script>
   </head>
   <body>
     <canvas id="pet-world" aria-label="Roaming 3D pet"></canvas>
@@ -86,7 +86,7 @@
         <section class="view" id="avatar">
           <div class="studio-grid">
             <section class="surface studio-copy">
-              <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a high-fidelity digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">capture ready</span></div></div>
+              <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a photo-matched digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">photo quality</span></div></div>
               <p data-i18n="studioCopy">Use four clear views or a guided 3D scan. PetTwin adapts shape and proportions to each pet.</p>
               <div class="capture-tabs"><button class="active" data-capture-mode="photos" data-i18n="photoSet">Photo set</button><button data-capture-mode="scan" data-i18n="videoScan">Video scan</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
               <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add four pet photos</strong><span data-i18n="uploadHint">Front, left side, right side and back in even light.</span></label>
@@ -95,7 +95,7 @@
               <div class="quality-panel"><div><span data-i18n="captureQuality">Capture quality</span><strong id="quality-summary">0 / 4</strong></div><div class="quality-checks" id="quality-checks"></div></div>
               <div class="scan-progress" id="scan-progress"><i></i><span data-i18n="waitingInput">Add the four required views to begin</span></div>
               <div class="pipeline" id="reconstruction-pipeline"><span class="active" data-i18n="stageCapture">Capture</span><span data-i18n="stageShape">Shape</span><span data-i18n="stageTexture">Texture</span><span data-i18n="stageRig">Rig</span><span data-i18n="stageReview">Review</span></div>
-              <button class="primary-action full" id="generate-twin" disabled data-i18n="generateTwin">Generate high-fidelity twin</button><p class="result-line" id="studio-result"></p>
+              <button class="primary-action full" id="generate-twin" disabled data-i18n="generateTwin">Create photo-matched preview</button><p class="result-line" id="studio-result"></p>
             </section>
             <section class="studio-stage"><div class="studio-badge"><strong data-i18n="liveModel">LIVE MODEL</strong><span id="model-source" data-i18n="proceduralPreview">Capture preview</span></div><div class="studio-orbit"><span>Mochi 3D</span><small data-i18n="dragRotate">Move the pointer to inspect the twin</small></div></section>
           </div>
