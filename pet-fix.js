@@ -1,6 +1,6 @@
 (()=>{
 const $=s=>document.querySelector(s);
-let ready=false,state=null,coat="#8f8980",cream="#f7f1e8";
+let ready=false,state=null,coat="#8f8980",cream="#f7f1e8",modelUrl="assets/Dingus%20the%20cat.glb";
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function mix(hex,amt){const n=parseInt(hex.slice(1),16),rgb=[n>>16&255,n>>8&255,n&255].map(v=>Math.round(clamp(v+(amt>0?(255-v)*amt:v*amt),0,255)));return"#"+rgb.map(v=>v.toString(16).padStart(2,"0")).join("")}
 function material(color,rough=.64,metal=0){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal})}
@@ -82,6 +82,10 @@ function makeWalkRig(){
   return rig;
 }
 function updateWalkRig(root){root.traverse(obj=>{if(obj.material&&obj.material.name==="walk-paw"){obj.material.color.set(mix(coat,.38));obj.material.needsUpdate=true}})}
+function setSourceLabel(name){
+  const label=$("#model-source");
+  if(label)label.textContent=(document.documentElement.lang||"en").startsWith("zh")?`已选择 ${name}`:`${name} model selected`;
+}
 function fitModel(root){
   const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
   box.getSize(size);box.getCenter(center);root.position.sub(center);
@@ -93,6 +97,22 @@ function fitModel(root){
   root.add(makeWalkRig());
   tintModel(root);
   return root;
+}
+function replaceModel(root){
+  if(!state)return;
+  const fitted=fitModel(root);
+  if(state.model)state.scene.remove(state.model);
+  state.model=fitted;
+  state.scene.add(state.model);
+}
+function loadModel(url=modelUrl,name="Dingus"){
+  modelUrl=url;
+  if(!state||!window.THREE||!THREE.GLTFLoader)return;
+  new THREE.GLTFLoader().load(url,gltf=>{
+    replaceModel(gltf.scene);
+    setSourceLabel(name);
+    movePet(innerWidth*.7,innerHeight*.52);
+  },undefined,()=>setSourceLabel("Fallback"));
 }
 function initThree(pet){
   if(state||!window.THREE)return state;
@@ -114,14 +134,7 @@ function initThree(pet){
   floor.position.y=-.86;floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
   const model=makePetModel();scene.add(model);
   state={renderer,scene,camera,model,drag:false,lastX:0,lastY:0,spin:0,walkUntil:0};
-  if(THREE.GLTFLoader){
-    new THREE.GLTFLoader().load("assets/Dingus%20the%20cat.glb",gltf=>{
-      const fitted=fitModel(gltf.scene);
-      scene.remove(state.model);
-      state.model=fitted;
-      scene.add(state.model);
-    },undefined,()=>{});
-  }
+  loadModel(modelUrl,"Dingus");
 
   function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
   addEventListener("resize",resize);
@@ -150,6 +163,6 @@ function movePet(x,y){const pet=ensurePet();pet.classList.remove("hidden");pet.c
 function setCoat(hex,light=true){coat=hex;cream=light?"#f7f1e8":mix(hex,.48);if(state){if(state.model.userData.isGltf){tintModel(state.model);updateWalkRig(state.model)}else{state.scene.remove(state.model);state.model=makePetModel();state.scene.add(state.model)}}}
 function readPhotoColour(file){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=72;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,light=0;for(let i=0;i<d.length;i+=16){const l=(d[i]+d[i+1]+d[i+2])/3;if(l>34&&l<232){r+=d[i];g+=d[i+1];b+=d[i+2];n++}if(l>184)light++}URL.revokeObjectURL(url);if(!n)return resolve(null);resolve({hex:"#"+[r/n,g/n,b/n].map(v=>Math.round(clamp(v*.86,46,190)).toString(16).padStart(2,"0")).join(""),light:light>n*.1})};img.onerror=()=>resolve(null);img.src=url})}
 function polishResult(){const line=$("#studio-result");if(line)line.textContent=document.documentElement.lang.startsWith("zh")?"真正的 3D 数字宠物预览已生成。按住它可以 360 度旋转，点击页面会移动。":"True 3D desktop pet preview created. Drag it to rotate 360 degrees, or click the page to move it."}
-function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a,#pet-sprite"))return;movePet(e.clientX,e.clientY)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52)});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}
+function bind(){if(ready)return;ready=true;ensurePet();movePet(innerWidth*.72,innerHeight*.54);document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,label,a,#pet-sprite"))return;movePet(e.clientX,e.clientY)});const input=$("#pet-photo");if(input)input.addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const colour=await readPhotoColour(file);if(colour)setCoat(colour.hex,colour.light);movePet(innerWidth*.7,innerHeight*.52)});document.querySelectorAll("[data-model-url]").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("[data-model-url]").forEach(b=>b.classList.toggle("active",b===btn));loadModel(btn.dataset.modelUrl,btn.dataset.modelName||btn.textContent.trim())}));const glb=$("#glb-file");if(glb)glb.addEventListener("change",e=>{const file=e.target.files&&e.target.files[0];if(!file)return;loadModel(URL.createObjectURL(file),file.name.replace(/\.glb$/i,""))});const btn=$("#generate-twin");if(btn)btn.addEventListener("click",()=>setTimeout(()=>{polishResult();movePet(innerWidth*.7,innerHeight*.52)},1800));const toggle=$("#pet-toggle");if(toggle)toggle.addEventListener("click",()=>setTimeout(()=>ensurePet().classList.toggle("hidden",toggle.textContent.includes("显示")||toggle.textContent.includes("Show")),0))}
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()
 })();
