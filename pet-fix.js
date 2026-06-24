@@ -9,6 +9,7 @@ const mix=(a,b,t)=>({r:a.r+(b.r-a.r)*t,g:a.g+(b.g-a.g)*t,b:a.b+(b.b-a.b)*t});
 const cuteTone=(c,amount=.16)=>mix(c,{r:246,g:241,b:232},amount);
 const naturalWhite=c=>({r:clamp(c.r,214,242),g:clamp(c.g,211,240),b:clamp(c.b,205,236)});
 const softDark=(dark,base)=>mix(cuteTone(dark,.22),cuteTone(base,.1),.34);
+const avoidMud=c=>lum(c)<118?cuteTone(c,.28):c;
 const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
 const zoneRgb=(name,fallback)=>hexRgb((look.zones&&look.zones[name])||fallback);
 const blendZone=(c,name,w,fallback)=>mix(c,zoneRgb(name,fallback||look.coat||coat),smooth(w));
@@ -215,7 +216,9 @@ function regionStats(data,size,rx0,ry0,rx1,ry1){
   const x0=Math.floor(rx0*size),x1=Math.ceil(rx1*size),y0=Math.floor(ry0*size),y1=Math.ceil(ry1*size);
   for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
     const i=(y*size+x)*4,rr=data[i],gg=data[i+1],bb=data[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb);
-    if(l<34||l>246)continue;
+    const greenBackground=gg>rr*1.06&&gg>bb*1.05&&spread>18;
+    const blueWindow=bb>rr*1.12&&bb>gg*1.04&&l<160;
+    if(l<34||l>246||greenBackground||blueWindow)continue;
     const warm=rr>gg*1.04&&gg>bb*1.08;
     r+=rr;g+=gg;b+=bb;n++;
     if(l>158&&spread<92){lr+=rr;lg+=gg;lb+=bb;ln++}
@@ -227,11 +230,11 @@ function regionStats(data,size,rx0,ry0,rx1,ry1){
   if(!n)return null;
   const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.2),white=wn?naturalWhite({r:wr/wn,g:wg/wn,b:wb/wn}):naturalWhite(light),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg;
   const whiteRatio=wn/n,warmRatio=orange/n,stripeRatio=striped/n;
-  const softened=cuteTone(avg,warmRatio>.18?.14:.1);
+  const softened=avoidMud(cuteTone(avg,warmRatio>.18?.14:.1));
   const zoneColor=whiteRatio>.24?mix(softened,white,clamp(whiteRatio*.82,0,.62)):softened;
   return{avg,light:white,dark,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmRatio,stripeRatio,whiteRatio};
 }
-function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else if(view===2){add("right",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else{add("back",[.04,.08,.96,.9]);add("left",[.03,.18,.48,.86]);add("right",[.52,.18,.97,.86])}stats.push(whole);const isGinger=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length>.18,striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.color,cream:whole.cream,dark:whole.darkHex,warm:rgbHex(cuteTone(whole.avg,.26)),zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.6,.16,.7),pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*2.2,.06,.32)})};img.onerror=()=>res(null);img.src=url})}
+function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.28,.2,.9,.7])}else if(view===2){add("right",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.1,.2,.72,.7])}else{add("back",[.14,.28,.84,.82]);add("left",[.08,.32,.5,.84]);add("right",[.5,.32,.92,.84])}stats.push(whole);const isGinger=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length>.18,striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.color,cream:whole.cream,dark:whole.darkHex,warm:rgbHex(cuteTone(whole.avg,.26)),zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.6,.16,.7),pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*2.2,.06,.32)})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
   const all=(await Promise.all([...files].slice(0,4).map((file,i)=>readPhoto(file,i)))).filter(Boolean);
   if(!all.length)return null;
@@ -239,6 +242,10 @@ async function readPhotos(files){
   const pattern=all.filter(c=>c.pattern==="ginger").length>=Math.ceil(all.length/2)?"ginger":all.filter(c=>c.pattern==="tabby").length>=Math.ceil(all.length/2)?"tabby":"solid";
   const zoneNames=["face","chest","belly","left","right","back"],zones={};
   zoneNames.forEach(name=>{const items=all.filter(c=>c.zones&&c.zones[name]);if(items.length)zones[name]=rgbHex(["r","g","b"].reduce((o,k)=>{o[k]=items.reduce((s,c)=>s+hexRgb(c.zones[name])[k],0)/items.length;return o},{}))});
+  if(zones.back){
+    const back=hexRgb(zones.back),body=hexRgb(zones.left||zones.right||avg("coat")),main=hexRgb(avg("coat"));
+    if(lum(back)<lum(main)-22||lum(back)<105)zones.back=rgbHex(mix(mix(back,body,.58),main,.22));
+  }
   return{coat:avg("coat"),cream:all.some(c=>c.cream)?avg("cream"):null,dark:all.some(c=>c.dark)?avg("dark"):null,warm:avg("warm"),zones,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.16,.72),pattern,stripe:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36)};
 }
 function bind(){
