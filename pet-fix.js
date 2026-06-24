@@ -23,7 +23,7 @@ function standardMaterial(m){
   const nm=new THREE.MeshStandardMaterial({
     name:m&&m.name||"",
     color:base,
-    map:m&&m.map||null,
+    map:null,
     normalMap:m&&m.normalMap||null,
     transparent:!!(m&&m.transparent),
     opacity:m&&typeof m.opacity==="number"?m.opacity:1,
@@ -126,8 +126,10 @@ function tint(root){
   eachMat(root,m=>{
     const name=(m.name||"").toLowerCase();
     if(name.includes("eye")||name.includes("nose")||name.includes("mouth")||name.includes("whisker"))return;
-    const textured=recolorTexture(m);
-    if(m.color)m.color.set(textured?"#ffffff":coat);
+    m.map=null;
+    m.lightMap=null;
+    m.aoMap=null;
+    if(m.color)m.color.set(coat);
     m.roughness=.82;m.metalness=0;m.needsUpdate=true;
   });
   applyVertexCoat(root);
