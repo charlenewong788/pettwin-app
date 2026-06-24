@@ -1,13 +1,16 @@
 (()=>{
 const $=s=>document.querySelector(s);
 let ready=false,ctx=null,coat="#9b9690",cream="#f5f1e8",action="idle",actionUntil=0,spinUntil=0,motion="calm";
-let look={coat:"#9b9690",cream:"#f5f1e8",dark:"#5d5a52",warm:"#c58a48",pattern:"solid",whiteRatio:.18,stripe:.18};
+let look={coat:"#9b9690",cream:"#f5f1e8",dark:"#5d5a52",warm:"#c58a48",pattern:"solid",whiteRatio:.18,stripe:.18,zones:{}};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hexRgb=h=>{h=(h||"#999999").replace("#","");return{r:parseInt(h.slice(0,2),16)||153,g:parseInt(h.slice(2,4),16)||153,b:parseInt(h.slice(4,6),16)||153}};
 const rgbHex=({r,g,b})=>"#"+[r,g,b].map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,"0")).join("");
 const mix=(a,b,t)=>({r:a.r+(b.r-a.r)*t,g:a.g+(b.g-a.g)*t,b:a.b+(b.b-a.b)*t});
-const cuteTone=(c,amount=.28)=>mix(c,{r:246,g:238,b:222},amount);
-const softDark=(dark,base)=>mix(cuteTone(dark,.34),cuteTone(base,.22),.38);
+const cuteTone=(c,amount=.38)=>mix(c,{r:250,g:242,b:228},amount);
+const softDark=(dark,base)=>mix(cuteTone(dark,.5),cuteTone(base,.34),.52);
+const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
+const zoneRgb=(name,fallback)=>hexRgb((look.zones&&look.zones[name])||fallback);
+const blendZone=(c,name,w,fallback)=>mix(c,zoneRgb(name,fallback||look.coat||coat),smooth(w));
 const lum=c=>(c.r+c.g+c.b)/3;
 const sat=c=>(Math.max(c.r,c.g,c.b)-Math.min(c.r,c.g,c.b))/255;
 const mat=(c,r=.66)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:0});
@@ -57,8 +60,8 @@ function recolorTexture(m){
     const tabby=Math.max(0,Math.sin(u*58+v*34)+Math.sin(u*24-v*70)-.72);
     const tiger=Math.max(0,Math.sin(v*92+u*18)-.48);
     let target=nearlyWhite?light:base;
-    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.38,0,.34));
-    if(look.pattern==="ginger")target=mix(target,warm,.18);
+    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.26,0,.24));
+    if(look.pattern==="ginger")target=mix(target,warm,.12);
     target=mix(target,light,clamp(bellyMask+faceMask+(nearlyWhite?.45:0),0,.82));
     const shade=clamp((l+76)/170,.6,1.34);
     a[i]=clamp(target.r*shade,0,255);
@@ -85,15 +88,30 @@ function applyVertexCoat(root){
     meshBox.setFromObject(o);meshBox.getCenter(center);
     const nx=(center.x-min.x)/(span.x||1),ny=(center.y-min.y)/(span.y||1),nz=(center.z-min.z)/(span.z||1);
     let c={...base};
-    const underside=clamp((.43-ny)*2.5,0,1)*clamp(1-Math.abs(nx-.5)*2.5,0,1);
-    const chest=clamp((.6-ny)*2,0,1)*clamp((nz-.42)*2,0,1);
-    const muzzle=clamp((ny-.58)*2.4,0,1)*clamp((nz-.5)*2.2,0,1)*clamp(1-Math.abs(nx-.5)*3,0,1);
-    c=mix(c,light,clamp((underside+chest+muzzle)*look.whiteRatio*1.7,0,.8));
+    const left=clamp((.52-nx)*2.25,0,1);
+    const right=clamp((nx-.48)*2.25,0,1);
+    const front=clamp((nz-.44)*2.4,0,1);
+    const back=clamp((.56-nz)*2.4,0,1);
+    const high=clamp((ny-.48)*2.2,0,1);
+    const low=clamp((.48-ny)*2.2,0,1);
+    const center=clamp(1-Math.abs(nx-.5)*2.5,0,1);
+    const underside=clamp((.43-ny)*2.5,0,1)*center;
+    const chest=clamp((.62-ny)*2,0,1)*front*center;
+    const muzzle=high*front*center;
+    const leftWeight=left*clamp(1-chest*.55-muzzle*.35,0,1);
+    const rightWeight=right*clamp(1-chest*.55-muzzle*.35,0,1);
+    c=blendZone(c,"left",leftWeight,"#"+rgbHex(base).replace("#",""));
+    c=blendZone(c,"right",rightWeight,"#"+rgbHex(base).replace("#",""));
+    c=blendZone(c,"back",back*clamp(1-low*.28,0,1),look.coat||coat);
+    c=blendZone(c,"face",muzzle*.78,look.coat||coat);
+    c=blendZone(c,"chest",chest*.86,look.cream||cream);
+    c=blendZone(c,"belly",underside*.78,look.cream||cream);
+    c=mix(c,light,clamp((underside+chest+muzzle)*look.whiteRatio*.72,0,.42));
     if(look.pattern==="tabby"||look.pattern==="ginger"){
       const stripe=(Math.max(0,Math.sin(ny*44+nx*16)-.36)+Math.max(0,Math.sin(nx*50+ny*9)-.52)*clamp(.36-ny,0,.36)*2.2)*look.stripe;
-      c=mix(c,dark,clamp(stripe,0,.28));
+      c=mix(c,dark,clamp(stripe,0,.16));
     }
-    if(look.pattern==="ginger")c=mix(c,warm,.15);
+    if(look.pattern==="ginger")c=mix(c,warm,.08);
     const hex=rgbHex(c);
     (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.color&&m.color.isColor)m.color.set(hex);m.vertexColors=false;m.needsUpdate=true});
   });
@@ -191,42 +209,43 @@ function setAction(type){
   if(type==="spin")spinUntil=performance.now()+4300;
   const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");
   if(line){const msg={feed:["Feeding preview: bowl placed and the twin leans toward food.","喂食预览：食盆出现，数字猫会靠近食物。"],shake:["Handshake preview: a front paw reaches toward the owner.","握手预览：前爪会伸向主人。"],play:["Play preview: toy ball appears and the twin reacts curiously.","玩耍预览：玩具球出现，数字猫会好奇互动。"],calm:["Calm mode: softer breathing and slower motion.","安静模式：呼吸和动作变得更柔和。"],spin:["360 view: the complete model rotates for inspection.","360 查看：完整模型会旋转展示。"]}[type]||["Interactive preview ready.","互动预览已准备好。"];line.textContent=msg[zh?1:0]}}
-function promptColor(text){
-  const v=(text||"").toLowerCase();
-  let picked=null,light=null;
-  if(v.includes("蓝白")||v.includes("英短")||v.includes("蓝猫")||v.includes("灰")||v.includes("grey")||v.includes("gray")){picked="#8d9498";light="#f5f1e8"}
-  else if(v.includes("黑白")){picked="#303335";light="#f7f3ea"}
-  else if(v.includes("橘")||v.includes("金")||v.includes("orange")||v.includes("ginger")||v.includes("golden")){picked="#d99545";light="#fff1dc"}
-  else if(v.includes("白")||v.includes("white")){picked="#d9d7d0";light="#fbf8ef"}
-  else if(v.includes("brown"))picked="#8d6855";
-  else if(v.includes("tabby"))picked="#8b8075";
-  else if(v.includes("black"))picked="#343638";
-  const pattern=v.includes("橘")||v.includes("金")||v.includes("orange")||v.includes("ginger")?"ginger":v.includes("狸花")||v.includes("虎斑")||v.includes("tabby")?"tabby":null;
-  if(picked){setLook({coat:picked,cream:light||cream,pattern:pattern||look.pattern,stripe:pattern?.42:look.stripe});const p=$("#coat-picker");if(p)p.value=picked}
-  if(light){const p=$("#cream-picker");if(p)p.value=light}
-  if(v.includes("playful")||v.includes("活泼")||v.includes("玩"))motion="playful";
-  if(v.includes("curious")||v.includes("好奇"))motion="curious";
-  if(v.includes("calm")||v.includes("quiet")||v.includes("安静"))motion="calm";
-  const s=$("#motion-style");if(s)s.value=motion;setLabel((document.documentElement.lang||"en").startsWith("zh")?"定制坐姿猫":"Custom sitting cat")}
-function readPhoto(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=120;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,dr=0,dg=0,db=0,dn=0,wr=0,wg=0,wb=0,wn=0,orange=0,striped=0;for(let i=0;i<d.length;i+=12){const rr=d[i],gg=d[i+1],bb=d[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb),warm=rr>gg*1.04&&gg>bb*1.08;if(l>35&&l<232&&!(rr>238&&gg>238&&bb>238)){r+=rr;g+=gg;b+=bb;n++;if(warm)orange++}if(l>158&&l<248&&spread<86){lr+=rr;lg+=gg;lb+=bb;ln++}if(l>35&&l<122){dr+=rr;dg+=gg;db+=bb;dn++}if(warm&&l>80&&l<225){wr+=rr;wg+=gg;wb+=bb;wn++}if(l>38&&l<118&&spread>22)striped++}URL.revokeObjectURL(url);if(!n)return res(null);const base={r:r/n,g:g/n,b:b/n},warmAvg=wn?{r:wr/wn,g:wg/wn,b:wb/wn}:base;const isGinger=orange/n>.18&&warmAvg.r>warmAvg.b*1.38,rawCoat=isGinger?warmAvg:base,softCoat=cuteTone(rawCoat,isGinger?.24:.31),softWarm=cuteTone(warmAvg,.2),rawDark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:rawCoat;res({coat:rgbHex({r:clamp(softCoat.r,88,228),g:clamp(softCoat.g,78,218),b:clamp(softCoat.b,58,205)}),cream:ln?rgbHex(cuteTone({r:lr/ln,g:lg/ln,b:lb/ln},.14)):rgbHex(cuteTone(rawCoat,.48)),dark:rgbHex(softDark(rawDark,softCoat)),warm:rgbHex(softWarm),whiteRatio:clamp(ln/(n||1)*3.2,.16,.72),pattern:isGinger?"ginger":striped/n>.08?"tabby":"solid",stripe:clamp((striped/n)*3.4,.12,.46)})};img.onerror=()=>res(null);img.src=url})}
+function regionStats(data,size,rx0,ry0,rx1,ry1){
+  let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,dr=0,dg=0,db=0,dn=0,orange=0,striped=0;
+  const x0=Math.floor(rx0*size),x1=Math.ceil(rx1*size),y0=Math.floor(ry0*size),y1=Math.ceil(ry1*size);
+  for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
+    const i=(y*size+x)*4,rr=data[i],gg=data[i+1],bb=data[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb);
+    if(l<34||l>246)continue;
+    const warm=rr>gg*1.04&&gg>bb*1.08;
+    r+=rr;g+=gg;b+=bb;n++;
+    if(l>158&&spread<92){lr+=rr;lg+=gg;lb+=bb;ln++}
+    if(l<130&&spread>18){dr+=rr;dg+=gg;db+=bb;dn++}
+    if(warm)orange++;
+    if(l>38&&l<128&&spread>22)striped++;
+  }
+  if(!n)return null;
+  const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.58),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg;
+  const whiteRatio=ln/n,warmRatio=orange/n,stripeRatio=striped/n;
+  const softened=cuteTone(avg,warmRatio>.18?.3:.4);
+  const zoneColor=whiteRatio>.32?mix(softened,cuteTone(light,.24),clamp(whiteRatio*.78,0,.68)):softened;
+  return{avg,light,dark,color:rgbHex(zoneColor),cream:rgbHex(cuteTone(light,.2)),darkHex:rgbHex(softDark(dark,softened)),warmRatio,stripeRatio,whiteRatio};
+}
+function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else if(view===2){add("right",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else{add("back",[.04,.08,.96,.9]);add("left",[.03,.18,.48,.86]);add("right",[.52,.18,.97,.86])}stats.push(whole);const isGinger=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length>.18,striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.color,cream:whole.cream,dark:whole.darkHex,warm:rgbHex(cuteTone(whole.avg,.26)),zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.6,.16,.7),pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*2.2,.06,.32)})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
-  const all=(await Promise.all([...files].slice(0,4).map(readPhoto))).filter(Boolean);
+  const all=(await Promise.all([...files].slice(0,4).map((file,i)=>readPhoto(file,i)))).filter(Boolean);
   if(!all.length)return null;
   const avg=key=>rgbHex(["r","g","b"].reduce((o,k)=>{o[k]=all.reduce((s,c)=>s+hexRgb(c[key]||c.coat)[k],0)/all.length;return o},{}));
   const pattern=all.filter(c=>c.pattern==="ginger").length>=Math.ceil(all.length/2)?"ginger":all.filter(c=>c.pattern==="tabby").length>=Math.ceil(all.length/2)?"tabby":"solid";
-  return{coat:avg("coat"),cream:all.some(c=>c.cream)?avg("cream"):null,dark:all.some(c=>c.dark)?avg("dark"):null,warm:avg("warm"),whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.12,.82),pattern,stripe:clamp(all.reduce((s,c)=>s+(c.stripe||.2),0)/all.length,.16,.68)};
+  const zoneNames=["face","chest","belly","left","right","back"],zones={};
+  zoneNames.forEach(name=>{const items=all.filter(c=>c.zones&&c.zones[name]);if(items.length)zones[name]=rgbHex(["r","g","b"].reduce((o,k)=>{o[k]=items.reduce((s,c)=>s+hexRgb(c.zones[name])[k],0)/items.length;return o},{}))});
+  return{coat:avg("coat"),cream:all.some(c=>c.cream)?avg("cream"):null,dark:all.some(c=>c.dark)?avg("dark"):null,warm:avg("warm"),zones,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.16,.72),pattern,stripe:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36)};
 }
 function bind(){
   if(ready)return;ready=true;ensure();move(innerWidth*.7,innerHeight*.52);
   document.addEventListener("pointerdown",e=>{if(e.target.closest("button,input,textarea,select,label,a,#pet-sprite"))return;move(e.clientX,e.clientY)});
-  $("#coat-picker")?.addEventListener("input",e=>setCoat(e.target.value));
-  $("#cream-picker")?.addEventListener("input",e=>setCream(e.target.value));
-  $("#motion-style")?.addEventListener("change",e=>{motion=e.target.value;setAction(motion==="playful"?"play":motion==="curious"?"shake":"calm")});
-  $("#pet-prompt")?.addEventListener("input",e=>promptColor(e.target.value));
-  $("#pet-photo")?.addEventListener("change",async e=>{const files=e.target.files;if(!files||!files.length)return;const c=await readPhotos(files);if(c){setLook(c);const p=$("#coat-picker");if(p)p.value=c.coat;if(c.cream){const q=$("#cream-picker");if(q)q.value=c.cream}const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");if(line)line.textContent=zh?`已提取照片外观：${c.pattern==="ginger"?"橘色虎斑":c.pattern==="tabby"?"虎斑/狸花":"纯色"}，正在模拟主色、浅色和深色花纹。`:`Photo appearance extracted: ${c.pattern} coat, light markings and darker pattern.`}setLabel((document.documentElement.lang||"en").startsWith("zh")?"照片匹配外观":"Photo-matched appearance")});
+  $("#pet-photo")?.addEventListener("change",async e=>{const files=e.target.files;if(!files||!files.length)return;const c=await readPhotos(files);if(c){setLook(c);const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");if(line)line.textContent=zh?`已按照片分区生成：脸部、胸口、左右身体和背部颜色会柔和渐变。`:`Photo regions mapped: face, chest, sides and back now blend softly.`}setLabel((document.documentElement.lang||"en").startsWith("zh")?"照片分区外观":"Photo-region appearance")});
   document.querySelectorAll("[data-pet-action]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-pet-action]").forEach(x=>x.classList.toggle("active",x===b));setAction(b.dataset.petAction)}));
   $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
-  $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>{promptColor($("#pet-prompt")?.value);setAction("spin")},700));
+  $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>setAction("spin"),700));
 }
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();
