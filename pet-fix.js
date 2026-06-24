@@ -94,10 +94,10 @@ function applyVertexCoat(root){
     const back=clamp((.56-nz)*2.4,0,1);
     const high=clamp((ny-.48)*2.2,0,1);
     const low=clamp((.48-ny)*2.2,0,1);
-    const center=clamp(1-Math.abs(nx-.5)*2.5,0,1);
-    const underside=clamp((.43-ny)*2.5,0,1)*center;
-    const chest=clamp((.62-ny)*2,0,1)*front*center;
-    const muzzle=high*front*center;
+    const mid=clamp(1-Math.abs(nx-.5)*2.5,0,1);
+    const underside=clamp((.43-ny)*2.5,0,1)*mid;
+    const chest=clamp((.62-ny)*2,0,1)*front*mid;
+    const muzzle=high*front*mid;
     const leftWeight=left*clamp(1-chest*.55-muzzle*.35,0,1);
     const rightWeight=right*clamp(1-chest*.55-muzzle*.35,0,1);
     c=blendZone(c,"left",leftWeight,"#"+rgbHex(base).replace("#",""));
