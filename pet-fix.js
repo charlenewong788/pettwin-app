@@ -11,6 +11,8 @@ const naturalWhite=c=>({r:clamp(c.r,214,242),g:clamp(c.g,211,240),b:clamp(c.b,20
 const softDark=(dark,base)=>mix(cuteTone(dark,.22),cuteTone(base,.1),.34);
 const avoidMud=c=>lum(c)<118?cuteTone(c,.28):c;
 const rescueLight=(c,base,cream)=>look.lightPet&&lum(c)<145?mix(mix(c,base,.58),cream,.34):c;
+const goldLift=c=>mix(c,{r:218,g:166,b:96},.18);
+const keepWarm=(base,warm,ratio)=>mix(base,warm,clamp(.56+ratio*3.8,.56,.9));
 const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
 const zoneRgb=(name,fallback)=>hexRgb((look.zones&&look.zones[name])||fallback);
 const blendZone=(c,name,w,fallback)=>mix(c,zoneRgb(name,fallback||look.coat||coat),smooth(w));
@@ -107,15 +109,15 @@ function applyVertexCoat(root){
     c=blendZone(c,"left",leftWeight,"#"+rgbHex(base).replace("#",""));
     c=blendZone(c,"right",rightWeight,"#"+rgbHex(base).replace("#",""));
     c=blendZone(c,"back",back*clamp(1-low*.28,0,1),look.coat||coat);
-    c=blendZone(c,"face",muzzle*.78,look.coat||coat);
-    c=blendZone(c,"chest",chest*.86,look.cream||cream);
-    c=blendZone(c,"belly",underside*.78,look.cream||cream);
-    c=mix(c,naturalWhite(light),clamp((underside+chest+muzzle)*look.whiteRatio*.5,0,.28));
+    c=blendZone(c,"face",muzzle*.55,look.coat||coat);
+    c=blendZone(c,"chest",chest*.58,look.cream||cream);
+    c=blendZone(c,"belly",underside*.52,look.cream||cream);
+    c=mix(c,naturalWhite(light),clamp((underside+chest+muzzle)*look.whiteRatio*.18,0,.1));
     if(look.pattern==="tabby"||look.pattern==="ginger"){
       const stripe=(Math.max(0,Math.sin(ny*44+nx*16)-.36)+Math.max(0,Math.sin(nx*50+ny*9)-.52)*clamp(.36-ny,0,.36)*2.2)*look.stripe;
       c=mix(c,dark,clamp(stripe,0,.13));
     }
-    if(look.pattern==="ginger")c=mix(c,warm,.08);
+    if(look.pattern==="ginger")c=mix(c,warm,clamp(.36+high*.08,0,.48));
     c=rescueLight(c,base,light);
     const hex=rgbHex(c);
     (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{if(m.color&&m.color.isColor)m.color.set(hex);m.vertexColors=false;m.needsUpdate=true});
@@ -217,29 +219,30 @@ function setAction(type){
   const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");
   if(line){const msg={feed:["Feeding preview: bowl placed and the twin leans toward food.","喂食预览：食盆出现，数字猫会靠近食物。"],shake:["Handshake preview: a front paw reaches toward the owner.","握手预览：前爪会伸向主人。"],play:["Play preview: toy ball appears and the twin reacts curiously.","玩耍预览：玩具球出现，数字猫会好奇互动。"],calm:["Calm mode: softer breathing and slower motion.","安静模式：呼吸和动作变得更柔和。"],spin:["360 view: the complete model rotates for inspection.","360 查看：完整模型会旋转展示。"]}[type]||["Interactive preview ready.","互动预览已准备好。"];line.textContent=msg[zh?1:0]}}
 function regionStats(data,size,rx0,ry0,rx1,ry1){
-  let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,wr=0,wg=0,wb=0,wn=0,dr=0,dg=0,db=0,dn=0,orange=0,striped=0;
+  let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,wr=0,wg=0,wb=0,wn=0,dr=0,dg=0,db=0,dn=0,gr=0,ggg=0,gb=0,gn=0,orange=0,striped=0;
   const x0=Math.floor(rx0*size),x1=Math.ceil(rx1*size),y0=Math.floor(ry0*size),y1=Math.ceil(ry1*size);
   for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
     const i=(y*size+x)*4,rr=data[i],gg=data[i+1],bb=data[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb);
     const greenBackground=gg>rr*1.06&&gg>bb*1.05&&spread>18;
     const blueWindow=bb>rr*1.12&&bb>gg*1.04&&l<160;
     if(l<34||l>246||greenBackground||blueWindow)continue;
-    const warm=rr>gg*1.04&&gg>bb*1.08;
+    const warm=rr>gg*.96&&gg>bb*1.08&&rr>bb+28&&gg>bb+14&&l>72;
     r+=rr;g+=gg;b+=bb;n++;
     if(l>158&&spread<92){lr+=rr;lg+=gg;lb+=bb;ln++}
     if(l>184&&spread<56){wr+=rr;wg+=gg;wb+=bb;wn++}
     if(l<130&&spread>18){dr+=rr;dg+=gg;db+=bb;dn++}
-    if(warm)orange++;
+    if(warm){orange++;gr+=rr;ggg+=gg;gb+=bb;gn++}
     if(l>38&&l<128&&spread>22)striped++;
   }
   if(!n)return null;
-  const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.2),white=wn?naturalWhite({r:wr/wn,g:wg/wn,b:wb/wn}):naturalWhite(light),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg;
+  const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.2),white=wn?naturalWhite({r:wr/wn,g:wg/wn,b:wb/wn}):naturalWhite(light),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg,warmAvg=gn?goldLift({r:gr/gn,g:ggg/gn,b:gb/gn}):goldLift(avg);
   const whiteRatio=wn/n,warmRatio=orange/n,stripeRatio=striped/n;
-  const softened=avoidMud(cuteTone(avg,warmRatio>.18?.14:.1));
-  const zoneColor=whiteRatio>.24?mix(softened,white,clamp(whiteRatio*.82,0,.62)):softened;
-  return{avg,light:white,dark,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmRatio,stripeRatio,whiteRatio};
+  let softened=avoidMud(cuteTone(avg,warmRatio>.08?.04:.08));
+  if(warmRatio>.025)softened=keepWarm(softened,warmAvg,warmRatio);
+  const zoneColor=whiteRatio>.38&&warmRatio<.025?mix(softened,white,clamp(whiteRatio*.52,0,.36)):softened;
+  return{avg,light:white,dark,warm:warmAvg,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmHex:rgbHex(warmAvg),warmRatio,stripeRatio,whiteRatio};
 }
-function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.28,.2,.9,.7])}else if(view===2){add("right",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.1,.2,.72,.7])}else{add("back",[.14,.28,.84,.82]);add("left",[.08,.32,.5,.84]);add("right",[.5,.32,.92,.84])}stats.push(whole);const isGinger=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length>.18,striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.color,cream:whole.cream,dark:whole.darkHex,warm:rgbHex(cuteTone(whole.avg,.26)),zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.6,.16,.7),warmRatio:stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length,pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*2.2,.06,.32)})};img.onerror=()=>res(null);img.src=url})}
+function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.warmRatio>.025?rgbHex(keepWarm(hexRgb(st.color),hexRgb(st.warmHex),st.warmRatio)):st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.28,.2,.9,.7])}else if(view===2){add("right",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.1,.2,.72,.7])}else{add("back",[.14,.28,.84,.82]);add("left",[.08,.32,.5,.84]);add("right",[.5,.32,.92,.84])}stats.push(whole);const warmAvg=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length,isGinger=warmAvg>.025||stats.some(v=>v.warmRatio>.05),striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.warmRatio>.025?rgbHex(keepWarm(hexRgb(whole.color),hexRgb(whole.warmHex),whole.warmRatio)):whole.color,cream:whole.cream,dark:whole.darkHex,warm:whole.warmHex,zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.05,.08,.42),warmRatio:warmAvg,pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*1.8,.06,.28)})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
   const all=(await Promise.all([...files].slice(0,4).map((file,i)=>readPhoto(file,i)))).filter(Boolean);
   if(!all.length)return null;
@@ -248,10 +251,16 @@ async function readPhotos(files){
   const zoneNames=["face","chest","belly","left","right","back"],zones={};
   zoneNames.forEach(name=>{const items=all.filter(c=>c.zones&&c.zones[name]);if(items.length)zones[name]=rgbHex(["r","g","b"].reduce((o,k)=>{o[k]=items.reduce((s,c)=>s+hexRgb(c.zones[name])[k],0)/items.length;return o},{}))});
   let coatOut=avg("coat"),creamOut=all.some(c=>c.cream)?avg("cream"):null,darkOut=all.some(c=>c.dark)?avg("dark"):null,warmOut=avg("warm");
-  const lightPet=all.reduce((s,c)=>s+(c.warmRatio||0),0)/all.length>.1||lum(hexRgb(creamOut||coatOut))>204;
-  if(lightPet){
+  const warmScore=all.reduce((s,c)=>s+(c.warmRatio||0),0)/all.length,maxWarm=Math.max(...all.map(c=>c.warmRatio||0)),warmPet=warmScore>.025||maxWarm>.05,lightPet=warmPet||lum(hexRgb(creamOut||coatOut))>204;
+  if(warmPet){
+    const warmRgb=hexRgb(warmOut),coatRgb=hexRgb(coatOut);
+    coatOut=rgbHex(mix(coatRgb,warmRgb,.88));
+    darkOut=rgbHex(mix(hexRgb(darkOut||coatOut),warmRgb,.76));
+    ["left","right","back","face"].forEach(name=>{zones[name]=rgbHex(mix(hexRgb(zones[name]||coatOut),warmRgb,.88))});
+    ["chest","belly"].forEach(name=>{if(zones[name])zones[name]=rgbHex(mix(hexRgb(zones[name]),hexRgb(creamOut||coatOut),.34))});
+  }else if(lightPet){
     const creamRgb=hexRgb(creamOut||coatOut),warmRgb=hexRgb(warmOut),coatRgb=hexRgb(coatOut);
-    if(lum(coatRgb)<168)coatOut=rgbHex(mix(mix(coatRgb,warmRgb,.45),creamRgb,.38));
+    if(lum(coatRgb)<168)coatOut=rgbHex(mix(mix(coatRgb,warmRgb,.32),creamRgb,.22));
     darkOut=rgbHex(mix(hexRgb(darkOut||coatOut),hexRgb(coatOut),.72));
     zoneNames.forEach(name=>{if(zones[name]&&lum(hexRgb(zones[name]))<145)zones[name]=rgbHex(mix(hexRgb(zones[name]),hexRgb(coatOut),.78))});
   }
@@ -259,7 +268,7 @@ async function readPhotos(files){
     const back=hexRgb(zones.back),body=hexRgb(zones.left||zones.right||coatOut),main=hexRgb(coatOut);
     if(lum(back)<lum(main)-12||lum(back)<145)zones.back=rgbHex(mix(mix(back,body,.62),main,.28));
   }
-  return{coat:coatOut,cream:creamOut,dark:darkOut,warm:warmOut,zones,lightPet,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.16,.72),pattern,stripe:lightPet?.05:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36)};
+  return{coat:coatOut,cream:creamOut,dark:darkOut,warm:warmOut,zones,lightPet,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.04,warmPet?.2:.5),pattern:warmPet?"ginger":pattern,stripe:warmPet?clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.1,.24):lightPet?.05:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36)};
 }
 function bind(){
   if(ready)return;ready=true;ensure();move(innerWidth*.7,innerHeight*.52);
