@@ -6,8 +6,9 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hexRgb=h=>{h=(h||"#999999").replace("#","");return{r:parseInt(h.slice(0,2),16)||153,g:parseInt(h.slice(2,4),16)||153,b:parseInt(h.slice(4,6),16)||153}};
 const rgbHex=({r,g,b})=>"#"+[r,g,b].map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,"0")).join("");
 const mix=(a,b,t)=>({r:a.r+(b.r-a.r)*t,g:a.g+(b.g-a.g)*t,b:a.b+(b.b-a.b)*t});
-const cuteTone=(c,amount=.38)=>mix(c,{r:250,g:242,b:228},amount);
-const softDark=(dark,base)=>mix(cuteTone(dark,.5),cuteTone(base,.34),.52);
+const cuteTone=(c,amount=.16)=>mix(c,{r:246,g:241,b:232},amount);
+const naturalWhite=c=>({r:clamp(c.r,214,242),g:clamp(c.g,211,240),b:clamp(c.b,205,236)});
+const softDark=(dark,base)=>mix(cuteTone(dark,.22),cuteTone(base,.1),.34);
 const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
 const zoneRgb=(name,fallback)=>hexRgb((look.zones&&look.zones[name])||fallback);
 const blendZone=(c,name,w,fallback)=>mix(c,zoneRgb(name,fallback||look.coat||coat),smooth(w));
@@ -54,16 +55,16 @@ function recolorTexture(m){
     const r=a[i],g=a[i+1],b=a[i+2],l=(r+g+b)/3;
     const pink=r>135&&g<130&&b<135&&r-g>24;
     if(pink)continue;
-    const nearlyWhite=l>178&&Math.max(r,g,b)-Math.min(r,g,b)<62;
+    const nearlyWhite=l>172&&Math.max(r,g,b)-Math.min(r,g,b)<58;
     const bellyMask=(v>.56&&u>.28&&u<.72)?clamp((v-.56)*2.2,0,.72):0;
     const faceMask=(v<.33&&u>.35&&u<.67)?clamp((.33-v)*2.4,0,.58):0;
     const tabby=Math.max(0,Math.sin(u*58+v*34)+Math.sin(u*24-v*70)-.72);
     const tiger=Math.max(0,Math.sin(v*92+u*18)-.48);
-    let target=nearlyWhite?light:base;
-    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.26,0,.24));
+    let target=nearlyWhite?naturalWhite(light):base;
+    if(look.pattern==="tabby"||look.pattern==="ginger")target=mix(target,dark,clamp((tabby+tiger)*look.stripe*.22,0,.2));
     if(look.pattern==="ginger")target=mix(target,warm,.12);
-    target=mix(target,light,clamp(bellyMask+faceMask+(nearlyWhite?.45:0),0,.82));
-    const shade=clamp((l+76)/170,.6,1.34);
+    target=mix(target,naturalWhite(light),clamp(bellyMask+faceMask+(nearlyWhite?.22:0),0,.64));
+    const shade=clamp((l+68)/192,.58,1.08);
     a[i]=clamp(target.r*shade,0,255);
     a[i+1]=clamp(target.g*shade,0,255);
     a[i+2]=clamp(target.b*shade,0,255);
@@ -106,10 +107,10 @@ function applyVertexCoat(root){
     c=blendZone(c,"face",muzzle*.78,look.coat||coat);
     c=blendZone(c,"chest",chest*.86,look.cream||cream);
     c=blendZone(c,"belly",underside*.78,look.cream||cream);
-    c=mix(c,light,clamp((underside+chest+muzzle)*look.whiteRatio*.72,0,.42));
+    c=mix(c,naturalWhite(light),clamp((underside+chest+muzzle)*look.whiteRatio*.5,0,.28));
     if(look.pattern==="tabby"||look.pattern==="ginger"){
       const stripe=(Math.max(0,Math.sin(ny*44+nx*16)-.36)+Math.max(0,Math.sin(nx*50+ny*9)-.52)*clamp(.36-ny,0,.36)*2.2)*look.stripe;
-      c=mix(c,dark,clamp(stripe,0,.16));
+      c=mix(c,dark,clamp(stripe,0,.13));
     }
     if(look.pattern==="ginger")c=mix(c,warm,.08);
     const hex=rgbHex(c);
@@ -173,9 +174,9 @@ function init(pet){
   const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;pet.appendChild(renderer.domElement);
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(30,1,.1,100);camera.position.set(0,.28,6.35);
-  scene.add(new THREE.AmbientLight(0xffffff,.72));
-  const key=new THREE.DirectionalLight(0xffffff,1.5);key.position.set(-3,4,5);scene.add(key);
-  const rim=new THREE.DirectionalLight(0xcce8ff,.65);rim.position.set(3,2,-3);scene.add(rim);
+  scene.add(new THREE.AmbientLight(0xffffff,.58));
+  const key=new THREE.DirectionalLight(0xffffff,1.05);key.position.set(-3,4,5);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xd9efff,.28);rim.position.set(3,2,-3);scene.add(rim);
   const floor=new THREE.Mesh(new THREE.CircleGeometry(1.8,64),new THREE.ShadowMaterial({opacity:.16}));floor.position.y=-.86;floor.rotation.x=-Math.PI/2;scene.add(floor);
   ctx={renderer,scene,camera,model:null,drag:false,lastX:0,lastY:0,w:0,h:0};
   function resize(){const w=pet.clientWidth,h=pet.clientHeight;if(!w||!h)return;ctx.w=w;ctx.h=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
@@ -210,7 +211,7 @@ function setAction(type){
   const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");
   if(line){const msg={feed:["Feeding preview: bowl placed and the twin leans toward food.","喂食预览：食盆出现，数字猫会靠近食物。"],shake:["Handshake preview: a front paw reaches toward the owner.","握手预览：前爪会伸向主人。"],play:["Play preview: toy ball appears and the twin reacts curiously.","玩耍预览：玩具球出现，数字猫会好奇互动。"],calm:["Calm mode: softer breathing and slower motion.","安静模式：呼吸和动作变得更柔和。"],spin:["360 view: the complete model rotates for inspection.","360 查看：完整模型会旋转展示。"]}[type]||["Interactive preview ready.","互动预览已准备好。"];line.textContent=msg[zh?1:0]}}
 function regionStats(data,size,rx0,ry0,rx1,ry1){
-  let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,dr=0,dg=0,db=0,dn=0,orange=0,striped=0;
+  let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,wr=0,wg=0,wb=0,wn=0,dr=0,dg=0,db=0,dn=0,orange=0,striped=0;
   const x0=Math.floor(rx0*size),x1=Math.ceil(rx1*size),y0=Math.floor(ry0*size),y1=Math.ceil(ry1*size);
   for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
     const i=(y*size+x)*4,rr=data[i],gg=data[i+1],bb=data[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb);
@@ -218,16 +219,17 @@ function regionStats(data,size,rx0,ry0,rx1,ry1){
     const warm=rr>gg*1.04&&gg>bb*1.08;
     r+=rr;g+=gg;b+=bb;n++;
     if(l>158&&spread<92){lr+=rr;lg+=gg;lb+=bb;ln++}
+    if(l>184&&spread<56){wr+=rr;wg+=gg;wb+=bb;wn++}
     if(l<130&&spread>18){dr+=rr;dg+=gg;db+=bb;dn++}
     if(warm)orange++;
     if(l>38&&l<128&&spread>22)striped++;
   }
   if(!n)return null;
-  const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.58),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg;
-  const whiteRatio=ln/n,warmRatio=orange/n,stripeRatio=striped/n;
-  const softened=cuteTone(avg,warmRatio>.18?.3:.4);
-  const zoneColor=whiteRatio>.32?mix(softened,cuteTone(light,.24),clamp(whiteRatio*.78,0,.68)):softened;
-  return{avg,light,dark,color:rgbHex(zoneColor),cream:rgbHex(cuteTone(light,.2)),darkHex:rgbHex(softDark(dark,softened)),warmRatio,stripeRatio,whiteRatio};
+  const avg={r:r/n,g:g/n,b:b/n},light=ln?{r:lr/ln,g:lg/ln,b:lb/ln}:cuteTone(avg,.2),white=wn?naturalWhite({r:wr/wn,g:wg/wn,b:wb/wn}):naturalWhite(light),dark=dn?{r:dr/dn,g:dg/dn,b:db/dn}:avg;
+  const whiteRatio=wn/n,warmRatio=orange/n,stripeRatio=striped/n;
+  const softened=cuteTone(avg,warmRatio>.18?.14:.1);
+  const zoneColor=whiteRatio>.24?mix(softened,white,clamp(whiteRatio*.82,0,.62)):softened;
+  return{avg,light:white,dark,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmRatio,stripeRatio,whiteRatio};
 }
 function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else if(view===2){add("right",[.04,.12,.96,.9]);add("belly",[.12,.56,.88,.98]);add("back",[.1,.08,.9,.42])}else{add("back",[.04,.08,.96,.9]);add("left",[.03,.18,.48,.86]);add("right",[.52,.18,.97,.86])}stats.push(whole);const isGinger=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length>.18,striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.color,cream:whole.cream,dark:whole.darkHex,warm:rgbHex(cuteTone(whole.avg,.26)),zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.6,.16,.7),pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*2.2,.06,.32)})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
