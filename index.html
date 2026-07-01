@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f7f2" />
     <title>PetTwin | Your pet, understood</title>
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
     <link rel="stylesheet" href="pet-fix.css?v=8" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=10" defer></script>
+    <script src="app.js?v=11" defer></script>
     <script src="pet-fix.js?v=25" defer></script>
     <style>
       #pet-world{display:none!important}.model-library{display:none}.twin-generator{display:grid;gap:12px;margin:-6px 0 12px}.interaction-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.interaction-bar button{min-height:38px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-size:12px;font-weight:900}.interaction-bar button.active,.interaction-bar button:hover{border-color:#6fbf92;background:#edf7f0;color:#285d43;box-shadow:0 8px 15px rgba(64,132,93,.1)}@media(max-width:560px){.interaction-bar{grid-template-columns:1fr}}
@@ -55,6 +55,33 @@
             <div class="score-ring"><strong id="wellbeing-score">82</strong><span data-i18n="wellbeing">Wellbeing</span></div>
           </div>
 
+          <div class="pt-engage">
+            <article class="persona-card" id="persona-card">
+              <div class="persona-head">
+                <span class="persona-emoji" id="persona-emoji">🐾</span>
+                <div>
+                  <span class="persona-label" data-i18n="personaLabel">Personality type</span>
+                  <h3 id="persona-name">—</h3>
+                </div>
+                <button class="persona-share" id="open-share" data-i18n="sharePoster">Share card</button>
+              </div>
+              <p class="persona-quote" id="persona-quote">—</p>
+              <div class="persona-traits" id="persona-traits"></div>
+            </article>
+            <div class="engage-side">
+              <article class="streak-card" id="streak-card">
+                <span class="streak-flame">🔥</span>
+                <strong id="streak-count">0</strong>
+                <span class="streak-unit" data-i18n="streakDays">day streak</span>
+                <button class="streak-btn" id="check-in" data-i18n="checkIn">Check in today</button>
+              </article>
+              <article class="whisper-card">
+                <span class="whisper-label" data-i18n="whisperLabel">Today's whisper</span>
+                <p id="daily-whisper">—</p>
+              </article>
+            </div>
+          </div>
+
           <div class="signal-strip">
             <button data-signal="activity"><span data-i18n="activity">Activity</span><strong id="activity-value">72</strong><small>+4%</small></button>
             <button data-signal="stress"><span data-i18n="stress">Stress</span><strong id="stress-value">28</strong><small>-3%</small></button>
@@ -65,7 +92,14 @@
           <div class="two-column">
             <section class="surface"><div class="section-heading"><div><span data-i18n="worthKnowing">Worth knowing</span><h2 data-i18n="smartFinding">One useful finding</h2></div><span class="confidence">87%</span></div><p class="finding" id="smart-finding">4 of Mochi’s last 5 hiding events happened after visitors arrived. Recovery usually took around 2 hours.</p><div class="action-row"><button class="secondary-action" data-task-add="safe-space" data-i18n="addCareTask">Add care task</button><button class="text-action" data-view-jump="insights" data-i18n="viewEvidence">View evidence</button></div></section>
             <section class="surface"><div class="section-heading"><div><span data-i18n="todayPlan">Today’s plan</span><h2 data-i18n="smallActions">Small actions that help</h2></div><strong id="task-progress">1/3</strong></div><div class="compact-tasks" id="compact-tasks"></div></section>
+          <div class="achievements">
+            <div class="ach-head">
+              <span class="ach-title" data-i18n="achievements">Milestones</span>
+              <span class="ach-progress" id="ach-progress">0/0</span>
+            </div>
+            <div class="ach-grid" id="ach-grid"></div>
           </div>
+        </div>
         </section>
 
         <section class="view" id="home">
@@ -121,6 +155,16 @@
           </div>
         </section>
       </main>
+    </div>
+  <div class="share-overlay hidden" id="share-overlay">
+      <div class="share-modal">
+        <button class="share-close" id="share-close" aria-label="Close">×</button>
+        <h3 data-i18n="shareTitle">Your pet card</h3>
+        <canvas id="share-canvas" width="720" height="1080"></canvas>
+        <div class="share-actions">
+          <button class="primary-action" id="download-poster" data-i18n="downloadPoster">Save image</button>
+        </div>
+      </div>
     </div>
   </body>
 </html>
