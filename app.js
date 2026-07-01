@@ -5,8 +5,10 @@ Object.assign(copy.en,{buildLookalike:"Create a photo-matched digital twin",stud
 Object.assign(copy.zh,{buildLookalike:"创建照片匹配的 3D 数字分身",studioCopy:"拍摄四个清晰视角或使用 3D 环绕扫描，预览会匹配体型、主毛色和浅色花纹。",captureReady:"照片质量",photoSet:"照片组",videoScan:"3D 扫描",loadModel:"载入 GLB",uploadPhotos:"添加四张宠物照片",uploadHint:"在均匀光线下拍摄正面、左侧、右侧和背面。",guidedScan:"开始 3D 扫描",scanHint:"用 45 秒绕宠物拍摄一圈",captureQuality:"采集质量",stageCapture:"采集",stageShape:"形体",stageTexture:"毛色",stageRig:"动作",stageReview:"验收",generateTwin:"创建照片匹配预览",liveModel:"实时模型",proceduralPreview:"自适应 Q 版预览",waitingInput:"添加四个必需视角后开始",dragRotate:"点击任意位置，数字分身会跑过去"});
 Object.assign(copy.en,{baseModel:"Base model",sittingOnly:"Sitting cat kept as the only model",promptLabel:"Describe the pet",promptPlaceholder:"Grey British shorthair, round face, pale chest, calm personality",coatColor:"Fur colour",accentColor:"Light marking",motionStyle:"Motion style",feedPet:"Feed",shakePaw:"Shake paw",playPet:"Play",calmPet:"Calm",view360:"360 view"});
 Object.assign(copy.zh,{baseModel:"基础模型",sittingOnly:"只保留这只坐姿猫",promptLabel:"描述宠物外形",promptPlaceholder:"灰色英短，圆脸，浅色胸口，性格安静",coatColor:"毛发颜色",accentColor:"浅色花纹",motionStyle:"动作风格",feedPet:"喂食",shakePaw:"握手",playPet:"玩耍",calmPet:"安静",view360:"360 查看"});
+Object.assign(copy.en,{personaLabel:"Personality type",checkIn:"Check in today",checkedIn:"Checked in ✓",streakDays:"day streak",whisperLabel:"Today's whisper",achievements:"Milestones",sharePoster:"Share card",shareTitle:"Your pet card",downloadPoster:"Save image",petCardTagline:"Understood, every day"});
+Object.assign(copy.zh,{personaLabel:"性格原型",checkIn:"今日打卡",checkedIn:"已打卡 ✓",streakDays:"天连续记录",whisperLabel:"今日碎碎念",achievements:"里程碑",sharePoster:"分享卡片",shareTitle:"你的宠物卡片",downloadPoster:"保存图片",petCardTagline:"每天，更懂它一点"});
 let lang=localStorage.getItem("pt-lang")||"en";
-const defaultState={activity:72,stress:28,litter:5,repeat:2,mode:"companion",twinVisible:true,coat:"#77bed2",pattern:"solid",tasks:[{id:"play",done:false,en:"10-minute play session",zh:"互动玩耍 10 分钟",whyEn:"Activity is 8% below the evening baseline",whyZh:"晚间活跃度比基线低 8%"},{id:"water",done:true,en:"Check water level",zh:"检查饮水量",whyEn:"Completed at 12:30",whyZh:"已于 12:30 完成"},{id:"safe",done:false,en:"Prepare a quiet hiding space",zh:"准备安静的躲藏空间",whyEn:"Visitors are expected tonight",whyZh:"今晚预计有客人来访"}]};
+const defaultState={activity:72,stress:28,litter:5,repeat:2,streak:0,lastCheckIn:null,achievements:{},mode:"companion",twinVisible:true,coat:"#77bed2",pattern:"solid",tasks:[{id:"play",done:false,en:"10-minute play session",zh:"互动玩耍 10 分钟",whyEn:"Activity is 8% below the evening baseline",whyZh:"晚间活跃度比基线低 8%"},{id:"water",done:true,en:"Check water level",zh:"检查饮水量",whyEn:"Completed at 12:30",whyZh:"已于 12:30 完成"},{id:"safe",done:false,en:"Prepare a quiet hiding space",zh:"准备安静的躲藏空间",whyEn:"Visitors are expected tonight",whyZh:"今晚预计有客人来访"}]};
 function loadState(){try{const raw=localStorage.getItem("pt-state");const parsed=raw?JSON.parse(raw):null;return parsed&&typeof parsed==='object'?Object.assign(structuredClone(defaultState),parsed):structuredClone(defaultState)}catch(e){console.warn('PetTwin: could not read saved state, resetting.',e);return structuredClone(defaultState)}}
 let state=loadState();
 let coatMaterial,petGroup,headMesh,tailMesh,legs=[],worldRenderer,worldCamera,worldScene,modelMixer,modelClock,mouseX=0,activeView="today",roam=0,clickTarget=null,clickTargetUntil=0;
@@ -59,8 +61,123 @@ const eventsEn=[{time:"14:42",icon:"L",title:"Litter-box visit",detail:"54 secon
 const eventsZh=[{time:"14:42",icon:"砂",title:"猫砂盆记录",detail:"停留 54 秒 · 体重 4.62 kg"},{time:"13:18",icon:"眠",title:"午睡结束",detail:"休息了 2 小时 06 分钟"},{time:"11:07",icon:"动",title:"客厅活动",detail:"活动量恢复到正常范围"},{time:"09:36",icon:"水",title:"饮水记录",detail:"处于日常早间范围"}];
 const deviceData=[{icon:"LB",en:"Smart litter box",zh:"智能猫砂盆",enD:"Visits, weight and duration",zhD:"次数、体重和停留时间",connected:true},{icon:"CM",en:"Home camera",zh:"家庭摄像头",enD:"Movement and rest zones",zhD:"活动和休息区域",connected:true},{icon:"FD",en:"Smart feeder",zh:"智能喂食器",enD:"Meals and portion limits",zhD:"进食和份量限制",connected:true},{icon:"CL",en:"Activity collar",zh:"活动项圈",enD:"Activity and sleep",zhD:"活动量和睡眠",connected:false}];
 
+// === Engagement features: persona, streak, whisper, achievements, share ===
+const PERSONAS=[
+  {id:"explorer",emoji:"🐆",en:"The Curious Explorer",zh:"好奇探险家",qEn:"The world is my playground — I have three spots to inspect before dinner.",qZh:"世界是我的游乐场——晚饭前我还有三个地方要巡视。",tEn:["High curiosity","Playful","Bold"],tZh:["高好奇","爱玩","大胆"]},
+  {id:"noble",emoji:"👑",en:"The Aloof Noble",zh:"高冷贵族",qEn:"I permit your admiration, but do keep a respectful distance.",qZh:"我允许你欣赏我，但请保持得体的距离。",tEn:["Independent","Calm","Selective"],tZh:["独立","沉稳","挑剔"]},
+  {id:"cuddler",emoji:"🧸",en:"The Gentle Cuddler",zh:"温柔黏人精",qEn:"Wherever you are is exactly where I want to nap.",qZh:"你在哪里，哪里就是我最想打盹的地方。",tEn:["Affectionate","Social","Soft"],tZh:["亲人","社交","柔软"]},
+  {id:"guardian",emoji:"🛡️",en:"The Watchful Guardian",zh:"警觉守护者",qEn:"I heard that. I hear everything. The house is secure — for now.",qZh:"我听到了，我什么都听得到。屋子暂时安全。",tEn:["Alert","Sensitive","Loyal"],tZh:["警觉","敏感","忠诚"]},
+  {id:"zen",emoji:"🍃",en:"The Zen Dreamer",zh:"佛系梦想家",qEn:"A sunbeam, a slow blink, a quiet afternoon. This is enough.",qZh:"一束阳光，一次慢眨眼，一个安静的下午，足矣。",tEn:["Relaxed","Steady","Content"],tZh:["放松","稳定","知足"]}
+];
+function computePersona(){
+  const a=state.activity,s=state.stress;
+  if(s>52)return PERSONAS[3];
+  if(a>=72&&s<40)return PERSONAS[0];
+  if(a<50&&s<34)return PERSONAS[4];
+  if(a<60&&s>=34)return PERSONAS[1];
+  return PERSONAS[2];
+}
+function renderPersona(){
+  const p=computePersona(),en=lang==='en';
+  const emoji=$('#persona-emoji'),name=$('#persona-name'),quote=$('#persona-quote'),traits=$('#persona-traits');
+  if(!name)return;
+  emoji.textContent=p.emoji;
+  name.textContent=en?p.en:p.zh;
+  quote.textContent='“'+(en?p.qEn:p.qZh)+'”';
+  traits.innerHTML=(en?p.tEn:p.tZh).map(x=>'<span>'+x+'</span>').join('');
+  window.__persona=p;
+}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function renderStreak(){
+  const c=$('#streak-count'),btn=$('#check-in');
+  if(!c)return;
+  c.textContent=state.streak||0;
+  const done=state.lastCheckIn===todayKey();
+  btn.disabled=done;
+  btn.classList.toggle('done',done);
+  btn.textContent=done?t('checkedIn'):t('checkIn');
+}
+function checkInToday(){
+  const today=todayKey();
+  if(state.lastCheckIn===today)return;
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  state.streak=state.lastCheckIn===yesterday?(state.streak||0)+1:1;
+  state.lastCheckIn=today;
+  save();renderStreak();evaluateAchievements();renderAchievements();petReaction('happy');
+}
+const WHISPERS_EN=["I saved you the sunny spot by the window today.","I knocked something off the shelf. Purely scientific curiosity.","Your chair smells like you. I approve.","I pretended not to hear you, but I did.","I watched a bird for 40 minutes. Riveting stuff."];
+const WHISPERS_ZH=["今天我帮你把窗边最晒的位置占好了。","我把架子上的东西推下去了，纯粹出于科学好奇。","你的椅子有你的味道，我批准了。","我假装没听见你叫我，其实听见了。","我盯着一只鸟看了 40 分钟，非常精彩。"];
+function renderWhisper(){
+  const el=$('#daily-whisper');if(!el)return;
+  const day=Number(todayKey().replace(/-/g,''))%WHISPERS_EN.length;
+  el.textContent=lang==='en'?WHISPERS_EN[day]:WHISPERS_ZH[day];
+}
+const ACHIEVEMENTS=[
+  {id:"firstCheckin",ico:"✅",en:"First Check-in",zh:"首次打卡",test:()=>((state.streak||0)>=1||state.lastCheckIn)},
+  {id:"streak7",ico:"🔥",en:"7-Day Streak",zh:"连续 7 天",test:()=>(state.streak||0)>=7},
+  {id:"streak30",ico:"🏆",en:"30-Day Streak",zh:"连续 30 天",test:()=>(state.streak||0)>=30},
+  {id:"caretaker",ico:"💚",en:"Caretaker",zh:"贴心照护",test:()=>state.tasks&&state.tasks.filter(x=>x.done).length>=2},
+  {id:"twin",ico:"✨",en:"Twin Created",zh:"生成分身",test:()=>!!(captureResults&&captureResults.filter(x=>x&&x.pass).length>=4)},
+  {id:"calmKeeper",ico:"🧘",en:"Calm Keeper",zh:"稳定守护",test:()=>state.stress<=25}
+];
+function evaluateAchievements(){
+  state.achievements=state.achievements||{};
+  let changed=false;
+  ACHIEVEMENTS.forEach(a=>{if(a.test()&&!state.achievements[a.id]){state.achievements[a.id]=todayKey();changed=true}});
+  if(changed)save();
+  return changed;
+}
+function renderAchievements(){
+  const grid=$('#ach-grid');if(!grid)return;
+  state.achievements=state.achievements||{};
+  const en=lang==='en';
+  grid.innerHTML=ACHIEVEMENTS.map(a=>{
+    const unlocked=!!state.achievements[a.id];
+    return '<div class="ach-item '+(unlocked?'unlocked':'locked')+'"><span class="ach-ico">'+a.ico+'</span><span class="ach-name">'+(en?a.en:a.zh)+'</span></div>';
+  }).join('');
+  const count=ACHIEVEMENTS.filter(a=>state.achievements[a.id]).length;
+  $('#ach-progress').textContent=count+'/'+ACHIEVEMENTS.length;
+}
+function roundRect(x,ctx,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function buildSharePoster(){
+  const canvas=$('#share-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,en=lang==='en';
+  const p=window.__persona||computePersona();
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#a9a0d8');g.addColorStop(.55,'#75bdd0');g.addColorStop(1,'#84c5a1');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(W-90,120,180,0,7);ctx.fill();
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='600 30px system-ui,sans-serif';
+  ctx.fillText('PetTwin',W/2,90);
+  ctx.font='150px system-ui,sans-serif';ctx.fillText(p.emoji,W/2,320);
+  ctx.fillStyle='#fff';ctx.font='700 58px system-ui,sans-serif';
+  ctx.fillText('Mochi',W/2,420);
+  ctx.font='600 40px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,.95)';
+  ctx.fillText(en?p.en:p.zh,W/2,485);
+  // quote box
+  ctx.fillStyle='rgba(255,255,255,.18)';roundRect(60,ctx,540,W-120,150,24);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='italic 30px system-ui,sans-serif';
+  const q='“'+(en?p.qEn:p.qZh)+'”';
+  wrapText(ctx,q,W/2,590,W-140,40);
+  // stats row
+  const stats=[[state.activity,en?'Activity':'活跃'],[state.streak||0,en?'Streak':'连续'],[state.litter,en?'Litter':'如厕']];
+  stats.forEach((s,i)=>{
+    const cx=W/2+(i-1)*200;
+    ctx.fillStyle='#fff';ctx.font='700 52px system-ui,sans-serif';ctx.fillText(s[0],cx,820);
+    ctx.font='500 26px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillText(s[1],cx,860);
+  });
+  ctx.font='500 28px system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,.9)';
+  ctx.fillText(t('petCardTagline'),W/2,1010);
+}
+function wrapText(ctx,text,x,y,maxW,lh){
+  const words=text.split('');let line='',ly=y;
+  for(const ch of words){const test=line+ch;if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line,x,ly);line=ch;ly+=lh}else line=test}
+  ctx.fillText(line,x,ly);
+}
+
 function applyLanguage(){document.documentElement.lang=lang==="zh"?"zh-CN":"en";$$('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));$$('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));$$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));renderAll();if($('#capture-slots'))renderCaptureSlots()}
-function renderAll(){renderSummary();renderTasks();renderEvents();renderDevices();renderInsights();renderTimeline();renderPlaybook();updatePetMessage();}
+function renderAll(){renderSummary();renderTasks();renderEvents();renderDevices();renderInsights();renderTimeline();renderPlaybook();updatePetMessage();renderPersona();renderStreak();renderWhisper();evaluateAchievements();renderAchievements();}
 function renderSummary(){const score=Math.max(45,Math.round(100-state.stress*.45-Math.max(0,70-state.activity)*.25-Math.max(0,state.litter-5)*2));$('#wellbeing-score').textContent=score;$('#activity-value').textContent=state.activity;$('#stress-value').textContent=state.stress;$('#litter-value').textContent=state.litter;$('#visits-today').textContent=state.litter;$('#repeat-entries').textContent=state.repeat;$('#daily-summary').textContent=lang==='en'?`Activity and routine are close to Mochi’s baseline. Litter-box visits are ${state.litter>6?'higher':state.litter<4?'lower':'close to'} usual.`:`Mochi 的活动和作息接近日常基线，猫砂盆次数${state.litter>6?'明显高于':state.litter<4?'低于':'接近'}平时。`;$('#smart-finding').textContent=lang==='en'?"4 of Mochi’s last 5 hiding events happened after visitors arrived. Recovery usually took around 2 hours.":"Mochi 最近 5 次躲藏中，有 4 次发生在来客之后，通常需要约 2 小时恢复。";$('#litter-note').textContent=lang==='en'?"Visits are slightly above Mochi’s baseline. Continue observing drinking, appetite and repeated short visits.":"如厕次数略高于 Mochi 的日常基线，建议继续观察饮水、食欲和短时间重复进入。";$('#workday-summary').textContent=lang==='en'?"Mochi slept for 5h 48m, used the litter box several times, and played less than usual. Try a 10-minute play session tonight.":"Mochi 今天睡了约 5 小时 48 分钟，多次使用猫砂盆，玩耍比平时少。今晚可以安排 10 分钟互动。";}
 function taskHTML(task,compact=false){return `<div class="task-item ${task.done?'done':''}" data-task="${task.id}"><button aria-label="Complete task">${task.done?'✓':''}</button><div><strong>${lang==='en'?task.en:task.zh}</strong><small>${lang==='en'?task.whyEn:task.whyZh}</small></div>${compact?'':`<span>${task.done?(lang==='en'?'Done':'完成'):(lang==='en'?'Planned':'计划中')}</span>`}</div>`}
 function renderTasks(){const done=state.tasks.filter(x=>x.done).length;$('#task-progress').textContent=`${done}/${state.tasks.length}`;$('#compact-tasks').innerHTML=state.tasks.map(x=>taskHTML(x,true)).join('');$('#care-list').innerHTML=state.tasks.map(x=>taskHTML(x)).join('');$$('[data-task] button').forEach(btn=>btn.onclick=()=>{const task=state.tasks.find(x=>x.id===btn.parentElement.dataset.task);task.done=!task.done;if(task.done){state.activity=Math.min(100,state.activity+3);state.stress=Math.max(0,state.stress-2);petReaction('happy')}save();renderAll()})}
@@ -104,6 +221,13 @@ function loadGlb(file){const url=URL.createObjectURL(file);loadGlbFromUrl(url,tr
 $('#glb-file').onchange=e=>{if(e.target.files[0])loadGlb(e.target.files[0])};
 $('#generate-twin').onclick=async()=>{$('#generate-twin').disabled=true;try{if(await reconServiceAvailable()){$('#studio-result').textContent=lang==='en'?'Reconstruction service connected. Uploading four views…':'已连接重建服务，正在上传四个视角…';const modelUrl=await runReconstruction(status=>{const pct=Math.max(10,Math.min(95,status.progress||10));$('#scan-progress').style.setProperty('--progress',pct+'%');$('#studio-result').textContent=(lang==='en'?'Reconstructing… ':'正在重建… ')+pct+'%'});loadGlbFromUrl(modelUrl,false);$('#generate-twin').disabled=false;return}}catch(e){$('#studio-result').textContent=(lang==='en'?'Reconstruction unavailable, using adaptive preview. ':'重建服务不可用，改用自适应预览。 ')+(e&&e.message?e.message:'')}const stages=$$('#reconstruction-pipeline span');stages.forEach(x=>x.classList.remove('active'));for(let i=0;i<stages.length;i++){stages[i].classList.add('active');$('#scan-progress').style.setProperty('--progress',(20+i*20)+'%');$('#studio-result').textContent=lang==='en'?['Reading four views…','Adapting body proportions…','Matching coat and light markings…','Adding chibi motion…','Preparing preview…'][i]:['正在读取四个视角…','正在调整身体比例…','正在匹配主毛色和浅色花纹…','正在添加 Q 版动作…','正在准备预览…'][i];await new Promise(r=>setTimeout(r,320))}adaptShapeFromPhotos();$('#studio-result').textContent=lang==='en'?'Desktop pet preview created. PetTwin has matched the body feel, main coat colour and soft companion motion.':'桌面宠物预览已生成。PetTwin 已匹配体型感觉、主毛色和柔和陪伴动作。';$('#generate-twin').disabled=false};
 renderCaptureSlots();
+
+// Engagement event bindings
+if($('#check-in'))$('#check-in').onclick=()=>checkInToday();
+if($('#open-share'))$('#open-share').onclick=()=>{buildSharePoster();$('#share-overlay').classList.remove('hidden')};
+if($('#share-close'))$('#share-close').onclick=()=>$('#share-overlay').classList.add('hidden');
+if($('#share-overlay'))$('#share-overlay').onclick=e=>{if(e.target===$('#share-overlay'))$('#share-overlay').classList.add('hidden')};
+if($('#download-poster'))$('#download-poster').onclick=()=>{const c=$('#share-canvas');const a=document.createElement('a');a.download='pettwin-mochi.png';a.href=c.toDataURL('image/png');a.click()};
 
 applyLanguage();initTwin();
 if(!state.twinVisible){
