@@ -62,3 +62,29 @@ main{padding:28px 34px 100px;min-width:0}.topbar{display:flex;align-items:center
 .share-actions{margin-top:16px;display:flex;justify-content:center}
 .share-close{position:absolute;top:12px;right:16px;border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer;color:var(--muted)}
 .share-close:hover{color:var(--ink)}
+
+/* === Check-in + onboarding modals, sample tags, toast === */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,30,34,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal{position:relative;background:var(--paper);border-radius:24px;padding:26px;max-width:400px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:popIn .28s ease}
+.modal h3{margin:0;color:var(--ink);font-size:22px}
+.modal-sub{margin:6px 0 4px;color:var(--muted);font-size:14px;line-height:1.5}
+.modal label{display:block;margin:16px 0 8px;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mood-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mood-row button{font-size:24px;padding:9px 0;border:1px solid var(--line);border-radius:12px;background:#fff;line-height:1}
+.mood-row button.active{border-color:var(--mint);background:#edf7f0;box-shadow:0 6px 14px rgba(132,197,161,.3)}
+.opt-row{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.opt-row button{min-height:40px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:800;color:var(--muted)}
+.opt-row button.active{border-color:var(--mint);background:#edf7f0;color:#285d43}
+.modal textarea{width:100%;min-height:64px;margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;font:inherit;background:#fff}
+.modal input[type=text],.modal input[type=number]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;background:#fff}
+.modal .primary-action.full{margin-top:18px}
+.onboarding{text-align:center}
+.onboarding label{text-align:left}
+.onb-mark{font-size:44px;margin-bottom:6px}
+.freeze-chip{margin-top:8px;font-size:11px;color:var(--muted);font-weight:700}
+.persona-progress{position:relative;z-index:1;margin:12px 0 0;font-size:12px;opacity:.85}
+.sample-tag{display:inline-flex;padding:5px 9px;border-radius:999px;background:#f3ede2;color:#8a7350;font-size:10px;font-weight:900;letter-spacing:.08em}
+.checkin-toast{position:fixed;left:50%;bottom:34px;z-index:1200;translate:-50% 20px;padding:12px 20px;border-radius:999px;background:var(--ink);color:#fff;font-weight:800;font-size:14px;opacity:0;pointer-events:none;transition:.3s}
+.checkin-toast.show{opacity:1;translate:-50% 0}
+.capture-tabs.two{grid-template-columns:1fr 1fr}

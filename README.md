@@ -8,18 +8,21 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 
 ## Current Features
 
+- Onboarding: create your own pet profile (name and age drive the whole interface)
+- 30-second daily check-in (mood, appetite, litter box, optional note) — the app's core data loop
+- Streaks with timezone-safe day tracking and streak-freeze tokens for missed days
+- Personality persona that evolves slowly from real check-in history (EMA), with a progress hint
+- State-aware daily whispers (different pools for stressed days, checked-in days and weekends)
+- Long-tail milestones (12 achievements from first check-in to a 100-day streak)
+- Share card rendered from the live 3D twin snapshot with real stats
+- Real trend chart and findings computed from logged check-ins (unlocks after 3 days)
+- Plain-text report export of the full check-in history
+- Interactive 3D digital pet with photo-matched coat colours and feed/paw/play/calm actions
+- Four-view capture workflow with resolution, lighting and sharpness checks
+- Optional reconstruction API bridge with graceful fallback
+- PWA: installable, offline-capable via service worker
 - Bilingual English / Chinese interface
-- Roaming interactive 3D digital pet
-- Four-view capture workflow with resolution, lighting, sharpness, and coverage checks
-- Adaptive chibi preview with photo-derived body proportions, primary coat colour, light markings, and click-to-run interaction
-- Guided scan flow, reconstruction pipeline status, and textured/animated GLB loading
-- Workday Companion with quiet, companion, and observation modes
-- Smart litter-box, camera, feeder, and collar device hub
-- Litter-box baseline and repeat-entry observations
-- Remote voice, treat, toy, and camera interaction prototypes
-- Linked behavior, environment, and care recommendations
-- Care tasks with outcome feedback and a personal care playbook
-- Pet status, home diary, insights, and personality timeline
+- Device hub and Workday Companion pages are honest previews until hardware pairing ships
 
 ## Product Boundary
 

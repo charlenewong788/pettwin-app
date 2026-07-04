@@ -5,26 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f5f7f2" />
     <title>PetTwin | Your pet, understood</title>
-    <link rel="stylesheet" href="styles.css?v=5" />
-    <link rel="stylesheet" href="pet-fix.css?v=8" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="pet-fix.css?v=9" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=12" defer></script>
-    <script src="pet-fix.js?v=25" defer></script>
-    <style>
-      .model-library{display:none}.twin-generator{display:grid;gap:12px;margin:-6px 0 12px}.interaction-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.interaction-bar button{min-height:38px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-size:12px;font-weight:900}.interaction-bar button.active,.interaction-bar button:hover{border-color:#6fbf92;background:#edf7f0;color:#285d43;box-shadow:0 8px 15px rgba(64,132,93,.1)}@media(max-width:560px){.interaction-bar{grid-template-columns:1fr}}
-    </style>
+    <script src="app.js?v=13" defer></script>
+    <script src="pet-fix.js?v=26" defer></script>
   </head>
   <body>
-    <canvas id="pet-world" aria-label="Roaming 3D pet"></canvas>
-    <div id="pet-sprite" aria-hidden="true">
-      <i class="ear left"></i><i class="ear right"></i><i class="tail"></i>
-      <span class="shadow"></span><span class="leg back2"></span><span class="leg back"></span>
-      <span class="body"></span><span class="chest"></span><span class="leg front2"></span><span class="leg front"></span>
-      <span class="head"></span><span class="muzzle"></span><b class="eye left"></b><b class="eye right"></b><em class="nose"></em><em class="mouth"></em>
-    </div>
+    <div id="pet-sprite" aria-hidden="true"></div>
     <div class="pet-message" id="pet-message">
-      <strong>Mochi</strong>
+      <strong id="pet-message-name">—</strong>
       <span id="pet-message-text">I seem quieter than usual today. Does that feel right?</span>
       <div><button data-answer="yes" data-i18n="yes">Yes</button><button data-answer="no" data-i18n="no">No</button></div>
     </div>
@@ -32,7 +25,7 @@
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand"><div class="brand-mark">PT</div><div><strong>PetTwin</strong><span data-i18n="brandSub">Your pet, understood</span></div></div>
-        <div class="pet-switch"><span class="mini-avatar">M</span><div><strong>Mochi</strong><small data-i18n="catMeta">Cat · 3 years</small></div><button title="Pet menu">⌄</button></div>
+        <div class="pet-switch"><span class="mini-avatar" id="mini-avatar">P</span><div><strong id="side-pet-name">—</strong><small id="pet-meta"></small></div></div>
         <nav class="nav">
           <button class="nav-item active" data-view="today" data-i18n="navToday">Today</button>
           <button class="nav-item" data-view="home" data-i18n="navHome">Home mode</button>
@@ -47,12 +40,12 @@
       </aside>
 
       <main>
-        <header class="topbar"><div><p class="eyebrow" id="section-eyebrow">PETTWIN HOME</p><h1 id="page-title" data-i18n="navToday">Today</h1></div><div class="top-actions"><span class="sync-status"><i></i><span data-i18n="synced">All sources synced</span></span><button class="primary-action" data-view-jump="care" data-i18n="quickCheck">Quick check</button></div></header>
+        <header class="topbar"><div><p class="eyebrow" id="section-eyebrow">PETTWIN HOME</p><h1 id="page-title" data-i18n="navToday">Today</h1></div><div class="top-actions"><span class="sync-status"><i></i><span data-i18n="savedLocal">Data stays on this device</span></span><button class="primary-action" data-checkin-open data-i18n="quickCheck">Daily check-in</button></div></header>
 
         <section class="view active" id="today">
           <div class="today-hero">
-            <div><span class="status-chip" data-i18n="stableToday">Stable today</span><h2><span data-i18n="hello">Hello,</span> Mochi</h2><p id="daily-summary">Activity and routine are close to Mochi’s normal baseline. Litter-box visits are slightly higher than usual.</p><div class="hero-actions"><button class="primary-action" data-view-jump="home" data-i18n="seeHome">See what happened at home</button><button class="secondary-action" data-view-jump="care" data-i18n="addObservation">Add observation</button></div></div>
-            <div class="score-ring"><strong id="wellbeing-score">82</strong><span data-i18n="wellbeing">Wellbeing</span></div>
+            <div><span class="status-chip" id="status-chip">—</span><h2><span data-i18n="hello">Hello,</span> <span id="hero-pet-name">—</span></h2><p id="daily-summary"></p><div class="hero-actions"><button class="primary-action" data-checkin-open data-i18n="addObservation">Check in now</button><button class="secondary-action" data-view-jump="home" data-i18n="seeHome">See what happened at home</button></div></div>
+            <div class="score-ring"><strong id="wellbeing-score">—</strong><span data-i18n="wellbeing">Wellbeing</span></div>
           </div>
 
           <div class="pt-engage">
@@ -67,6 +60,7 @@
               </div>
               <p class="persona-quote" id="persona-quote">—</p>
               <div class="persona-traits" id="persona-traits"></div>
+              <p class="persona-progress" id="persona-progress"></p>
             </article>
             <div class="engage-side">
               <article class="streak-card" id="streak-card">
@@ -74,6 +68,7 @@
                 <strong id="streak-count">0</strong>
                 <span class="streak-unit" data-i18n="streakDays">day streak</span>
                 <button class="streak-btn" id="check-in" data-i18n="checkIn">Check in today</button>
+                <span class="freeze-chip" id="freeze-chip"></span>
               </article>
               <article class="whisper-card">
                 <span class="whisper-label" data-i18n="whisperLabel">Today's whisper</span>
@@ -83,15 +78,16 @@
           </div>
 
           <div class="signal-strip">
-            <button data-signal="activity"><span data-i18n="activity">Activity</span><strong id="activity-value">72</strong><small>+4%</small></button>
-            <button data-signal="stress"><span data-i18n="stress">Stress</span><strong id="stress-value">28</strong><small>-3%</small></button>
-            <button data-signal="litter"><span data-i18n="litterVisits">Litter visits</span><strong id="litter-value">5</strong><small>+1</small></button>
-            <button data-signal="water"><span data-i18n="water">Water</span><strong>Normal</strong><small data-i18n="baseline">Baseline</small></button>
+            <button data-signal="activity"><span data-i18n="activity">Activity</span><strong id="activity-value">—</strong><small id="activity-delta"></small></button>
+            <button data-signal="stress"><span data-i18n="stress">Stress</span><strong id="stress-value">—</strong><small id="stress-delta"></small></button>
+            <button data-signal="mood"><span data-i18n="moodLabel">Mood</span><strong id="mood-value">—</strong><small></small></button>
+            <button data-signal="appetite"><span data-i18n="water">Appetite</span><strong id="appetite-value">—</strong><small></small></button>
           </div>
 
           <div class="two-column">
-            <section class="surface"><div class="section-heading"><div><span data-i18n="worthKnowing">Worth knowing</span><h2 data-i18n="smartFinding">One useful finding</h2></div><span class="confidence">87%</span></div><p class="finding" id="smart-finding">4 of Mochi’s last 5 hiding events happened after visitors arrived. Recovery usually took around 2 hours.</p><div class="action-row"><button class="secondary-action" data-task-add="safe-space" data-i18n="addCareTask">Add care task</button><button class="text-action" data-view-jump="insights" data-i18n="viewEvidence">View evidence</button></div></section>
-            <section class="surface"><div class="section-heading"><div><span data-i18n="todayPlan">Today’s plan</span><h2 data-i18n="smallActions">Small actions that help</h2></div><strong id="task-progress">1/3</strong></div><div class="compact-tasks" id="compact-tasks"></div></section>
+            <section class="surface"><div class="section-heading"><div><span data-i18n="worthKnowing">Worth knowing</span><h2 data-i18n="smartFinding">One useful finding</h2></div><span class="confidence">—</span></div><p class="finding" id="smart-finding"></p><div class="action-row"><button class="secondary-action" data-task-add="safe-space" data-i18n="addCareTask">Add care task</button><button class="text-action" data-view-jump="insights" data-i18n="viewEvidence">View evidence</button></div></section>
+            <section class="surface"><div class="section-heading"><div><span data-i18n="todayPlan">Today’s plan</span><h2 data-i18n="smallActions">Small actions that help</h2></div><strong id="task-progress">0/0</strong></div><div class="compact-tasks" id="compact-tasks"></div></section>
+          </div>
           <div class="achievements">
             <div class="ach-head">
               <span class="ach-title" data-i18n="achievements">Milestones</span>
@@ -99,31 +95,31 @@
             </div>
             <div class="ach-grid" id="ach-grid"></div>
           </div>
-        </div>
         </section>
 
         <section class="view" id="home">
           <div class="mode-banner"><div><span data-i18n="workdayCompanion">Workday Companion</span><h2 data-i18n="homeWithoutWatching">Know what matters without watching all day</h2><p data-i18n="homeModeCopy">PetTwin turns device events into a calm, useful home diary.</p></div><div class="mode-picker"><button data-mode="quiet" data-i18n="quietMode">Quiet</button><button class="active" data-mode="companion" data-i18n="companionMode">Companion</button><button data-mode="observe" data-i18n="observeMode">Observe</button></div></div>
           <div class="two-column">
-            <section class="surface"><div class="section-heading"><div><span data-i18n="liveDiary">Live home diary</span><h2 data-i18n="todayAtHome">Today at home</h2></div><span class="live-dot">LIVE</span></div><div class="event-feed" id="event-feed"></div><button class="secondary-action full" id="add-home-event" data-i18n="simulateEvent">Simulate new event</button></section>
-            <section class="surface"><div class="section-heading"><div><span data-i18n="remoteCare">Remote care</span><h2 data-i18n="connectGently">Connect gently</h2></div></div><div class="remote-grid"><button data-remote="voice"><strong>Voice</strong><span data-i18n="playVoice">Play a familiar message</span></button><button data-remote="treat"><strong>Treat</strong><span data-i18n="smallPortion">Dispense a limited portion</span></button><button data-remote="toy"><strong>Play</strong><span data-i18n="startToy">Start a safe toy session</span></button><button data-remote="camera"><strong>Camera</strong><span data-i18n="openCamera">Check the living room</span></button></div><p class="result-line" id="remote-result"></p><div class="workday-summary"><strong data-i18n="beforeHome">Before you get home</strong><p id="workday-summary">Mochi slept for 5h 48m, used the litter box 5 times, and played less than usual. Try a 10-minute play session tonight.</p></div></section>
+            <section class="surface"><div class="section-heading"><div><span data-i18n="liveDiary">Home diary</span><h2 data-i18n="todayAtHome">Today at home</h2></div><span class="sample-tag" data-i18n="sampleTag">SAMPLE</span></div><div class="event-feed" id="event-feed"></div></section>
+            <section class="surface"><div class="section-heading"><div><span data-i18n="remoteCare">Remote care</span><h2 data-i18n="connectGently">Connect gently</h2></div><span class="sample-tag" data-i18n="sampleTag">SAMPLE</span></div><div class="remote-grid"><button data-remote="voice"><strong>Voice</strong><span data-i18n="playVoice">Play a familiar message</span></button><button data-remote="treat"><strong>Treat</strong><span data-i18n="smallPortion">Dispense a limited portion</span></button><button data-remote="toy"><strong>Play</strong><span data-i18n="startToy">Start a safe toy session</span></button><button data-remote="camera"><strong>Camera</strong><span data-i18n="openCamera">Check the living room</span></button></div><p class="result-line" id="remote-result"></p><div class="workday-summary"><strong data-i18n="beforeHome">Before you get home</strong><p id="workday-summary"></p></div></section>
           </div>
         </section>
 
         <section class="view" id="devices">
-          <div class="page-intro"><p data-i18n="deviceIntro">Connect passive data sources so owners do less recording.</p><button class="primary-action" id="discover-devices" data-i18n="discoverDevices">Discover devices</button></div>
+          <div class="page-intro"><p data-i18n="deviceIntro">Hardware integrations are coming.</p><button class="primary-action" id="discover-devices" data-i18n="discoverDevices">Discover devices</button></div>
           <div class="device-grid" id="device-grid"></div>
-          <section class="surface litter-detail"><div class="section-heading"><div><span data-i18n="catOnly">Cat intelligence</span><h2 data-i18n="litterAnalysis">Smart litter-box analysis</h2></div><span class="device-online" data-i18n="connected">Connected</span></div><div class="litter-stats"><div><span data-i18n="visitsToday">Visits today</span><strong id="visits-today">5</strong></div><div><span data-i18n="averageDuration">Average duration</span><strong>54s</strong></div><div><span data-i18n="latestWeight">Latest weight</span><strong>4.62kg</strong></div><div><span data-i18n="repeatEntries">Repeat entries</span><strong id="repeat-entries">2</strong></div></div><div class="observation-note"><strong data-i18n="observeNotDiagnose">Observation, not diagnosis</strong><p id="litter-note">Visits are slightly above Mochi’s baseline. Continue observing drinking, appetite and repeated short visits.</p></div></section>
+          <p class="result-line" id="device-result"></p>
+          <section class="surface litter-detail"><div class="section-heading"><div><span data-i18n="catOnly">Cat intelligence</span><h2 data-i18n="litterAnalysis">Smart litter-box analysis</h2></div><span class="device-online" data-i18n="preview">Preview</span></div><div class="litter-stats"><div><span data-i18n="visitsToday">Visits today</span><strong id="visits-today">5</strong></div><div><span data-i18n="averageDuration">Average duration</span><strong>54s</strong></div><div><span data-i18n="latestWeight">Latest weight</span><strong>4.62kg</strong></div><div><span data-i18n="repeatEntries">Repeat entries</span><strong id="repeat-entries">2</strong></div></div><div class="observation-note"><strong data-i18n="observeNotDiagnose">Observation, not diagnosis</strong><p id="litter-note"></p></div></section>
         </section>
 
         <section class="view" id="care">
           <div class="page-intro"><p data-i18n="careIntro">Turn insights into actions, then learn what works for this pet.</p><button class="primary-action" id="new-task" data-i18n="newTask">New care task</button></div>
-          <div class="care-layout"><section class="surface"><div class="section-heading"><div><span data-i18n="activePlan">Active plan</span><h2 data-i18n="thisWeek">This week</h2></div></div><div class="care-list" id="care-list"></div></section><section class="surface"><div class="section-heading"><div><span>WHAT WORKS FOR MOCHI</span><h2 data-i18n="personalPlaybook">Personal care playbook</h2></div></div><div class="playbook" id="playbook"></div></section></div>
+          <div class="care-layout"><section class="surface"><div class="section-heading"><div><span data-i18n="activePlan">Active plan</span><h2 data-i18n="thisWeek">This week</h2></div></div><div class="care-list" id="care-list"></div></section><section class="surface"><div class="section-heading"><div><span data-i18n="personalPlaybook">Personal care playbook</span><h2 data-i18n="personalPlaybook">Personal care playbook</h2></div><span class="sample-tag" data-i18n="sampleTag">SAMPLE</span></div><div class="playbook" id="playbook"></div></section></div>
         </section>
 
         <section class="view" id="insights">
           <div class="insight-tabs"><button class="active" data-range="7">7D</button><button data-range="30">30D</button><button data-range="90">90D</button></div>
-          <div class="two-column"><section class="surface"><div class="section-heading"><div><span data-i18n="behaviorBaseline">Behavior baseline</span><h2 data-i18n="linkedSignals">Linked signals</h2></div></div><canvas id="trend-chart" width="620" height="320"></canvas></section><section class="surface"><div class="section-heading"><div><span data-i18n="environmentLinks">Environment links</span><h2 data-i18n="likelyTriggers">Likely triggers</h2></div></div><div class="correlation-list" id="correlation-list"></div></section></div>
+          <div class="two-column"><section class="surface"><div class="section-heading"><div><span data-i18n="behaviorBaseline">Behavior baseline</span><h2 data-i18n="linkedSignals">Logged signals</h2></div></div><canvas id="trend-chart" width="620" height="320"></canvas></section><section class="surface"><div class="section-heading"><div><span data-i18n="environmentLinks">Environment links</span><h2 data-i18n="likelyTriggers">Likely triggers (sample)</h2></div></div><div class="correlation-list" id="correlation-list"></div></section></div>
         </section>
 
         <section class="view" id="timeline"><section class="surface"><div class="section-heading"><div><span data-i18n="lifeArchive">Life archive</span><h2 data-i18n="personalityTimeline">Personality timeline</h2></div><button class="secondary-action" data-i18n="exportReport">Export report</button></div><div class="timeline" id="timeline-list"></div></section></section>
@@ -132,31 +128,31 @@
           <div class="studio-grid">
             <section class="surface studio-copy">
               <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a photo-matched digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">photo quality</span></div></div>
-              <p data-i18n="studioCopy">Use four clear views or a guided 3D scan. PetTwin adapts shape and proportions to each pet.</p>
-              <div class="capture-tabs"><button class="active" data-capture-mode="photos" data-i18n="photoSet">Photo set</button><button data-capture-mode="scan" data-i18n="videoScan">3D scan</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
+              <p data-i18n="studioCopy">Use four clear views. Photos stay on this device.</p>
+              <div class="capture-tabs two"><button class="active" data-i18n="photoSet">Photo set</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
               <div class="twin-generator">
                 <div class="interaction-bar" aria-label="Pet interactions">
-                  <button type="button" data-pet-action="feed">Feed 喂食</button>
-                  <button type="button" data-pet-action="shake">Paw 握手</button>
-                  <button type="button" data-pet-action="play">Play 玩耍</button>
-                  <button type="button" data-pet-action="calm">Calm 安静</button>
-                  <button type="button" data-pet-action="spin">360 查看</button>
+                  <button type="button" data-pet-action="feed" data-i18n="feedPet">Feed</button>
+                  <button type="button" data-pet-action="shake" data-i18n="shakePaw">Shake paw</button>
+                  <button type="button" data-pet-action="play" data-i18n="playPet">Play</button>
+                  <button type="button" data-pet-action="calm" data-i18n="calmPet">Calm</button>
+                  <button type="button" data-pet-action="spin" data-i18n="view360">360 view</button>
                 </div>
               </div>
               <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add four pet photos</strong><span data-i18n="uploadHint">Front, left side, right side and back in even light.</span></label>
               <div class="capture-slots" id="capture-slots"></div>
-              <button class="scan-method full" id="start-scan"><strong data-i18n="guidedScan">Start guided scan</strong><span data-i18n="scanHint">A 45-second route around your pet</span></button>
               <div class="quality-panel"><div><span data-i18n="captureQuality">Capture quality</span><strong id="quality-summary">0 / 4</strong></div><div class="quality-checks" id="quality-checks"></div></div>
               <div class="scan-progress" id="scan-progress"><i></i><span data-i18n="waitingInput">Add the four required views to begin</span></div>
-              <div class="pipeline" id="reconstruction-pipeline"><span class="active" data-i18n="stageCapture">Capture</span><span data-i18n="stageShape">Shape</span><span data-i18n="stageTexture">Texture</span><span data-i18n="stageRig">Rig</span><span data-i18n="stageReview">Review</span></div>
+              <div class="pipeline" id="reconstruction-pipeline"><span class="active" data-i18n="stageCapture">Capture</span><span data-i18n="stageShape">Shape</span><span data-i18n="stageTexture">Coat</span><span data-i18n="stageRig">Motion</span><span data-i18n="stageReview">Review</span></div>
               <button class="primary-action full" id="generate-twin" disabled data-i18n="generateTwin">Create photo-matched preview</button><p class="result-line" id="studio-result"></p>
             </section>
-            <section class="studio-stage"><div class="studio-badge"><strong data-i18n="liveModel">LIVE MODEL</strong><span id="model-source" data-i18n="proceduralPreview">Capture preview</span></div><div class="studio-orbit"><span>Mochi 3D</span><small data-i18n="dragRotate">Move the pointer to inspect the twin</small></div></section>
+            <section class="studio-stage"><div class="studio-badge"><strong data-i18n="liveModel">LIVE MODEL</strong><span id="model-source" data-i18n="proceduralPreview">Capture preview</span></div><div class="studio-orbit"><span id="studio-orbit-name">3D</span><small data-i18n="dragRotate">Drag the twin to rotate it</small></div></section>
           </div>
         </section>
       </main>
     </div>
-  <div class="share-overlay hidden" id="share-overlay">
+
+    <div class="share-overlay hidden" id="share-overlay">
       <div class="share-modal">
         <button class="share-close" id="share-close" aria-label="Close">×</button>
         <h3 data-i18n="shareTitle">Your pet card</h3>
@@ -166,5 +162,49 @@
         </div>
       </div>
     </div>
+
+    <div class="modal-overlay hidden" id="checkin-overlay">
+      <div class="modal">
+        <button class="share-close" id="checkin-close" aria-label="Close">×</button>
+        <h3 data-i18n="checkinTitle">30-second check-in</h3>
+        <p class="modal-sub" data-i18n="checkinSub">Three quick questions build your pet's real baseline.</p>
+        <label data-i18n="qMood">Mood today</label>
+        <div class="mood-row" id="mood-row">
+          <button type="button" data-mood="1">😿</button>
+          <button type="button" data-mood="2">😾</button>
+          <button type="button" data-mood="3">😺</button>
+          <button type="button" data-mood="4">😸</button>
+          <button type="button" data-mood="5">😻</button>
+        </div>
+        <label data-i18n="qAppetite">Appetite</label>
+        <div class="opt-row" data-field="appetite">
+          <button type="button" data-value="less" data-i18n="appLess">Less</button>
+          <button type="button" data-value="normal" data-i18n="appNormal">Normal</button>
+          <button type="button" data-value="more" data-i18n="appMore">More</button>
+        </div>
+        <label data-i18n="qLitter">Litter box</label>
+        <div class="opt-row" data-field="litter">
+          <button type="button" data-value="normal" data-i18n="litterNormal">Normal</button>
+          <button type="button" data-value="odd" data-i18n="litterOdd">Unusual</button>
+        </div>
+        <textarea id="checkin-note" data-i18n-placeholder="notePh"></textarea>
+        <button class="primary-action full" id="checkin-save" data-i18n="saveCheckin">Save today's check-in</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="onb-overlay">
+      <div class="modal onboarding">
+        <div class="onb-mark">🐾</div>
+        <h3 data-i18n="onbTitle">Welcome to PetTwin</h3>
+        <p class="modal-sub" data-i18n="onbSub">Tell us who we're getting to know.</p>
+        <label data-i18n="onbName">Pet's name</label>
+        <input type="text" id="onb-name" maxlength="20" data-i18n-placeholder="onbNamePh" />
+        <label data-i18n="onbAge">Age (years, optional)</label>
+        <input type="number" id="onb-age" min="0" max="40" step="1" />
+        <button class="primary-action full" id="onb-start" data-i18n="onbStart">Start</button>
+      </div>
+    </div>
+
+    <div class="checkin-toast" id="checkin-toast"></div>
   </body>
 </html>

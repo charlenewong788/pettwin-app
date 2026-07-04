@@ -173,13 +173,12 @@ function fit(root){
 }
 function load(url="assets/sitting_blue_cat.glb"){
   if(!ctx||!window.THREE||!THREE.GLTFLoader)return;
-  const src=url+(url.includes("?")?"&":"?")+"cache="+Date.now();
-  new THREE.GLTFLoader().load(src,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false)},undefined,()=>setLabel("Fallback"));
+  new THREE.GLTFLoader().load(url,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false)},undefined,()=>setLabel("Fallback"));
 }
 function init(pet){
   if(ctx||!window.THREE)return;
   pet.innerHTML="";
-  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;pet.appendChild(renderer.domElement);
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(30,1,.1,100);camera.position.set(0,.28,6.35);
   scene.add(new THREE.AmbientLight(0xffffff,.58));
@@ -278,5 +277,6 @@ function bind(){
   $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
   $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>setAction("spin"),700));
 }
+window.PetFix={load,setCoat,setCream,setLook,setAction,move};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();
