@@ -217,14 +217,15 @@ function setAction(type){
   if(type==="spin")spinUntil=performance.now()+4300;
   const line=$("#studio-result"),zh=(document.documentElement.lang||"en").startsWith("zh");
   if(line){const msg={feed:["Feeding preview: bowl placed and the twin leans toward food.","喂食预览：食盆出现，数字猫会靠近食物。"],shake:["Handshake preview: a front paw reaches toward the owner.","握手预览：前爪会伸向主人。"],play:["Play preview: toy ball appears and the twin reacts curiously.","玩耍预览：玩具球出现，数字猫会好奇互动。"],calm:["Calm mode: softer breathing and slower motion.","安静模式：呼吸和动作变得更柔和。"],spin:["360 view: the complete model rotates for inspection.","360 查看：完整模型会旋转展示。"]}[type]||["Interactive preview ready.","互动预览已准备好。"];line.textContent=msg[zh?1:0]}}
-function regionStats(data,size,rx0,ry0,rx1,ry1){
+function regionStats(data,size,rx0,ry0,rx1,ry1,bg){
   let r=0,g=0,b=0,n=0,lr=0,lg=0,lb=0,ln=0,wr=0,wg=0,wb=0,wn=0,dr=0,dg=0,db=0,dn=0,gr=0,ggg=0,gb=0,gn=0,orange=0,striped=0;
   const x0=Math.floor(rx0*size),x1=Math.ceil(rx1*size),y0=Math.floor(ry0*size),y1=Math.ceil(ry1*size);
   for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){
     const i=(y*size+x)*4,rr=data[i],gg=data[i+1],bb=data[i+2],l=(rr+gg+bb)/3,spread=Math.max(rr,gg,bb)-Math.min(rr,gg,bb);
     const greenBackground=gg>rr*1.06&&gg>bb*1.05&&spread>18;
-    const blueWindow=bb>rr*1.12&&bb>gg*1.04&&l<160;
+    const blueWindow=bb>rr*1.18&&bb>gg*1.06&&spread>26&&l<160; // real sky/window blue only — blue-grey coats (British Shorthair) have spread ~14 and must be kept
     if(l<34||l>246||greenBackground||blueWindow)continue;
+    if(bg&&bg.some(v=>Math.abs(rr-v.r)+Math.abs(gg-v.g)+Math.abs(bb-v.b)<72))continue;
     const warm=rr>gg*.96&&gg>bb*1.08&&rr>bb+28&&gg>bb+14&&l>72;
     r+=rr;g+=gg;b+=bb;n++;
     if(l>158&&spread<92){lr+=rr;lg+=gg;lb+=bb;ln++}
@@ -239,9 +240,30 @@ function regionStats(data,size,rx0,ry0,rx1,ry1){
   let softened=avoidMud(cuteTone(avg,warmRatio>.08?.04:.08));
   if(warmRatio>.025)softened=keepWarm(softened,warmAvg,warmRatio);
   const zoneColor=whiteRatio>.38&&warmRatio<.025?mix(softened,white,clamp(whiteRatio*.52,0,.36)):softened;
-  return{avg,light:white,dark,warm:warmAvg,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmHex:rgbHex(warmAvg),warmRatio,stripeRatio,whiteRatio};
+  return{avg,light:white,dark,warm:warmAvg,color:rgbHex(zoneColor),cream:rgbHex(white),darkHex:rgbHex(softDark(dark,softened)),warmHex:rgbHex(warmAvg),warmRatio,stripeRatio,whiteRatio,n};
 }
-function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);const whole=regionStats(d,s,.04,.04,.96,.96);if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect);if(st){zones[name]=st.warmRatio>.025?rgbHex(keepWarm(hexRgb(st.color),hexRgb(st.warmHex),st.warmRatio)):st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.28,.2,.9,.7])}else if(view===2){add("right",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.1,.2,.72,.7])}else{add("back",[.14,.28,.84,.82]);add("left",[.08,.32,.5,.84]);add("right",[.5,.32,.92,.84])}stats.push(whole);const warmAvg=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length,isGinger=warmAvg>.025||stats.some(v=>v.warmRatio>.05),striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.warmRatio>.025?rgbHex(keepWarm(hexRgb(whole.color),hexRgb(whole.warmHex),whole.warmRatio)):whole.color,cream:whole.cream,dark:whole.darkHex,warm:whole.warmHex,zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.05,.08,.42),warmRatio:warmAvg,pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*1.8,.06,.28)})};img.onerror=()=>res(null);img.src=url})}
+function readPhoto(file,view=0){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const c=document.createElement("canvas"),s=128;c.width=c.height=s;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,s,s);const d=x.getImageData(0,0,s,s).data;URL.revokeObjectURL(url);
+  // Estimate background colours from the border ring (walls, floor, sofa can
+  // all differ) and exclude them, so the coat colour comes from the pet only.
+  // Falls back to the full frame when the subject fills the border or matches
+  // the background (e.g. white cat against a white wall).
+  const clusters=[];
+  const addSample=(px,py)=>{
+    const i=(py*s+px)*4,sr=d[i],sg=d[i+1],sb=d[i+2];
+    for(const cl of clusters){
+      if(Math.abs(sr-cl.r/cl.count)+Math.abs(sg-cl.g/cl.count)+Math.abs(sb-cl.b/cl.count)<60){cl.r+=sr;cl.g+=sg;cl.b+=sb;cl.count++;return}
+    }
+    clusters.push({r:sr,g:sg,b:sb,count:1});
+  };
+  for(let p=2;p<s-2;p+=3){addSample(p,2);addSample(p,s-3);addSample(2,p);addSample(s-3,p)}
+  const ringTotal=clusters.reduce((sum,cl)=>sum+cl.count,0);
+  let bg=clusters.filter(cl=>cl.count>ringTotal*.12).map(cl=>({r:cl.r/cl.count,g:cl.g/cl.count,b:cl.b/cl.count}));
+  if(!bg.length)bg=null;
+  const dbgClusters=clusters.map(cl=>({count:cl.count,r:Math.round(cl.r/cl.count)}));
+  let whole=regionStats(d,s,.04,.04,.96,.96,bg);
+  const firstN=whole?whole.n:-1;
+  if(!whole||whole.n<250){bg=null;whole=regionStats(d,s,.04,.04,.96,.96)}
+  if(!whole)return res(null);const zones={},stats=[];const add=(name,rect)=>{const st=regionStats(d,s,...rect,bg);if(st){zones[name]=st.warmRatio>.025?rgbHex(keepWarm(hexRgb(st.color),hexRgb(st.warmHex),st.warmRatio)):st.color;stats.push(st)}};if(view===0){add("face",[.2,.04,.8,.42]);add("chest",[.26,.42,.74,.92]);add("belly",[.18,.58,.82,.98]);add("left",[.03,.16,.45,.88]);add("right",[.55,.16,.97,.88])}else if(view===1){add("left",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.28,.2,.9,.7])}else if(view===2){add("right",[.08,.18,.94,.86]);add("belly",[.16,.56,.88,.96]);add("back",[.1,.2,.72,.7])}else{add("back",[.14,.28,.84,.82]);add("left",[.08,.32,.5,.84]);add("right",[.5,.32,.92,.84])}stats.push(whole);const warmAvg=stats.reduce((s,v)=>s+v.warmRatio,0)/stats.length,isGinger=warmAvg>.025||stats.some(v=>v.warmRatio>.05),striped=stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length>.075;res({coat:whole.warmRatio>.025?rgbHex(keepWarm(hexRgb(whole.color),hexRgb(whole.warmHex),whole.warmRatio)):whole.color,cream:whole.cream,dark:whole.darkHex,warm:whole.warmHex,zones,whiteRatio:clamp(stats.reduce((s,v)=>s+v.whiteRatio,0)/stats.length*1.05,.08,.42),warmRatio:warmAvg,pattern:isGinger?"ginger":striped?"tabby":"solid",stripe:clamp(stats.reduce((s,v)=>s+v.stripeRatio,0)/stats.length*1.8,.06,.28),__debug:{bg,n:whole.n,firstN,ringTotal,dbgClusters,warmRatio:whole.warmRatio}})};img.onerror=()=>res(null);img.src=url})}
 async function readPhotos(files){
   const all=(await Promise.all([...files].slice(0,4).map((file,i)=>readPhoto(file,i)))).filter(Boolean);
   if(!all.length)return null;
@@ -250,7 +272,9 @@ async function readPhotos(files){
   const zoneNames=["face","chest","belly","left","right","back"],zones={};
   zoneNames.forEach(name=>{const items=all.filter(c=>c.zones&&c.zones[name]);if(items.length)zones[name]=rgbHex(["r","g","b"].reduce((o,k)=>{o[k]=items.reduce((s,c)=>s+hexRgb(c.zones[name])[k],0)/items.length;return o},{}))});
   let coatOut=avg("coat"),creamOut=all.some(c=>c.cream)?avg("cream"):null,darkOut=all.some(c=>c.dark)?avg("dark"):null,warmOut=avg("warm");
-  const warmScore=all.reduce((s,c)=>s+(c.warmRatio||0),0)/all.length,maxWarm=Math.max(...all.map(c=>c.warmRatio||0)),warmPet=warmScore>.025||maxWarm>.05,lightPet=warmPet||lum(hexRgb(creamOut||coatOut))>204;
+  // warmPet needs a clearly warm coat (not just warm furniture in frame);
+  // lightPet is judged on the main coat itself, never on the white chest.
+  const warmScore=all.reduce((s,c)=>s+(c.warmRatio||0),0)/all.length,maxWarm=Math.max(...all.map(c=>c.warmRatio||0)),warmPet=warmScore>.08||maxWarm>.16,lightPet=warmPet||lum(hexRgb(coatOut))>190;
   if(warmPet){
     const warmRgb=hexRgb(warmOut),coatRgb=hexRgb(coatOut);
     coatOut=rgbHex(mix(coatRgb,warmRgb,.88));
@@ -267,7 +291,7 @@ async function readPhotos(files){
     const back=hexRgb(zones.back),body=hexRgb(zones.left||zones.right||coatOut),main=hexRgb(coatOut);
     if(lum(back)<lum(main)-12||lum(back)<145)zones.back=rgbHex(mix(mix(back,body,.62),main,.28));
   }
-  return{coat:coatOut,cream:creamOut,dark:darkOut,warm:warmOut,zones,lightPet,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.04,warmPet?.2:.5),pattern:warmPet?"ginger":pattern,stripe:warmPet?clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.1,.24):lightPet?.05:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36)};
+  return{coat:coatOut,cream:creamOut,dark:darkOut,warm:warmOut,zones,lightPet,whiteRatio:clamp(all.reduce((s,c)=>s+(c.whiteRatio||.18),0)/all.length,.04,warmPet?.2:.5),pattern:warmPet?"ginger":pattern,stripe:warmPet?clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.1,.24):lightPet?.05:clamp(all.reduce((s,c)=>s+(c.stripe||.12),0)/all.length,.06,.36),__debug:all.map(c=>c.__debug)};
 }
 function bind(){
   if(ready)return;ready=true;ensure();move(innerWidth*.7,innerHeight*.52);
@@ -277,6 +301,6 @@ function bind(){
   $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
   $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>setAction("spin"),700));
 }
-window.PetFix={load,setCoat,setCream,setLook,setAction,move};
+window.PetFix={load,setCoat,setCream,setLook,setAction,move,readPhotos};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();
