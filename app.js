@@ -158,6 +158,7 @@ const defaultState = {
   ix: null,                   // today's interaction counters {date, pets, plays, talks, feeds, coined}
   ixTotal: { pets: 0, plays: 0, talks: 0, feeds: 0 },
   coins: 0,
+  model: "sitting",
   wardrobe: { owned: [], wearing: null },
   look: null,                 // photo-derived sprite colours {coat, cream, dark, pattern}
   twinVisible: true, coat: "#77bed2",
@@ -218,11 +219,11 @@ function addCoins(n) {
   if (n > 0) toast("+" + n + " " + t("coinsName"));
 }
 const WARDROBE = [
-  { id: "bow", zh: "红色蝴蝶结", en: "Red bow", price: 0, minLv: 2 },
-  { id: "bell", zh: "铃铛项圈", en: "Bell collar", price: 30, minLv: 1 },
-  { id: "scarf", zh: "蓝围巾", en: "Blue scarf", price: 60, minLv: 1 },
-  { id: "glasses", zh: "圆框眼镜", en: "Round glasses", price: 90, minLv: 3 },
-  { id: "flower", zh: "花环", en: "Flower crown", price: 120, minLv: 4 },
+  { id: "collar", zh: "铃铛项圈", en: "Bell collar", price: 0, minLv: 2 },
+  { id: "scarf", zh: "蓝围巾", en: "Blue scarf", price: 40, minLv: 1 },
+  { id: "cushion", zh: "专属坐垫", en: "Cushion", price: 80, minLv: 3 },
+  { id: "sparkles", zh: "星光", en: "Sparkles", price: 120, minLv: 4 },
+  { id: "halo", zh: "光环", en: "Halo", price: 160, minLv: 5 },
   { id: "crown", zh: "皇冠", en: "Crown", price: 200, minLv: 6 }
 ];
 
@@ -261,6 +262,7 @@ function renderGrowth() {
   $("#growth-progress-text").textContent = next
     ? (en() ? `${next.at - n} more check-in day${next.at - n > 1 ? "s" : ""} to Lv.${next.lv}` : `再打卡 ${next.at - n} 天升到 Lv.${next.lv}`)
     : (en() ? "Max level — a lifelong friend" : "满级——一生挚友");
+  if (window.PetFix && window.PetFix.setTier) window.PetFix.setTier(cur.lv); // growth forms, little-flame style
 }
 
 /* === Closet — coins + level gates buy wearables rendered on the sprite === */
@@ -479,7 +481,10 @@ function renderEmotion() {
   $("#emotion-reason").textContent = emotionReason(id);
   $("#emotion-msg").textContent = "“" + emotionMessage(id) + "”";
   window.__petMood = e.bias;
-  if (window.PetFix) window.PetFix.setMood(e.bias);
+  if (window.PetFix) {
+    window.PetFix.setMood(e.bias);
+    if (window.PetFix.setNeglected) window.PetFix.setNeglected(id === "missing"); // little-flame pattern: neglect greys the pet
+  }
 }
 function doEmoAct(kind) {
   if (kind === "talk") { openTalk(); return; }
@@ -1154,6 +1159,19 @@ function renderSwatches() {
   const box = $("#look-swatches"); if (!box) return;
   const l = state.look || { coat: "#8f9aa6", cream: "#f6f1e7", dark: "#5d6570" };
   box.innerHTML = [l.coat, l.cream, l.dark].map(c => `<span style="background:${c}"></span>`).join("");
+  renderModels();
+}
+function renderModels() {
+  const grid = $("#model-grid"); if (!grid || !window.PetFix || !window.PetFix.MODELS) return;
+  const M = window.PetFix.MODELS;
+  grid.innerHTML = Object.keys(M).map(id =>
+    `<button class="closet-item ${state.model === id ? "active" : ""}" data-model="${id}"><span class="closet-swatch model-${id}"></span><span class="closet-name">${en() ? M[id].en : M[id].zh}</span></button>`).join("");
+  $$("[data-model]").forEach(b => b.onclick = () => {
+    state.model = b.dataset.model;
+    save();
+    window.PetFix.setModel(state.model);
+    renderModels();
+  });
 }
 
 /* Share overlay */
@@ -1179,9 +1197,12 @@ maybeOnboard();
 if (state.pet.name) maybeAwayReport();
 function applySprite() {
   if (!window.PetFix) return;
+  if (state.model && state.model !== "sitting" && !applySprite.modelSet) { applySprite.modelSet = true; window.PetFix.setModel(state.model); return; }
   if (state.look) window.PetFix.setLook(state.look);
   window.PetFix.setAdornment(state.wardrobe.wearing);
   window.PetFix.setMood(window.__petMood || "content");
+  if (window.PetFix.setTier) window.PetFix.setTier(growthNow().cur.lv);
+  renderModels();
 }
 applySprite();
 document.addEventListener("pt-model-ready", applySprite);

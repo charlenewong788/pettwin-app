@@ -7,9 +7,11 @@
     <title>PetTwin | Your pet, understood</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=9" />
-    <script src="app.js?v=17" defer></script>
-    <script src="pet-sprite.js?v=1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=10" />
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
+    <script src="app.js?v=18" defer></script>
+    <script src="pet-sprite.js?v=2" defer></script>
   </head>
   <body>
     <div id="pet-sprite" aria-hidden="true"></div>
@@ -129,6 +131,7 @@
             <section class="surface">
               <div class="section-heading"><div><span data-i18n="appearanceTitle">Appearance</span><h2 data-i18n="appearanceTitle">Appearance</h2></div><span id="studio-orbit-name" class="muted-tag"></span></div>
               <p class="page-sub" data-i18n="appearanceSub">Upload 1–4 photos and the twin matches your pet's coat.</p>
+              <div class="closet-grid" id="model-grid"></div>
               <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add pet photos</strong><span data-i18n="uploadHint">Clear, even light works best.</span></label>
               <div class="look-row"><div class="look-swatches" id="look-swatches"></div><button class="text-action" id="reset-look" data-i18n="resetLook">Reset colours</button></div>
               <p class="result-line" id="studio-result"></p>

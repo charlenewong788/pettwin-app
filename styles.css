@@ -167,9 +167,12 @@ body{background:linear-gradient(160deg,#f6f3ec 0%,#eef4ef 45%,#eef1f6 100%)}
 .closet-item small{font-size:10.5px;color:var(--muted);font-weight:700}
 .closet-item small.own{color:#357d56}
 .closet-swatch{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(31,48,52,.18)}
-.closet-bow{background:#e05f6d}.closet-bell{background:linear-gradient(135deg,#c95f54 55%,#e7c678 55%)}
-.closet-scarf{background:#5e8fbf}.closet-glasses{background:#3f3a35}
-.closet-flower{background:linear-gradient(135deg,#f2a3b0 55%,#e7c678 55%)}.closet-crown{background:#e7c678}
+.closet-collar{background:linear-gradient(135deg,#c95f54 55%,#e7c678 55%)}
+.closet-scarf{background:#5e8fbf}.closet-cushion{background:#f0b7c3}
+.closet-sparkles{background:linear-gradient(135deg,#e7c678 55%,#fdf3d0 55%)}
+.closet-halo{background:radial-gradient(circle,#fdf3d0 30%,#f5d87a 32%)}.closet-crown{background:#e7c678}
+.model-dingus{background:#c9b8a4}
+.model-toon{background:#66492c}.model-lowpoly{background:#b8bec6}.model-sitting{background:#e8e2d6}
 .look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
 .look-swatches{display:flex;gap:8px}
 .look-swatches span{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(31,48,52,.2)}
