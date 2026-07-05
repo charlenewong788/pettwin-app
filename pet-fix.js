@@ -136,6 +136,67 @@ function tint(root){
   });
   applyVertexCoat(root);
 }
+/* Desktop-pet behavior engine (oneko / Shimeji style): the twin wanders the
+   page, naps with a floating 💤, occasionally chases the cursor, and purrs
+   with heart particles when stroked. Emotion bias from the app (via setMood)
+   weights which behaviors it picks. */
+let mood="content",napping=false,napEl=null,chaseUntil=0,lastPointer=null,petAccum=0,petAccumT=0,lastPetBurst=0;
+const spriteEl=()=>document.getElementById("pet-sprite");
+function burst(emoji,count=5){
+  const p=spriteEl();if(!p)return;
+  const r=p.getBoundingClientRect();
+  for(let i=0;i<count;i++){
+    const s=document.createElement("span");
+    s.className="pt-particle";s.textContent=emoji;
+    s.style.left=(r.left+r.width*.3+Math.random()*r.width*.4)+"px";
+    s.style.top=(r.top+r.height*.2+Math.random()*r.height*.35)+"px";
+    s.style.setProperty("--dx",(Math.random()*70-35)+"px");
+    s.style.animationDelay=(Math.random()*.28)+"s";
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),1500);
+  }
+}
+function nap(on){
+  if(napping===on)return;
+  napping=on;
+  motion=on?"calm":"curious";
+  const p=spriteEl();if(!p)return;
+  if(on&&!napEl){napEl=document.createElement("span");napEl.className="pt-zzz";napEl.textContent="💤";p.appendChild(napEl)}
+  if(!on&&napEl){napEl.remove();napEl=null}
+}
+function wander(){move(innerWidth*(.12+Math.random()*.76),innerHeight*(.5+Math.random()*.3))}
+function behaviorTick(){
+  if(!ctx||!ctx.model||document.hidden)return;
+  const r=Math.random();
+  if(napping){if(r<.3)nap(false);return}
+  if(mood==="sleepy"&&r<.65){nap(true);return}
+  if(mood==="playful"&&r<.5){chaseUntil=performance.now()+6000;return}
+  if(mood==="missing"&&r<.45){move(innerWidth*.5,innerHeight*.55);burst("💗",3);return}
+  if(mood==="anxious"&&r<.4)return; // uneasy cats stay put
+  if(r<.45)wander();
+  else if(r<.58)chaseUntil=performance.now()+4500;
+  else if(r<.66)nap(true);
+}
+setInterval(behaviorTick,9000);
+setInterval(()=>{if(lastPointer&&performance.now()<chaseUntil&&!napping)move(lastPointer.x,lastPointer.y-40)},1600);
+addEventListener("pointermove",e=>{
+  lastPointer={x:e.clientX,y:e.clientY};
+  const p=spriteEl();if(!p||p.classList.contains("hidden"))return;
+  const r=p.getBoundingClientRect();
+  if(e.clientX>r.left&&e.clientX<r.right&&e.clientY>r.top&&e.clientY<r.bottom){
+    const now=performance.now();
+    if(now-petAccumT>2500)petAccum=0;
+    petAccum+=Math.abs(e.movementX||0)+Math.abs(e.movementY||0);
+    petAccumT=now;
+    if(petAccum>450&&now-lastPetBurst>3500){
+      lastPetBurst=now;petAccum=0;
+      nap(false);burst("💗",6);setAction("calm");
+      document.dispatchEvent(new CustomEvent("pt-petted"));
+    }
+  }
+});
+function setMood(next){mood=next||"content";if(mood!=="sleepy")nap(false)}
+
 /* Growth keepsakes — y-axis symmetric or ambient shapes, attached to the scene
    so they stay put while the user drag-rotates the model. */
 let adorn=null;
@@ -232,7 +293,7 @@ function fit(root){
 }
 function load(url="assets/sitting_blue_cat.glb"){
   if(!ctx||!window.THREE||!THREE.GLTFLoader)return;
-  new THREE.GLTFLoader().load(url,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);if(adorn)setAdornment(adorn);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false);document.dispatchEvent(new CustomEvent("pt-model-ready"))},undefined,()=>setLabel("Fallback"));
+  new THREE.GLTFLoader().load(url,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);if(adorn)setAdornment(adorn);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false);setTimeout(()=>burst("💗",4),900);document.dispatchEvent(new CustomEvent("pt-model-ready"))},undefined,()=>setLabel("Fallback"));
 }
 function init(pet){
   if(ctx||!window.THREE)return;
@@ -370,6 +431,6 @@ function bind(){
   $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
   $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>setAction("spin"),700));
 }
-window.PetFix={load,setCoat,setCream,setLook,setAction,setAdornment,move,readPhotos};
+window.PetFix={load,setCoat,setCream,setLook,setAction,setAdornment,setMood,burst,move,readPhotos};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();

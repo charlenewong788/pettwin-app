@@ -7,19 +7,19 @@
     <title>PetTwin | Your pet, understood</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=8" />
     <link rel="stylesheet" href="pet-fix.css?v=9" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=15" defer></script>
-    <script src="pet-fix.js?v=36" defer></script>
+    <script src="app.js?v=16" defer></script>
+    <script src="pet-fix.js?v=37" defer></script>
   </head>
   <body>
     <div id="pet-sprite" aria-hidden="true"></div>
     <div class="pet-message" id="pet-message">
       <strong id="pet-message-name">—</strong>
-      <span id="pet-message-text">I seem quieter than usual today. Does that feel right?</span>
-      <div><button data-answer="yes" data-i18n="yes">Yes</button><button data-answer="no" data-i18n="no">No</button></div>
+      <span id="pet-message-text"></span>
+      <div><button data-emo-act="pet" data-i18n="bubblePet">💗</button><button data-emo-act="play" data-i18n="bubblePlay">🧶</button><button data-emo-act="talk">💬</button></div>
     </div>
 
     <div class="app-shell">
@@ -47,30 +47,37 @@
           </div>
 
           <div class="pt-engage">
-            <article class="persona-card" id="persona-card">
+            <article class="persona-card" id="mbti-card">
               <div class="persona-head">
-                <span class="persona-emoji" id="persona-emoji">🐾</span>
+                <span class="persona-emoji" id="mbti-emoji">🐾</span>
                 <div>
-                  <span class="persona-label" data-i18n="personaLabel">Personality type</span>
-                  <h3 id="persona-name">—</h3>
+                  <span class="persona-label" data-i18n="mbtiTitle">Pet MBTI</span>
+                  <h3><span id="mbti-type">—</span> · <span id="mbti-name">—</span></h3>
                 </div>
                 <button class="persona-share" id="open-share" data-i18n="sharePoster">Share card</button>
               </div>
-              <p class="persona-quote" id="persona-quote">—</p>
-              <div class="persona-traits" id="persona-traits"></div>
-              <p class="persona-progress" id="persona-progress"></p>
+              <div class="mbti-axes" id="mbti-axes"></div>
+              <div class="mbti-foot"><span id="mbti-conf"></span><span id="mbti-basis"></span></div>
+              <p class="persona-progress" data-i18n="mbtiSub">Inferred from real check-ins and interactions — no quizzes</p>
             </article>
             <div class="engage-side">
+              <article class="emotion-card">
+                <span class="whisper-label" data-i18n="emotionTitle">How it feels right now</span>
+                <div class="emotion-head"><span id="emotion-emoji">😊</span><div><strong id="emotion-name">—</strong><small id="emotion-reason"></small></div></div>
+                <p class="emotion-msg" id="emotion-msg"></p>
+                <div class="emotion-actions">
+                  <button data-emo-act="pet" data-i18n="actPet">💗 Pet it</button>
+                  <button data-emo-act="play" data-i18n="actPlay">🧶 Play</button>
+                  <button data-emo-act="talk" data-i18n="actTalk">💬 Talk to it</button>
+                  <button data-emo-act="feed" data-i18n="actFeed">🐟 Treat</button>
+                </div>
+              </article>
               <article class="streak-card" id="streak-card">
                 <span class="streak-flame">🔥</span>
                 <strong id="streak-count">0</strong>
                 <span class="streak-unit" data-i18n="streakDays">day streak</span>
                 <button class="streak-btn" id="check-in" data-i18n="checkIn">Check in today</button>
                 <span class="freeze-chip" id="freeze-chip"></span>
-              </article>
-              <article class="whisper-card">
-                <span class="whisper-label" data-i18n="whisperLabel">Today's whisper</span>
-                <p id="daily-whisper">—</p>
               </article>
             </div>
           </div>
@@ -119,7 +126,7 @@
           <div class="insight-tabs"><button class="active" data-range="7">7D</button><button data-range="30">30D</button><button data-range="90">90D</button></div>
           <div class="two-column">
             <section class="surface"><div class="section-heading"><div><span data-i18n="behaviorBaseline">Behavior baseline</span><h2 data-i18n="linkedSignals">Logged signals</h2></div></div><canvas id="trend-chart" width="620" height="320"></canvas></section>
-            <section class="surface"><div class="section-heading"><div><span data-i18n="weightTrend">Weight trend</span><h2 data-i18n="weightTrend">Weight trend</h2></div></div><canvas id="weight-chart" width="620" height="240"></canvas><div class="correlation-list" id="correlation-list"></div></section>
+            <section class="surface"><div class="section-heading"><div><span data-i18n="weightTrend">Weight trend</span><h2 data-i18n="weightTrend">Weight trend</h2></div></div><canvas id="weight-chart" width="620" height="240"></canvas><div class="section-heading" style="margin-top:14px"><div><span data-i18n="alertsTitle">Health signals</span><h2 data-i18n="alertsTitle">Health signals</h2></div></div><div class="alert-list" id="alert-list"></div></section>
           </div>
         </section>
 
@@ -257,6 +264,26 @@
         <label data-i18n="onbAge">Age (years, optional)</label>
         <input type="number" id="onb-age" min="0" max="40" step="1" />
         <button class="primary-action full" id="onb-start" data-i18n="onbStart">Start</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="talk-overlay">
+      <div class="modal">
+        <button class="share-close" id="talk-close" aria-label="Close">×</button>
+        <h3 data-i18n="talkTitle">Say something to it</h3>
+        <input type="text" id="talk-input" maxlength="80" data-i18n-placeholder="talkPh" />
+        <button class="primary-action full" id="talk-send" data-i18n="talkSend">Say it</button>
+        <p class="talk-reply" id="talk-reply"></p>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="away-overlay">
+      <div class="modal onboarding">
+        <button class="share-close" id="away-close" aria-label="Close">×</button>
+        <div class="onb-mark">🐈</div>
+        <h3 id="away-title">While you were away</h3>
+        <div class="away-body" id="away-body"></div>
+        <button class="primary-action full" id="away-hug" data-i18n="awayHug">🤗 Give a hug</button>
       </div>
     </div>
 

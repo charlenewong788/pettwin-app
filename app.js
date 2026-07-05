@@ -110,6 +110,29 @@ zh: {
   healthTaskEn: "连续 3 天观察标记的部位", healthWhyEn: "来自今日健康自查"
 }};
 
+Object.assign(copy.en, {
+  emotionTitle: "How it feels right now", mbtiTitle: "Pet MBTI", mbtiSub: "Inferred from real check-ins and interactions — no quizzes",
+  axisEI: "E · social — solo · I", axisSN: "S · steady — dreamy · N", axisTF: "T · independent — affectionate · F", axisJP: "J · routine — free · P",
+  confLabel: "confidence", basedOnA: "based on", basedOnB: "days of records &", basedOnC: "interactions",
+  actPet: "💗 Pet it", actPlay: "🧶 Play", actTalk: "💬 Talk to it", actFeed: "🐟 Treat",
+  talkTitle: "Say something to it", talkPh: "Type what you want to tell it…", talkSend: "Say it",
+  alertsTitle: "Health signals", alertOk: "Everything looks steady lately. Keep the check-ins coming.",
+  alertNoData: "Health signals appear after a few check-ins.",
+  awayTitle: "While you were away", awayHug: "🤗 Give a hug", purr: "purrrr… 💗",
+  bubblePet: "💗", bubblePlay: "🧶"
+});
+Object.assign(copy.zh, {
+  emotionTitle: "它现在的感觉", mbtiTitle: "宠物 MBTI", mbtiSub: "由真实打卡与互动推断——不做问卷",
+  axisEI: "E · 外向 — 独处 · I", axisSN: "S · 务实 — 爱幻想 · N", axisTF: "T · 独立 — 黏人 · F", axisJP: "J · 规律 — 随性 · P",
+  confLabel: "推断置信度", basedOnA: "基于", basedOnB: "天记录和", basedOnC: "次互动",
+  actPet: "💗 拍拍它", actPlay: "🧶 陪它玩", actTalk: "💬 和它说话", actFeed: "🐟 投喂",
+  talkTitle: "和它说说话", talkPh: "想对它说的话……", talkSend: "说给它听",
+  alertsTitle: "健康信号", alertOk: "最近一切平稳，继续保持打卡。",
+  alertNoData: "打卡几天后，这里会出现健康信号。",
+  awayTitle: "你不在的时候", awayHug: "🤗 抱抱它", purr: "咕噜咕噜…… 💗",
+  bubblePet: "💗", bubblePlay: "🧶"
+});
+
 let lang = localStorage.getItem("pt-lang") || "en";
 
 const defaultState = {
@@ -121,6 +144,9 @@ const defaultState = {
   adornment: null,            // equipped growth keepsake id
   reminders: [],              // {id, type, label, date:"YYYY-MM-DD", repeatMonths}
   healthChecks: {},           // "YYYY-MM-DD" -> {eyes, gums, skin}  true = normal
+  lastSeen: null,             // for the away-companion report
+  ix: null,                   // today's interaction counters {date, pets, plays, talks, feeds}
+  ixTotal: { pets: 0, plays: 0, talks: 0, feeds: 0 },
   twinVisible: true, coat: "#77bed2",
   tasks: [
     { id: "play", done: false, en: "10-minute play session", zh: "互动玩耍 10 分钟", whyEn: "Play keeps the evening baseline steady", whyZh: "晚间互动有助于保持基线稳定" },
@@ -141,6 +167,7 @@ function loadState() {
     merged.achievements = parsed.achievements || {};
     merged.reminders = Array.isArray(parsed.reminders) ? parsed.reminders : [];
     merged.healthChecks = parsed.healthChecks || {};
+    merged.ixTotal = Object.assign({ pets: 0, plays: 0, talks: 0, feeds: 0 }, parsed.ixTotal || {});
     return merged;
   } catch (e) {
     console.warn("PetTwin: could not read saved state, resetting.", e);
@@ -148,6 +175,11 @@ function loadState() {
   }
 }
 let state = loadState();
+
+/* Away-companion tracking: how long since the owner last opened the app. */
+const awayHours = state.lastSeen ? (Date.now() - state.lastSeen) / 36e5 : 0;
+state.lastSeen = Date.now();
+setInterval(() => { state.lastSeen = Date.now(); localStorage.setItem("pt-state", JSON.stringify(state)); }, 120000);
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const t = k => copy[lang][k] || k;
@@ -307,26 +339,179 @@ const PERSONAS = [
   { id: "guardian", emoji: "🛡️", en: "The Watchful Guardian", zh: "警觉守护者", qEn: "I heard that. I hear everything. The house is secure — for now.", qZh: "我听到了，我什么都听得到。屋子暂时安全。", tEn: ["Alert", "Sensitive", "Loyal"], tZh: ["警觉", "敏感", "忠诚"] },
   { id: "zen", emoji: "🍃", en: "The Zen Dreamer", zh: "佛系梦想家", qEn: "A sunbeam, a slow blink, a quiet afternoon. This is enough.", qZh: "一束阳光，一次慢眨眼，一个安静的下午，足矣。", tEn: ["Relaxed", "Steady", "Content"], tZh: ["放松", "稳定", "知足"] }
 ];
-function computePersona() {
-  const a = currentEnergy(), s = currentStress();
-  if (s > 52) return PERSONAS[3];
-  if (a >= 72 && s < 40) return PERSONAS[0];
-  if (a < 50 && s < 34) return PERSONAS[4];
-  if (a < 60 && s >= 34) return PERSONAS[1];
-  return PERSONAS[2];
+/* === Interactions (petting / play / talk / treats feed the MBTI & emotions) === */
+function todayIx() {
+  if (!state.ix || state.ix.date !== dkey()) state.ix = { date: dkey(), pets: 0, plays: 0, talks: 0, feeds: 0 };
+  return state.ix;
 }
-function renderPersona() {
-  const p = computePersona();
-  if (!$("#persona-name")) return;
-  $("#persona-emoji").textContent = p.emoji;
-  $("#persona-name").textContent = en() ? p.en : p.zh;
-  $("#persona-quote").textContent = "“" + (en() ? p.qEn : p.qZh) + "”";
-  $("#persona-traits").innerHTML = (en() ? p.tEn : p.tZh).map(x => "<span>" + x + "</span>").join("");
-  const n = logCount();
-  $("#persona-progress").textContent = n >= 7
-    ? (en() ? `Based on ${n} days of real check-ins` : `基于 ${n} 天真实打卡记录`)
-    : (en() ? `Check in ${7 - n} more day${7 - n > 1 ? "s" : ""} to sharpen this profile` : `再打卡 ${7 - n} 天，人格画像会更立体`);
-  window.__persona = p;
+function addIx(kind) {
+  const ix = todayIx();
+  ix[kind] = (ix[kind] || 0) + 1;
+  state.ixTotal[kind] = (state.ixTotal[kind] || 0) + 1;
+  save();
+  renderEmotion(); renderMbti();
+}
+
+/* === Pet MBTI — inferred from behavior data, never a questionnaire ===
+   E/I: energy baseline + how often the owner plays/talks with the twin
+   S/N: mood steadiness across check-ins (steady = S, dreamy/variable = N)
+   T/F: affection received (petting/talking) + calm baseline
+   J/P: routine regularity (litter + appetite normality) */
+const MBTI_TYPES = {
+  INTJ: { zh: "深谋远虑猫", en: "The Mastermind", emoji: "🧠", p: 1 }, INTP: { zh: "好奇学者猫", en: "The Scholar", emoji: "🔬", p: 0 },
+  ENTJ: { zh: "家中指挥官", en: "The Commander", emoji: "📣", p: 3 }, ENTP: { zh: "捣蛋发明家", en: "The Inventor", emoji: "💡", p: 0 },
+  INFJ: { zh: "温柔守望者", en: "The Watcher", emoji: "🌙", p: 4 }, INFP: { zh: "梦游诗人猫", en: "The Poet", emoji: "🎨", p: 4 },
+  ENFJ: { zh: "暖心小管家", en: "The Keeper", emoji: "🏡", p: 2 }, ENFP: { zh: "阳光冒险猫", en: "The Adventurer", emoji: "☀️", p: 0 },
+  ISTJ: { zh: "规律执行官", en: "The Officer", emoji: "📋", p: 3 }, ISFJ: { zh: "贴心守护者", en: "The Devotee", emoji: "🫶", p: 2 },
+  ESTJ: { zh: "领地监督员", en: "The Supervisor", emoji: "🏰", p: 3 }, ESFJ: { zh: "社交小明星", en: "The Star", emoji: "🌟", p: 2 },
+  ISTP: { zh: "冷静观察家", en: "The Observer", emoji: "🕶️", p: 1 }, ISFP: { zh: "安静艺术家", en: "The Artist", emoji: "🍵", p: 4 },
+  ESTP: { zh: "闪电玩家猫", en: "The Player", emoji: "⚡", p: 0 }, ESFP: { zh: "派对焦点猫", en: "The Spotlight", emoji: "🎉", p: 2 }
+};
+const clamp01 = v => Math.max(0, Math.min(100, Math.round(v)));
+function computeMbti() {
+  const logs = Object.values(state.checkIns), n = logs.length;
+  const tot = state.ixTotal || { pets: 0, plays: 0, talks: 0, feeds: 0 };
+  const ixAll = tot.pets + tot.plays + tot.talks + tot.feeds;
+  const E = clamp01((currentEnergy() - 35) * 1.1 + Math.min(24, (tot.plays + tot.talks) * 3));
+  let sd = 0;
+  if (n >= 2) {
+    const moods = logs.map(l => l.mood), mean = moods.reduce((a, b) => a + b, 0) / n;
+    sd = Math.sqrt(moods.reduce((s, m) => s + (m - mean) * (m - mean), 0) / n);
+  }
+  const noteRatio = n ? logs.filter(l => l.note).length / n : 0;
+  const N = clamp01(28 + sd * 36 + noteRatio * 22);
+  const F = clamp01(22 + Math.min(42, tot.pets * 4 + tot.talks * 2) + (100 - currentStress()) * 0.24);
+  const J = n ? clamp01(logs.filter(l => l.litterOk).length / n * 58 + logs.filter(l => l.appetite === "normal").length / n * 42) : 50;
+  const type = (E >= 50 ? "E" : "I") + (N >= 50 ? "N" : "S") + (F >= 50 ? "F" : "T") + (J >= 50 ? "J" : "P");
+  const conf = Math.min(95, 15 + n * 6 + Math.min(20, ixAll));
+  return { type, E, N, F, J, conf, n, ixAll };
+}
+function mbtiPersona() { return PERSONAS[(MBTI_TYPES[computeMbti().type] || { p: 2 }).p]; }
+function computePersona() { return mbtiPersona(); }
+function renderMbti() {
+  if (!$("#mbti-type")) return;
+  const m = computeMbti(), info = MBTI_TYPES[m.type];
+  $("#mbti-type").textContent = m.type;
+  $("#mbti-emoji").textContent = info.emoji;
+  $("#mbti-name").textContent = en() ? info.en : info.zh;
+  const axes = [["axisEI", m.E], ["axisSN", m.N], ["axisTF", m.F], ["axisJP", m.J]];
+  $("#mbti-axes").innerHTML = axes.map(([key, v]) =>
+    `<div class="mbti-axis"><span>${t(key)}</span><div class="mbti-bar"><i style="left:${100 - v}%"></i></div></div>`).join("");
+  $("#mbti-conf").textContent = m.conf + "% " + t("confLabel");
+  $("#mbti-basis").textContent = `${t("basedOnA")} ${m.n} ${t("basedOnB")} ${m.ixAll} ${t("basedOnC")}`;
+  window.__persona = mbtiPersona();
+}
+
+/* === Emotion engine — the pet has human-readable feelings, with reasons === */
+const EMOTIONS = {
+  missing: { emoji: "🥺", en: "Missing you", zh: "想你了", bias: "missing" },
+  anxious: { emoji: "😟", en: "A bit uneasy", zh: "有点不安", bias: "anxious" },
+  sleepy: { emoji: "😴", en: "Sleepy", zh: "困困的", bias: "sleepy" },
+  loved: { emoji: "🥰", en: "Feeling loved", zh: "被爱着", bias: "content" },
+  proud: { emoji: "😌", en: "A little proud", zh: "小骄傲", bias: "content" },
+  bored: { emoji: "🫠", en: "Bored", zh: "有点无聊", bias: "playful" },
+  playful: { emoji: "😼", en: "Playful", zh: "想玩", bias: "playful" },
+  content: { emoji: "😊", en: "Content", zh: "安心", bias: "content" }
+};
+const EMO_MSG = {
+  missing: { en: ["Where have you been? I checked your chair eleven times.", "You were gone so long the sunny spot got cold."], zh: ["你去哪儿了？我去你椅子上看了十一次。", "你走了太久，窗边的太阳都凉了。"] },
+  anxious: { en: ["Something feels off lately. Stay close tonight?", "Too many changes. I need my routine — and you."], zh: ["最近有点不对劲，今晚离我近一点好吗？", "变化太多了，我需要我的老规矩——还有你。"] },
+  sleepy: { en: ["Five more minutes. Or five more hours.", "The blanket cave is calling. Join me?"], zh: ["再睡五分钟。或者五小时。", "毯子洞穴在召唤我，一起来吗？"] },
+  loved: { en: ["Today's cuddle quota: exceeded. Well done, human.", "I purred so much today my motor needs a rest."], zh: ["今日撸猫配额：超额完成。人类干得不错。", "今天咕噜得太多，我的小马达需要休息了。"] },
+  proud: { en: ["We keep showing up, you and I. That's rare.", "Look at our streak. We are basically famous."], zh: ["我们一直在坚持，你和我。这很难得。", "看看我们的连续记录，我们基本上算名猫名人了。"] },
+  bored: { en: ["Nothing has moved in this house for hours. Fix that.", "I have batted zero toys today. Unacceptable."], zh: ["这屋子好几个小时没动静了，管管吧。", "我今天一个玩具都没拍到，不能接受。"] },
+  playful: { en: ["Energy at maximum. Toys should be worried.", "I feel fast today. Extremely fast. Watch this."], zh: ["能量满格，玩具们应该感到害怕。", "我今天感觉特别快，非常快，你看着。"] },
+  content: { en: ["All is well in my kingdom. You may relax too.", "A good nap, a full bowl, and you. Enough."], zh: ["我的王国一切安好，你也可以放松了。", "睡得好，碗是满的，还有你在，足够了。"] }
+};
+function computeEmotion() {
+  const h = new Date().getHours(), ix = todayIx();
+  const touched = ix.pets + ix.plays + ix.talks + ix.feeds;
+  if (currentStress() > 48) return "anxious";
+  if (awayHours > 8 && touched === 0) return "missing";
+  if (h >= 22 || h < 6) return "sleepy";
+  if (touched >= 5) return "loved";
+  if ((state.streak || 0) >= 3 && todayLog()) return "proud";
+  if (h >= 17 && ix.plays === 0 && !todayLog()) return "bored";
+  if (currentEnergy() >= 78 && h >= 9 && h < 20) return "playful";
+  return "content";
+}
+function emotionReason(id) {
+  const ix = todayIx(), touched = ix.pets + ix.plays + ix.talks + ix.feeds;
+  switch (id) {
+    case "missing": return en() ? `You've been away for ${Math.round(awayHours)} hours` : `你已经 ${Math.round(awayHours)} 小时没来看它了`;
+    case "anxious": return en() ? `Recent logs show stress at ${currentStress()}` : `最近记录的压力值偏高（${currentStress()}）`;
+    case "sleepy": return en() ? "It's cat bedtime right now" : "现在是猫咪的睡觉时间";
+    case "loved": return en() ? `You've interacted ${touched} times today` : `今天你已经陪它互动了 ${touched} 次`;
+    case "proud": return en() ? `A ${state.streak}-day streak, together` : `你们已经连续记录 ${state.streak} 天了`;
+    case "bored": return en() ? "No play sessions yet today" : "今天还没有人陪它玩";
+    case "playful": return en() ? `Energy is high (${currentEnergy()})` : `活跃度满格（${currentEnergy()}）`;
+    default: return en() ? "Everything is just right" : "一切都刚刚好";
+  }
+}
+function emotionMessage(id) {
+  const day = Number(dkey().replace(/-/g, ""));
+  const pool = (EMO_MSG[id] || EMO_MSG.content)[lang] || EMO_MSG.content.en;
+  return pool[day % pool.length];
+}
+function renderEmotion() {
+  if (!$("#emotion-emoji")) return;
+  const id = computeEmotion(), e = EMOTIONS[id];
+  $("#emotion-emoji").textContent = e.emoji;
+  $("#emotion-name").textContent = en() ? e.en : e.zh;
+  $("#emotion-reason").textContent = emotionReason(id);
+  $("#emotion-msg").textContent = "“" + emotionMessage(id) + "”";
+  window.__petMood = e.bias;
+  if (window.PetFix) window.PetFix.setMood(e.bias);
+}
+function doEmoAct(kind) {
+  if (kind === "talk") { openTalk(); return; }
+  addIx(kind === "pet" ? "pets" : kind === "play" ? "plays" : "feeds");
+  if (window.PetFix) {
+    if (kind === "pet") { window.PetFix.burst("💗", 6); window.PetFix.setAction("calm"); toast(t("purr")); }
+    if (kind === "play") { window.PetFix.setAction("play"); window.PetFix.burst("🧶", 3); }
+    if (kind === "feed") { window.PetFix.setAction("feed"); window.PetFix.burst("🐟", 3); }
+  }
+  evaluateAchievements(); renderAchievements();
+}
+
+/* === Talk to your pet (remote companionship): it reads and replies aloud === */
+function speakAsPet(text) {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.pitch = 1.7; u.rate = 1.05;
+    u.lang = en() ? "en-US" : "zh-CN";
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  } catch (e) { }
+}
+function openTalk() {
+  $("#talk-reply").textContent = "";
+  $("#talk-input").value = "";
+  $("#talk-overlay").classList.remove("hidden");
+  $("#talk-input").focus();
+}
+function sendTalk() {
+  const msg = $("#talk-input").value.trim();
+  if (!msg) return;
+  addIx("talks");
+  const id = computeEmotion();
+  const reply = emotionMessage(id);
+  $("#talk-reply").textContent = petName() + ": “" + reply + "”";
+  speakAsPet(reply);
+  if (window.PetFix) { window.PetFix.burst("💬", 3); window.PetFix.setAction("shake"); }
+}
+
+/* === Away report — what happened while you were gone === */
+function maybeAwayReport() {
+  if (awayHours < 6 || !logCount()) return;
+  const h = Math.round(awayHours);
+  const day = Number(dkey().replace(/-/g, ""));
+  const pool = WHISPERS.base[lang] || WHISPERS.base.en;
+  const lines = [pool[day % pool.length], pool[(day + 7) % pool.length]];
+  $("#away-title").textContent = t("awayTitle") + " · " + h + (en() ? "h" : " 小时");
+  $("#away-body").innerHTML = lines.map(l => "<p>· " + l + "</p>").join("") +
+    "<p class='away-close-line'>“" + emotionMessage(computeEmotion()) + "”</p>";
+  $("#away-overlay").classList.remove("hidden");
 }
 
 /* === Streak === */
@@ -359,21 +544,6 @@ const WHISPERS = {
     zh: ["你今天在家？很好，请就位到沙发上。", "周末规则：你在旁边，每一觉都更香。", "我安排好今天的日程了：睡觉、零食、睡觉、看窗外、睡觉。", "今天不许出门，我看过日历了，上面写着「猫的时间」。"]
   }
 };
-function pickWhisper() {
-  const day = Number(dkey().replace(/-/g, ""));
-  const wd = new Date().getDay();
-  let pool;
-  if (currentStress() > 45) pool = WHISPERS.stressed;
-  else if (todayLog()) pool = WHISPERS.checkedIn;
-  else if (wd === 0 || wd === 6) pool = WHISPERS.weekend;
-  else pool = WHISPERS.base;
-  const list = pool[lang] || pool.en;
-  return list[day % list.length];
-}
-function renderWhisper() {
-  const el = $("#daily-whisper"); if (!el) return;
-  el.textContent = pickWhisper();
-}
 
 /* === Monologue (the MeowTalk hook: what your cat would say today) === */
 const MONO_OPEN = {
@@ -593,7 +763,7 @@ function applyLanguage() {
 }
 function renderAll() {
   renderIdentity(); renderSummary(); renderTasks(); renderInsights(); renderTimeline();
-  updatePetMessage(); renderPersona(); renderStreak(); renderWhisper();
+  updatePetMessage(); renderMbti(); renderEmotion(); renderStreak();
   renderGrowth(); renderReminders();
   evaluateAchievements(); renderAchievements();
 }
@@ -672,11 +842,36 @@ function renderTasks() {
     save(); renderAll();
   });
 }
+/* Real health signals computed from the last few check-ins — observation, not diagnosis. */
+function computeAlerts() {
+  const keys = Object.keys(state.checkIns).sort();
+  if (!keys.length) return null;
+  const last3 = keys.slice(-3).map(k => state.checkIns[k]);
+  const alerts = [];
+  if (last3.filter(l => l.appetite === "less").length >= 2)
+    alerts.push({ ico: "🍽️", en: "Appetite has been low for 2+ recent days — watch eating and keep water fresh.", zh: "最近有 2 天以上食欲偏少——注意观察进食，保证饮水新鲜。" });
+  if (last3.filter(l => !l.litterOk).length >= 2)
+    alerts.push({ ico: "🚽", en: "Litter box has looked unusual repeatedly — if it continues, mention it to a vet.", zh: "猫砂盆连续出现异常——若持续，建议咨询兽医。" });
+  const weights = keys.map(k => state.checkIns[k].weight).filter(Boolean);
+  if (weights.length >= 3) {
+    const prev = weights.slice(0, -1).reduce((a, b) => a + b, 0) / (weights.length - 1);
+    const delta = (weights[weights.length - 1] - prev) / prev * 100;
+    if (Math.abs(delta) >= 5)
+      alerts.push({ ico: "⚖️", en: `Weight moved ${delta > 0 ? "up" : "down"} ${Math.abs(delta).toFixed(1)}% vs. recent average — worth tracking closely.`, zh: `体重较近期平均${delta > 0 ? "上升" : "下降"}了 ${Math.abs(delta).toFixed(1)}%——值得密切关注。` });
+  }
+  if (currentStress() > 48)
+    alerts.push({ ico: "💭", en: "Stress signals are elevated — keep evenings calm and routines steady.", zh: "压力信号偏高——保持晚间安静、作息稳定。" });
+  return alerts;
+}
+function renderAlerts() {
+  const box = $("#alert-list"); if (!box) return;
+  const alerts = computeAlerts();
+  if (alerts === null) { box.innerHTML = `<div class="alert-item ok"><span>ℹ️</span><p>${t("alertNoData")}</p></div>`; return; }
+  if (!alerts.length) { box.innerHTML = `<div class="alert-item ok"><span>✅</span><p>${t("alertOk")}</p></div>`; return; }
+  box.innerHTML = alerts.map(a => `<div class="alert-item warn"><span>${a.ico}</span><p>${en() ? a.en : a.zh}</p></div>`).join("");
+}
 function renderInsights() {
-  const data = en()
-    ? [["Visitors → hiding", "sample"], ["Rain → lower activity", "sample"], ["Late return → vocalising", "sample"], ["Clean litter → normal visits", "sample"]]
-    : [["来客 → 躲藏", "示例"], ["下雨 → 活跃度下降", "示例"], ["主人晚归 → 叫声增加", "示例"], ["清理猫砂 → 如厕恢复", "示例"]];
-  $("#correlation-list").innerHTML = data.map(x => `<div class="correlation-item"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("");
+  renderAlerts();
   drawTrend(+($(".insight-tabs button.active")?.dataset.range || 7));
   drawWeight();
 }
@@ -702,10 +897,8 @@ function renderTimeline() {
   $("#timeline-list").innerHTML = items.map(x => `<article class="timeline-item"><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join("");
 }
 function updatePetMessage() {
-  const text = currentStress() > 40
-    ? (en() ? "I have been a little unsettled. Could we keep tonight calm?" : "我今天有一点不安，今晚可以安静一点吗？")
-    : (en() ? "I seem quieter than usual today. Does that feel right?" : "我今天好像比平时安静，你也这样觉得吗？");
-  $("#pet-message-text").textContent = text;
+  const id = computeEmotion(), e = EMOTIONS[id];
+  $("#pet-message-text").textContent = e.emoji + " " + emotionMessage(id);
 }
 
 /* Trend chart driven by real check-ins; needs 3+ logged days in range. */
@@ -820,12 +1013,20 @@ function navigate(view) {
 $$("[data-view], [data-view-jump]").forEach(b => b.onclick = () => navigate(b.dataset.view || b.dataset.viewJump));
 $$("[data-lang]").forEach(b => b.onclick = () => { lang = b.dataset.lang; localStorage.setItem("pt-lang", lang); applyLanguage(); });
 $$("[data-signal]").forEach(b => b.onclick = () => { $$("[data-signal]").forEach(x => x.classList.toggle("active", x === b)); navigate("insights"); });
-$$("[data-answer]").forEach(b => b.onclick = () => {
-  const delta = b.dataset.answer === "yes" ? 2 : -2;
-  state.emaStress = Math.max(0, Math.min(100, currentStress() + delta));
-  save(); renderAll();
-  $("#pet-message").classList.add("hidden");
-});
+$$("[data-emo-act]").forEach(b => b.onclick = () => doEmoAct(b.dataset.emoAct));
+document.addEventListener("pt-petted", () => { addIx("pets"); toast(t("purr")); });
+$("#talk-close").onclick = () => $("#talk-overlay").classList.add("hidden");
+$("#talk-overlay").onclick = e => { if (e.target === $("#talk-overlay")) $("#talk-overlay").classList.add("hidden"); };
+$("#talk-send").onclick = sendTalk;
+$("#talk-input").addEventListener("keydown", e => { if (e.key === "Enter") sendTalk(); });
+$("#away-close").onclick = () => $("#away-overlay").classList.add("hidden");
+$("#away-overlay").onclick = e => { if (e.target === $("#away-overlay")) $("#away-overlay").classList.add("hidden"); };
+$("#away-hug").onclick = () => {
+  addIx("pets");
+  if (window.PetFix) { window.PetFix.burst("💗", 8); window.PetFix.setAction("calm"); }
+  $("#away-overlay").classList.add("hidden");
+  toast(t("purr"));
+};
 $("#new-task").onclick = () => {
   state.tasks.push({ id: "task" + Date.now(), done: false, en: "Observe evening litter visits", zh: "观察今晚猫砂盆使用情况", whyEn: "Added from care plan", whyZh: "从照护计划添加" });
   save(); renderTasks();
@@ -1016,8 +1217,13 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 applyLanguage();
 renderCaptureSlots();
 maybeOnboard();
+if (state.pet.name) maybeAwayReport();
 if (state.adornment && window.PetFix) window.PetFix.setAdornment(state.adornment);
-document.addEventListener("pt-model-ready", () => { if (state.adornment && window.PetFix) window.PetFix.setAdornment(state.adornment); });
+document.addEventListener("pt-model-ready", () => {
+  if (!window.PetFix) return;
+  if (state.adornment) window.PetFix.setAdornment(state.adornment);
+  window.PetFix.setMood(window.__petMood || "content");
+});
 if (!state.twinVisible) {
   $("#pet-sprite").classList.add("hidden");
   $("#pet-message").classList.add("hidden");
