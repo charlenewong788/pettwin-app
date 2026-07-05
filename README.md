@@ -1,63 +1,30 @@
-# PetTwin
+﻿# PetTwin
 
 ## Live Demo
 
 [Open PetTwin](https://charlenewong788.github.io/pettwin-app/)
 
-PetTwin is a static MVP prototype for a pet digital personality and behavior insights app. It turns daily behavior logs into a dynamic pet personality profile, trend view, alert system, and long-term life archive.
+PetTwin is a pet companion app: a living desktop pet with real emotions, a behavior-inferred pet MBTI, daily check-ins that build a true health baseline, and a coin-powered closet.
 
-## Current Features
+## Features
 
-- Onboarding: create your own pet profile (name and age drive the whole interface)
-- 30-second daily check-in (mood, appetite, litter box, optional note) — the app's core data loop
-- Streaks with timezone-safe day tracking and streak-freeze tokens for missed days
-- Personality persona that evolves slowly from real check-in history (EMA), with a progress hint
-- State-aware daily whispers (different pools for stressed days, checked-in days and weekends)
-- Long-tail milestones (12 achievements from first check-in to a 100-day streak)
-- Bond levels: check-in days level up the twin and unlock wearable 3D keepsakes (collar, cushion, halo, crown…)
-- "Today's monologue" share card — what your pet would say today, signed and shareable
-- Health reminders (vaccine / deworming / check-up) with repeat cycles and one-tap .ics calendar export
-- Weight logging in check-ins with a real weight trend chart
-- Guided 2-minute health self-check (eyes / gums / skin) that feeds the care plan and archive
-- Mobile-first bottom tab navigation
-- Share card rendered from the live 3D twin snapshot with real stats
-- Real trend chart and findings computed from logged check-ins (unlocks after 3 days)
-- Plain-text report export of the full check-in history
-- Interactive 3D digital pet with photo-matched coat colours and feed/paw/play/calm actions
-- Four-view capture workflow with resolution, lighting and sharpness checks
-- Optional reconstruction API bridge with graceful fallback
-- PWA: installable, offline-capable via service worker
-- Bilingual English / Chinese interface
-- Device hub and Workday Companion pages are honest previews until hardware pairing ships
-
-## Product Boundary
-
-PetTwin does not provide medical diagnosis. It only tracks behavior trends, highlights unusual changes, and offers care suggestions. If drinking, appetite, litter, pain, energy, or other health-related changes continue, users should consult a veterinarian.
-
-The browser-generated chibi is a stylized preview, not a claim of geometric reconstruction accuracy. A pet-specific textured mesh requires the optional reconstruction API and a production 3D provider. The percentage in the studio measures capture quality only.
+- Living desktop pet (SVG sprite): blinks, watches your cursor, swishes its tail, wanders the page, naps, chases the pointer, and purrs with hearts when stroked
+- Coat colours matched from your pet's photos (processed on-device, background-aware)
+- Emotion engine: eight human-readable feelings computed from real data, each shown with its reason
+- Pet MBTI: sixteen types inferred continuously from check-ins and interactions - never a questionnaire
+- 30-second daily check-ins (mood, appetite, litter, weight, notes) driving wellbeing, trends, findings and alerts
+- Streaks with timezone-safe tracking and streak-freeze tokens; bond levels that grow with check-in days
+- Coins earned by care, spent in a closet of wearables (bow, bell collar, scarf, glasses, flower crown, crown)
+- Remote companionship: away reports, talk-to-pet with spoken replies, remote treat/play actions
+- Health reminders (vaccine, deworming, check-up) with repeat cycles and .ics calendar export
+- Guided health self-checks and real health-signal alerts - observation, not diagnosis
+- Monologue and profile share cards drawn from the live sprite
+- PWA (installable, offline-capable), bilingual EN/中文, mobile-first bottom navigation
 
 ## How To Run
 
-The interface is a zero-dependency static project. Open `index.html` in a browser. The optional reconstruction API requires Node.js and lives in `server/`.
+Zero-dependency static project. Open `index.html` in a browser. All data stays in the browser (localStorage).
 
-## File Structure
+## Structure
 
-```text
-pettwin-app/
-  index.html
-  styles.css
-  app.js
-  README.md
-  server/
-    src/index.mjs
-    src/providers/mock-provider.mjs
-```
-
-## Suggested Next Steps
-
-1. Connect private object storage and a production 3D reconstruction provider.
-2. Add a review step for eye, ear, muzzle, body proportion, and coat corrections.
-3. Add real accounts, multi-pet profiles, and family permissions.
-4. Replace browser local storage with a cloud database.
-5. Integrate video and audio behavior analysis.
-
+`index.html` + `styles.css` + `app.js` (product logic) + `pet-sprite.js` (desktop pet) + `sw.js` / `manifest.webmanifest` (PWA)

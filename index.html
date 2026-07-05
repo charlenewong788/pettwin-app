@@ -7,19 +7,16 @@
     <title>PetTwin | Your pet, understood</title>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=8" />
-    <link rel="stylesheet" href="pet-fix.css?v=9" />
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=16" defer></script>
-    <script src="pet-fix.js?v=37" defer></script>
+    <link rel="stylesheet" href="styles.css?v=9" />
+    <script src="app.js?v=17" defer></script>
+    <script src="pet-sprite.js?v=1" defer></script>
   </head>
   <body>
     <div id="pet-sprite" aria-hidden="true"></div>
     <div class="pet-message" id="pet-message">
       <strong id="pet-message-name">—</strong>
       <span id="pet-message-text"></span>
-      <div><button data-emo-act="pet" data-i18n="bubblePet">💗</button><button data-emo-act="play" data-i18n="bubblePlay">🧶</button><button data-emo-act="talk">💬</button></div>
+      <div><button data-emo-act="pet" data-i18n="bubblePet">Pet</button><button data-emo-act="play" data-i18n="bubblePlay">Tease</button><button data-emo-act="talk" data-i18n="actTalk">Talk to it</button></div>
     </div>
 
     <div class="app-shell">
@@ -27,18 +24,18 @@
         <div class="brand"><div class="brand-mark">PT</div><div><strong>PetTwin</strong><span data-i18n="brandSub">Your pet, understood</span></div></div>
         <div class="pet-switch"><span class="mini-avatar" id="mini-avatar">P</span><div><strong id="side-pet-name">—</strong><small id="pet-meta"></small></div></div>
         <nav class="nav">
-          <button class="nav-item active" data-view="today" data-i18n="navToday">🏠 Today</button>
-          <button class="nav-item" data-view="care" data-i18n="navCare">💚 Care</button>
-          <button class="nav-item" data-view="insights" data-i18n="navInsights">📈 Insights</button>
-          <button class="nav-item" data-view="timeline" data-i18n="navTimeline">📖 Archive</button>
-          <button class="nav-item" data-view="avatar" data-i18n="navAvatar">🐱 Twin</button>
+          <button class="nav-item active" data-view="today" data-i18n="navToday">Today</button>
+          <button class="nav-item" data-view="care" data-i18n="navCare">Care</button>
+          <button class="nav-item" data-view="insights" data-i18n="navInsights">Insights</button>
+          <button class="nav-item" data-view="timeline" data-i18n="navTimeline">Archive</button>
+          <button class="nav-item" data-view="avatar" data-i18n="navAvatar">Twin</button>
         </nav>
         <div class="language-card"><span data-i18n="language">Language</span><div class="segmented"><button class="segment active" data-lang="en">EN</button><button class="segment" data-lang="zh">中文</button></div></div>
         <button class="pet-toggle" id="pet-toggle" data-i18n="hideTwin">Hide digital twin</button>
       </aside>
 
       <main>
-        <header class="topbar"><div><p class="eyebrow" id="section-eyebrow">PETTWIN</p><h1 id="page-title" data-i18n="navToday">Today</h1></div><div class="top-actions"><span class="sync-status"><i></i><span data-i18n="savedLocal">Data stays on this device</span></span><button class="primary-action" data-checkin-open data-i18n="quickCheck">Daily check-in</button></div></header>
+        <header class="topbar"><div><p class="eyebrow" id="section-eyebrow">PETTWIN</p><h1 id="page-title" data-i18n="navToday">Today</h1></div><div class="top-actions"><span class="coin-chip"><i></i><b id="coin-count">0</b></span><button class="primary-action" data-checkin-open data-i18n="quickCheck">Daily check-in</button></div></header>
 
         <section class="view active" id="today">
           <div class="today-hero">
@@ -49,7 +46,6 @@
           <div class="pt-engage">
             <article class="persona-card" id="mbti-card">
               <div class="persona-head">
-                <span class="persona-emoji" id="mbti-emoji">🐾</span>
                 <div>
                   <span class="persona-label" data-i18n="mbtiTitle">Pet MBTI</span>
                   <h3><span id="mbti-type">—</span> · <span id="mbti-name">—</span></h3>
@@ -63,17 +59,16 @@
             <div class="engage-side">
               <article class="emotion-card">
                 <span class="whisper-label" data-i18n="emotionTitle">How it feels right now</span>
-                <div class="emotion-head"><span id="emotion-emoji">😊</span><div><strong id="emotion-name">—</strong><small id="emotion-reason"></small></div></div>
+                <div class="emotion-head"><div><strong id="emotion-name">—</strong><small id="emotion-reason"></small></div></div>
                 <p class="emotion-msg" id="emotion-msg"></p>
                 <div class="emotion-actions">
-                  <button data-emo-act="pet" data-i18n="actPet">💗 Pet it</button>
-                  <button data-emo-act="play" data-i18n="actPlay">🧶 Play</button>
-                  <button data-emo-act="talk" data-i18n="actTalk">💬 Talk to it</button>
-                  <button data-emo-act="feed" data-i18n="actFeed">🐟 Treat</button>
+                  <button data-emo-act="pet" data-i18n="actPet">Pet it</button>
+                  <button data-emo-act="play" data-i18n="actPlay">Play</button>
+                  <button data-emo-act="talk" data-i18n="actTalk">Talk to it</button>
+                  <button data-emo-act="feed" data-i18n="actFeed">Treat</button>
                 </div>
               </article>
               <article class="streak-card" id="streak-card">
-                <span class="streak-flame">🔥</span>
                 <strong id="streak-count">0</strong>
                 <span class="streak-unit" data-i18n="streakDays">day streak</span>
                 <button class="streak-btn" id="check-in" data-i18n="checkIn">Check in today</button>
@@ -86,12 +81,9 @@
             <div class="growth-head">
               <div><span class="growth-label" data-i18n="growthTitle">Bond level</span>
                 <h3><span id="growth-level-num">Lv.1</span> · <span id="growth-level-name">—</span></h3></div>
-              <span class="growth-paw">🐾</span>
             </div>
             <div class="growth-bar" id="growth-bar"><i></i></div>
             <p class="growth-progress-text" id="growth-progress-text"></p>
-            <span class="growth-label" data-i18n="growthUnlocks">Unlocked keepsakes</span>
-            <div class="adorn-grid" id="adorn-grid"></div>
           </article>
 
           <div class="signal-strip">
@@ -133,39 +125,29 @@
         <section class="view" id="timeline"><section class="surface"><div class="section-heading"><div><span data-i18n="lifeArchive">Life archive</span><h2 data-i18n="personalityTimeline">Personality timeline</h2></div><button class="secondary-action" data-i18n="exportReport">Export report</button></div><div class="timeline" id="timeline-list"></div></section></section>
 
         <section class="view" id="avatar">
-          <div class="studio-grid">
-            <section class="surface studio-copy">
-              <div class="studio-title-row"><div><span data-i18n="digitalTwinStudio">Digital Twin Studio</span><h2 data-i18n="buildLookalike">Create a photo-matched digital twin</h2></div><div class="fidelity-score"><strong id="fidelity-score">0%</strong><span data-i18n="captureReady">photo quality</span></div></div>
-              <p data-i18n="studioCopy">Use four clear views. Photos stay on this device.</p>
-              <div class="capture-tabs two"><button class="active" data-i18n="photoSet">Photo set</button><label><input id="glb-file" type="file" accept=".glb,model/gltf-binary"><span data-i18n="loadModel">Load GLB</span></label></div>
-              <div class="twin-generator">
-                <div class="interaction-bar" aria-label="Pet interactions">
-                  <button type="button" data-pet-action="feed" data-i18n="feedPet">Feed</button>
-                  <button type="button" data-pet-action="shake" data-i18n="shakePaw">Shake paw</button>
-                  <button type="button" data-pet-action="play" data-i18n="playPet">Play</button>
-                  <button type="button" data-pet-action="calm" data-i18n="calmPet">Calm</button>
-                  <button type="button" data-pet-action="spin" data-i18n="view360">360 view</button>
-                </div>
-              </div>
-              <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add four pet photos</strong><span data-i18n="uploadHint">Front, left side, right side and back in even light.</span></label>
-              <div class="capture-slots" id="capture-slots"></div>
-              <div class="quality-panel"><div><span data-i18n="captureQuality">Capture quality</span><strong id="quality-summary">0 / 4</strong></div><div class="quality-checks" id="quality-checks"></div></div>
-              <div class="scan-progress" id="scan-progress"><i></i><span data-i18n="waitingInput">Add the four required views to begin</span></div>
-              <div class="pipeline" id="reconstruction-pipeline"><span class="active" data-i18n="stageCapture">Capture</span><span data-i18n="stageShape">Shape</span><span data-i18n="stageTexture">Coat</span><span data-i18n="stageRig">Motion</span><span data-i18n="stageReview">Review</span></div>
-              <button class="primary-action full" id="generate-twin" disabled data-i18n="generateTwin">Create photo-matched preview</button><p class="result-line" id="studio-result"></p>
+          <div class="care-layout">
+            <section class="surface">
+              <div class="section-heading"><div><span data-i18n="appearanceTitle">Appearance</span><h2 data-i18n="appearanceTitle">Appearance</h2></div><span id="studio-orbit-name" class="muted-tag"></span></div>
+              <p class="page-sub" data-i18n="appearanceSub">Upload 1–4 photos and the twin matches your pet's coat.</p>
+              <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add pet photos</strong><span data-i18n="uploadHint">Clear, even light works best.</span></label>
+              <div class="look-row"><div class="look-swatches" id="look-swatches"></div><button class="text-action" id="reset-look" data-i18n="resetLook">Reset colours</button></div>
+              <p class="result-line" id="studio-result"></p>
             </section>
-            <section class="studio-stage"><div class="studio-badge"><strong data-i18n="liveModel">LIVE MODEL</strong><span id="model-source" data-i18n="proceduralPreview">Capture preview</span></div><div class="studio-orbit"><span id="studio-orbit-name">3D</span><small data-i18n="dragRotate">Drag the twin to rotate it</small></div></section>
+            <section class="surface">
+              <div class="section-heading"><div><span data-i18n="closetTitle">Closet</span><h2 data-i18n="closetTitle">Closet</h2></div><span class="coin-chip"><i></i><b id="coin-count-2">0</b></span></div>
+              <div class="closet-grid" id="closet-grid"></div>
+            </section>
           </div>
         </section>
       </main>
     </div>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" data-view="today" data-i18n="navToday">🏠 Today</button>
-      <button class="nav-item" data-view="care" data-i18n="navCare">💚 Care</button>
-      <button class="nav-item" data-view="insights" data-i18n="navInsights">📈 Insights</button>
-      <button class="nav-item" data-view="timeline" data-i18n="navTimeline">📖 Archive</button>
-      <button class="nav-item" data-view="avatar" data-i18n="navAvatar">🐱 Twin</button>
+      <button class="nav-item active" data-view="today" data-i18n="navToday">Today</button>
+      <button class="nav-item" data-view="care" data-i18n="navCare">Care</button>
+      <button class="nav-item" data-view="insights" data-i18n="navInsights">Insights</button>
+      <button class="nav-item" data-view="timeline" data-i18n="navTimeline">Archive</button>
+      <button class="nav-item" data-view="avatar" data-i18n="navAvatar">Twin</button>
     </nav>
 
     <div class="share-overlay hidden" id="share-overlay">
@@ -186,11 +168,11 @@
         <p class="modal-sub" data-i18n="checkinSub">Quick questions build your pet's real baseline.</p>
         <label data-i18n="qMood">Mood today</label>
         <div class="mood-row" id="mood-row">
-          <button type="button" data-mood="1">😿</button>
-          <button type="button" data-mood="2">😾</button>
-          <button type="button" data-mood="3">😺</button>
-          <button type="button" data-mood="4">😸</button>
-          <button type="button" data-mood="5">😻</button>
+          <button type="button" data-mood="1" aria-label="very low"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.4" cy="10" r="1.4" fill="currentColor"/><circle cx="15.6" cy="10" r="1.4" fill="currentColor"/><path d="M8 17 q4 -3.4 8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" data-mood="2" aria-label="low"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.4" cy="10" r="1.4" fill="currentColor"/><circle cx="15.6" cy="10" r="1.4" fill="currentColor"/><path d="M8.4 16.4 h7.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" transform="rotate(-6 12 16)"/></svg></button>
+          <button type="button" data-mood="3" aria-label="okay"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.4" cy="10" r="1.4" fill="currentColor"/><circle cx="15.6" cy="10" r="1.4" fill="currentColor"/><path d="M8.4 16 h7.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" data-mood="4" aria-label="good"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.4" cy="10" r="1.4" fill="currentColor"/><circle cx="15.6" cy="10" r="1.4" fill="currentColor"/><path d="M8 15 q4 3.4 8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" data-mood="5" aria-label="great"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 10.2 q1.4 -1.8 2.8 0 M14.2 10.2 q1.4 -1.8 2.8 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7.6 14.4 q4.4 4.4 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         </div>
         <label data-i18n="qAppetite">Appetite</label>
         <div class="opt-row" data-field="appetite">
@@ -254,19 +236,6 @@
       </div>
     </div>
 
-    <div class="modal-overlay hidden" id="onb-overlay">
-      <div class="modal onboarding">
-        <div class="onb-mark">🐾</div>
-        <h3 data-i18n="onbTitle">Welcome to PetTwin</h3>
-        <p class="modal-sub" data-i18n="onbSub">Tell us who we're getting to know.</p>
-        <label data-i18n="onbName">Pet's name</label>
-        <input type="text" id="onb-name" maxlength="20" data-i18n-placeholder="onbNamePh" />
-        <label data-i18n="onbAge">Age (years, optional)</label>
-        <input type="number" id="onb-age" min="0" max="40" step="1" />
-        <button class="primary-action full" id="onb-start" data-i18n="onbStart">Start</button>
-      </div>
-    </div>
-
     <div class="modal-overlay hidden" id="talk-overlay">
       <div class="modal">
         <button class="share-close" id="talk-close" aria-label="Close">×</button>
@@ -280,10 +249,21 @@
     <div class="modal-overlay hidden" id="away-overlay">
       <div class="modal onboarding">
         <button class="share-close" id="away-close" aria-label="Close">×</button>
-        <div class="onb-mark">🐈</div>
         <h3 id="away-title">While you were away</h3>
         <div class="away-body" id="away-body"></div>
-        <button class="primary-action full" id="away-hug" data-i18n="awayHug">🤗 Give a hug</button>
+        <button class="primary-action full" id="away-hug" data-i18n="awayHug">Give a hug</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="onb-overlay">
+      <div class="modal onboarding">
+        <h3 data-i18n="onbTitle">Welcome to PetTwin</h3>
+        <p class="modal-sub" data-i18n="onbSub">Tell us who we're getting to know.</p>
+        <label data-i18n="onbName">Pet's name</label>
+        <input type="text" id="onb-name" maxlength="20" data-i18n-placeholder="onbNamePh" />
+        <label data-i18n="onbAge">Age (years, optional)</label>
+        <input type="number" id="onb-age" min="0" max="40" step="1" />
+        <button class="primary-action full" id="onb-start" data-i18n="onbStart">Start</button>
       </div>
     </div>
 

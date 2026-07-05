@@ -5,7 +5,7 @@
 const copy = {
 en: {
   brandSub: "Your pet, understood",
-  navToday: "🏠 Today", navCare: "💚 Care", navInsights: "📈 Insights", navTimeline: "📖 Archive", navAvatar: "🐱 Twin",
+  navToday: "Today", navCare: "Care", navInsights: "Insights", navTimeline: "Archive", navAvatar: "Twin",
   language: "Language", hideTwin: "Hide digital twin", showTwin: "Show digital twin",
   savedLocal: "Data stays on this device", quickCheck: "Daily check-in",
   hello: "Hello,", wellbeing: "Wellbeing",
@@ -58,7 +58,7 @@ en: {
 },
 zh: {
   brandSub: "更懂你的宠物",
-  navToday: "🏠 今日", navCare: "💚 照护", navInsights: "📈 洞察", navTimeline: "📖 档案", navAvatar: "🐱 分身",
+  navToday: "今日", navCare: "照护", navInsights: "洞察", navTimeline: "档案", navAvatar: "分身",
   language: "语言", hideTwin: "隐藏数字分身", showTwin: "显示数字分身",
   savedLocal: "数据保存在本设备", quickCheck: "今日打卡",
   hello: "你好，", wellbeing: "综合状态",
@@ -114,23 +114,33 @@ Object.assign(copy.en, {
   emotionTitle: "How it feels right now", mbtiTitle: "Pet MBTI", mbtiSub: "Inferred from real check-ins and interactions — no quizzes",
   axisEI: "E · social — solo · I", axisSN: "S · steady — dreamy · N", axisTF: "T · independent — affectionate · F", axisJP: "J · routine — free · P",
   confLabel: "confidence", basedOnA: "based on", basedOnB: "days of records &", basedOnC: "interactions",
-  actPet: "💗 Pet it", actPlay: "🧶 Play", actTalk: "💬 Talk to it", actFeed: "🐟 Treat",
+  actPet: "Pet it", actPlay: "Play", actTalk: "Talk to it", actFeed: "Treat",
   talkTitle: "Say something to it", talkPh: "Type what you want to tell it…", talkSend: "Say it",
   alertsTitle: "Health signals", alertOk: "Everything looks steady lately. Keep the check-ins coming.",
   alertNoData: "Health signals appear after a few check-ins.",
-  awayTitle: "While you were away", awayHug: "🤗 Give a hug", purr: "purrrr… 💗",
-  bubblePet: "💗", bubblePlay: "🧶"
+  awayTitle: "While you were away", awayHug: "Give a hug", purr: "purrrr…",
+  bubblePet: "Pet", bubblePlay: "Tease",
+  coinsName: "coins", closetTitle: "Closet", appearanceTitle: "Appearance",
+  appearanceSub: "Upload 1–4 photos and the twin matches your pet's coat. Photos never leave this device.",
+  resetLook: "Reset colours", lookApplied: "Coat colours updated from your photos.",
+  wear: "Wear", takeOff: "Take off", buyFor: "Unlock ·", lvLockA: "Reaches Lv.", lvLockB: "to unlock",
+  ownedTag: "Owned", coinShort: "c"
 });
 Object.assign(copy.zh, {
   emotionTitle: "它现在的感觉", mbtiTitle: "宠物 MBTI", mbtiSub: "由真实打卡与互动推断——不做问卷",
   axisEI: "E · 外向 — 独处 · I", axisSN: "S · 务实 — 爱幻想 · N", axisTF: "T · 独立 — 黏人 · F", axisJP: "J · 规律 — 随性 · P",
   confLabel: "推断置信度", basedOnA: "基于", basedOnB: "天记录和", basedOnC: "次互动",
-  actPet: "💗 拍拍它", actPlay: "🧶 陪它玩", actTalk: "💬 和它说话", actFeed: "🐟 投喂",
+  actPet: "拍拍它", actPlay: "陪它玩", actTalk: "和它说话", actFeed: "投喂",
   talkTitle: "和它说说话", talkPh: "想对它说的话……", talkSend: "说给它听",
   alertsTitle: "健康信号", alertOk: "最近一切平稳，继续保持打卡。",
   alertNoData: "打卡几天后，这里会出现健康信号。",
-  awayTitle: "你不在的时候", awayHug: "🤗 抱抱它", purr: "咕噜咕噜…… 💗",
-  bubblePet: "💗", bubblePlay: "🧶"
+  awayTitle: "你不在的时候", awayHug: "抱抱它", purr: "咕噜咕噜……",
+  bubblePet: "拍拍", bubblePlay: "逗它",
+  coinsName: "金币", closetTitle: "衣橱", appearanceTitle: "分身外观",
+  appearanceSub: "上传 1–4 张照片，分身会匹配它的毛色。照片不会离开这台设备。",
+  resetLook: "恢复默认配色", lookApplied: "毛色已按照片更新。",
+  wear: "穿上", takeOff: "脱下", buyFor: "解锁 ·", lvLockA: "羁绊达到 Lv.", lvLockB: "解锁",
+  ownedTag: "已拥有", coinShort: "币"
 });
 
 let lang = localStorage.getItem("pt-lang") || "en";
@@ -145,8 +155,11 @@ const defaultState = {
   reminders: [],              // {id, type, label, date:"YYYY-MM-DD", repeatMonths}
   healthChecks: {},           // "YYYY-MM-DD" -> {eyes, gums, skin}  true = normal
   lastSeen: null,             // for the away-companion report
-  ix: null,                   // today's interaction counters {date, pets, plays, talks, feeds}
+  ix: null,                   // today's interaction counters {date, pets, plays, talks, feeds, coined}
   ixTotal: { pets: 0, plays: 0, talks: 0, feeds: 0 },
+  coins: 0,
+  wardrobe: { owned: [], wearing: null },
+  look: null,                 // photo-derived sprite colours {coat, cream, dark, pattern}
   twinVisible: true, coat: "#77bed2",
   tasks: [
     { id: "play", done: false, en: "10-minute play session", zh: "互动玩耍 10 分钟", whyEn: "Play keeps the evening baseline steady", whyZh: "晚间互动有助于保持基线稳定" },
@@ -168,6 +181,7 @@ function loadState() {
     merged.reminders = Array.isArray(parsed.reminders) ? parsed.reminders : [];
     merged.healthChecks = parsed.healthChecks || {};
     merged.ixTotal = Object.assign({ pets: 0, plays: 0, talks: 0, feeds: 0 }, parsed.ixTotal || {});
+    merged.wardrobe = Object.assign({ owned: [], wearing: null }, parsed.wardrobe || {});
     return merged;
   } catch (e) {
     console.warn("PetTwin: could not read saved state, resetting.", e);
@@ -195,39 +209,22 @@ const todayLog = () => state.checkIns[dkey()] || null;
 const logCount = () => Object.keys(state.checkIns).length;
 function petName() { return (state.pet && state.pet.name) || (en() ? "your cat" : "你的猫"); }
 
-/* --- Reconstruction API bridge (optional backend) --- */
-const RECON_API_BASE = (typeof window !== "undefined" && window.PETTWIN_API_BASE) || localStorage.getItem("pt-api-base") || "";
-async function reconServiceAvailable() {
-  if (!RECON_API_BASE) return false;
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
-    const res = await fetch(RECON_API_BASE + "/api/v1/health", { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) return false;
-    return !!(await res.json()).ok;
-  } catch (e) { return false; }
+/* === Coins — earned by care, spent in the closet (the Finch model) === */
+function syncCoins() { $$("#coin-count, #coin-count-2").forEach(el => el.textContent = state.coins || 0); }
+function addCoins(n) {
+  state.coins = (state.coins || 0) + n;
+  save();
+  syncCoins();
+  if (n > 0) toast("+" + n + " " + t("coinsName"));
 }
-async function runReconstruction(setStatus) {
-  const assets = captureResults.slice(0, 4).map(x => x.url);
-  const body = { assets, coatColor: state.coat, species: "cat" };
-  const created = await fetch(RECON_API_BASE + "/api/v1/reconstruction/jobs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  if (!created.ok) throw new Error("Job could not be created (" + created.status + ")");
-  const job = await created.json();
-  for (let attempt = 0; attempt < 90; attempt++) {
-    await new Promise(r => setTimeout(r, 2000));
-    const res = await fetch(RECON_API_BASE + "/api/v1/reconstruction/jobs/" + encodeURIComponent(job.id));
-    if (!res.ok) throw new Error("Job status error (" + res.status + ")");
-    const status = await res.json();
-    if (setStatus) setStatus(status);
-    if (status.error) throw new Error(status.error);
-    if (status.modelUrl) return status.modelUrl;
-  }
-  throw new Error("Reconstruction timed out");
-}
-
-let captureResults = [];
-const requiredViews = ["Front", "Left side", "Right side", "Back"];
+const WARDROBE = [
+  { id: "bow", zh: "红色蝴蝶结", en: "Red bow", price: 0, minLv: 2 },
+  { id: "bell", zh: "铃铛项圈", en: "Bell collar", price: 30, minLv: 1 },
+  { id: "scarf", zh: "蓝围巾", en: "Blue scarf", price: 60, minLv: 1 },
+  { id: "glasses", zh: "圆框眼镜", en: "Round glasses", price: 90, minLv: 3 },
+  { id: "flower", zh: "花环", en: "Flower crown", price: 120, minLv: 4 },
+  { id: "crown", zh: "皇冠", en: "Crown", price: 200, minLv: 6 }
+];
 
 /* === Derived wellbeing model (driven by check-ins) === */
 function energyOf(log) { return log.mood * 18 + 8; }
@@ -240,13 +237,13 @@ function wellbeingScore() {
 
 /* === Growth / bond level (the Finch loop: records feed the twin) === */
 const GROWTH = [
-  { lv: 1, at: 0, en: "New Friends", zh: "初次见面", unlock: null },
-  { lv: 2, at: 3, en: "Warming Up", zh: "渐渐熟悉", unlock: { id: "hearts", ico: "💗", en: "Heart bubbles", zh: "爱心泡泡" } },
-  { lv: 3, at: 7, en: "Close Pals", zh: "亲密伙伴", unlock: { id: "collar", ico: "🎀", en: "Collar", zh: "项圈" } },
-  { lv: 4, at: 14, en: "Family", zh: "正式家人", unlock: { id: "cushion", ico: "🛋️", en: "Cushion", zh: "专属坐垫" } },
-  { lv: 5, at: 30, en: "Soul Bond", zh: "心有灵犀", unlock: { id: "sparkles", ico: "✨", en: "Sparkles", zh: "星光" } },
-  { lv: 6, at: 60, en: "Legend Duo", zh: "传奇搭档", unlock: { id: "halo", ico: "😇", en: "Halo", zh: "光环" } },
-  { lv: 7, at: 100, en: "Lifelong", zh: "一生挚友", unlock: { id: "crown", ico: "👑", en: "Crown", zh: "皇冠" } }
+  { lv: 1, at: 0, en: "New Friends", zh: "初次见面" },
+  { lv: 2, at: 3, en: "Warming Up", zh: "渐渐熟悉" },
+  { lv: 3, at: 7, en: "Close Pals", zh: "亲密伙伴" },
+  { lv: 4, at: 14, en: "Family", zh: "正式家人" },
+  { lv: 5, at: 30, en: "Soul Bond", zh: "心有灵犀" },
+  { lv: 6, at: 60, en: "Legend Duo", zh: "传奇搭档" },
+  { lv: 7, at: 100, en: "Lifelong", zh: "一生挚友" }
 ];
 function growthNow() {
   const n = logCount();
@@ -264,18 +261,39 @@ function renderGrowth() {
   $("#growth-progress-text").textContent = next
     ? (en() ? `${next.at - n} more check-in day${next.at - n > 1 ? "s" : ""} to Lv.${next.lv}` : `再打卡 ${next.at - n} 天升到 Lv.${next.lv}`)
     : (en() ? "Max level — a lifelong friend" : "满级——一生挚友");
-  const grid = $("#adorn-grid");
-  grid.innerHTML = GROWTH.filter(g => g.unlock).map(g => {
-    const unlocked = n >= g.at, active = state.adornment === g.unlock.id;
-    return `<button class="adorn-item ${unlocked ? "unlocked" : "locked"} ${active ? "active" : ""}" data-adorn="${g.unlock.id}" ${unlocked ? "" : "disabled"}>
-      <span class="adorn-ico">${g.unlock.ico}</span><span class="adorn-name">${en() ? g.unlock.en : g.unlock.zh}</span>
-      <small>${unlocked ? (active ? t("equipped") : "Lv." + g.lv) : "Lv." + g.lv + " 🔒"}</small></button>`;
+}
+
+/* === Closet — coins + level gates buy wearables rendered on the sprite === */
+function renderCloset() {
+  const grid = $("#closet-grid"); if (!grid) return;
+  const { cur } = growthNow();
+  const w = state.wardrobe;
+  syncCoins();
+  grid.innerHTML = WARDROBE.map(item => {
+    const owned = w.owned.includes(item.id) || item.price === 0 && cur.lv >= item.minLv;
+    const lvOk = cur.lv >= item.minLv;
+    const active = w.wearing === item.id;
+    let cta;
+    if (!lvOk) cta = `<small>${t("lvLockA")}${item.minLv} ${t("lvLockB")}</small>`;
+    else if (owned) cta = `<small class="own">${active ? t("takeOff") : t("wear")}</small>`;
+    else cta = `<small>${t("buyFor")} ${item.price}${t("coinShort")}</small>`;
+    return `<button class="closet-item ${owned && lvOk ? "owned" : ""} ${active ? "active" : ""} ${lvOk ? "" : "locked"}" data-closet="${item.id}" ${lvOk ? "" : "disabled"}>
+      <span class="closet-swatch closet-${item.id}"></span><span class="closet-name">${en() ? item.en : item.zh}</span>${cta}</button>`;
   }).join("");
-  $$("[data-adorn]").forEach(b => b.onclick = () => {
-    state.adornment = state.adornment === b.dataset.adorn ? null : b.dataset.adorn;
+  $$("[data-closet]").forEach(b => b.onclick = () => {
+    const item = WARDROBE.find(x => x.id === b.dataset.closet);
+    const { cur } = growthNow();
+    if (cur.lv < item.minLv) return;
+    const owned = state.wardrobe.owned.includes(item.id) || item.price === 0;
+    if (!owned) {
+      if ((state.coins || 0) < item.price) { toast((en() ? "Need " : "还差 ") + (item.price - state.coins) + t("coinShort")); return; }
+      addCoins(-item.price);
+      state.wardrobe.owned.push(item.id);
+    }
+    state.wardrobe.wearing = state.wardrobe.wearing === item.id ? null : item.id;
     save();
-    if (window.PetFix) window.PetFix.setAdornment(state.adornment);
-    renderGrowth();
+    if (window.PetFix) { window.PetFix.setAdornment(state.wardrobe.wearing); window.PetFix.burst("spark", 4); }
+    renderCloset();
   });
 }
 
@@ -320,6 +338,7 @@ function submitCheckIn() {
     else state.streak = 1;
     if (state.streak > 0 && state.streak % 7 === 0) state.freezes = Math.min(2, (state.freezes || 0) + 1);
     state.lastCheckIn = today;
+    addCoins(10 + (state.streak % 7 === 0 ? 20 : 0));
   }
   const e = energyOf(log), s = stressOf(log);
   state.emaEnergy = state.emaEnergy == null ? e : Math.round(state.emaEnergy * 0.75 + e * 0.25);
@@ -348,6 +367,7 @@ function addIx(kind) {
   const ix = todayIx();
   ix[kind] = (ix[kind] || 0) + 1;
   state.ixTotal[kind] = (state.ixTotal[kind] || 0) + 1;
+  if ((ix.coined || 0) < 5) { ix.coined = (ix.coined || 0) + 1; state.coins = (state.coins || 0) + 1; syncCoins(); }
   save();
   renderEmotion(); renderMbti();
 }
@@ -392,7 +412,6 @@ function renderMbti() {
   if (!$("#mbti-type")) return;
   const m = computeMbti(), info = MBTI_TYPES[m.type];
   $("#mbti-type").textContent = m.type;
-  $("#mbti-emoji").textContent = info.emoji;
   $("#mbti-name").textContent = en() ? info.en : info.zh;
   const axes = [["axisEI", m.E], ["axisSN", m.N], ["axisTF", m.F], ["axisJP", m.J]];
   $("#mbti-axes").innerHTML = axes.map(([key, v]) =>
@@ -454,9 +473,8 @@ function emotionMessage(id) {
   return pool[day % pool.length];
 }
 function renderEmotion() {
-  if (!$("#emotion-emoji")) return;
+  if (!$("#emotion-name")) return;
   const id = computeEmotion(), e = EMOTIONS[id];
-  $("#emotion-emoji").textContent = e.emoji;
   $("#emotion-name").textContent = en() ? e.en : e.zh;
   $("#emotion-reason").textContent = emotionReason(id);
   $("#emotion-msg").textContent = "“" + emotionMessage(id) + "”";
@@ -467,9 +485,9 @@ function doEmoAct(kind) {
   if (kind === "talk") { openTalk(); return; }
   addIx(kind === "pet" ? "pets" : kind === "play" ? "plays" : "feeds");
   if (window.PetFix) {
-    if (kind === "pet") { window.PetFix.burst("💗", 6); window.PetFix.setAction("calm"); toast(t("purr")); }
-    if (kind === "play") { window.PetFix.setAction("play"); window.PetFix.burst("🧶", 3); }
-    if (kind === "feed") { window.PetFix.setAction("feed"); window.PetFix.burst("🐟", 3); }
+    if (kind === "pet") { window.PetFix.burst("heart", 6); window.PetFix.setAction("calm"); toast(t("purr")); }
+    if (kind === "play") { window.PetFix.setAction("play"); window.PetFix.burst("dot", 3); }
+    if (kind === "feed") { window.PetFix.setAction("feed"); window.PetFix.burst("spark", 3); }
   }
   evaluateAchievements(); renderAchievements();
 }
@@ -498,7 +516,7 @@ function sendTalk() {
   const reply = emotionMessage(id);
   $("#talk-reply").textContent = petName() + ": “" + reply + "”";
   speakAsPet(reply);
-  if (window.PetFix) { window.PetFix.burst("💬", 3); window.PetFix.setAction("shake"); }
+  if (window.PetFix) { window.PetFix.burst("dot", 3); window.PetFix.setAction("shake"); }
 }
 
 /* === Away report — what happened while you were gone === */
@@ -584,15 +602,15 @@ const ACHIEVEMENTS = [
   { id: "healthCheck", ico: "🩺", en: "First Self-check", zh: "首次自查", test: () => Object.keys(state.healthChecks).length >= 1 }
 ];
 function evaluateAchievements() {
-  let changed = false;
-  ACHIEVEMENTS.forEach(a => { if (a.test() && !state.achievements[a.id]) { state.achievements[a.id] = dkey(); changed = true; } });
-  if (changed) save();
+  let earned = 0;
+  ACHIEVEMENTS.forEach(a => { if (a.test() && !state.achievements[a.id]) { state.achievements[a.id] = dkey(); earned++; } });
+  if (earned) { state.coins = (state.coins || 0) + earned * 15; save(); }
 }
 function renderAchievements() {
   const grid = $("#ach-grid"); if (!grid) return;
   grid.innerHTML = ACHIEVEMENTS.map(a => {
     const unlocked = !!state.achievements[a.id];
-    return '<div class="ach-item ' + (unlocked ? "unlocked" : "locked") + '"><span class="ach-ico">' + a.ico + '</span><span class="ach-name">' + (en() ? a.en : a.zh) + "</span></div>";
+    return '<div class="ach-item ' + (unlocked ? "unlocked" : "locked") + '"><i class="ach-mark"></i><span class="ach-name">' + (en() ? a.en : a.zh) + "</span></div>";
   }).join("");
   $("#ach-progress").textContent = ACHIEVEMENTS.filter(a => state.achievements[a.id]).length + "/" + ACHIEVEMENTS.length;
 }
@@ -687,20 +705,22 @@ function wrapText(ctx, text, x, y, maxW, lh) {
   ctx.fillText(line.trimEnd(), x, ly);
   return ly;
 }
-function drawTwinPortrait(ctx, cx, cy, R, fallbackEmoji) {
+function drawTwinPortrait(ctx, cx, cy, R) {
   ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.beginPath(); ctx.arc(cx, cy, R + 8, 0, 7); ctx.fill();
   let drew = false;
-  const pc = document.querySelector("#pet-sprite canvas");
-  if (pc && pc.width > 0) {
+  const img = window.PetFix && window.PetFix.portrait();
+  if (img && img.complete && img.naturalWidth > 0) {
     try {
       ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.clip();
-      const side = Math.min(pc.width, pc.height) * 0.72;
-      ctx.drawImage(pc, (pc.width - side) / 2, (pc.height - side) / 2 + pc.height * 0.05, side, side, cx - R, cy - R, R * 2, R * 2);
+      ctx.drawImage(img, cx - R * 0.95, cy - R * 0.82, R * 1.9, R * 1.9);
       ctx.restore();
       drew = true;
     } catch (e) { ctx.restore(); }
   }
-  if (!drew) { ctx.font = Math.round(R * 1.15) + "px system-ui,sans-serif"; ctx.textAlign = "center"; ctx.fillText(fallbackEmoji, cx, cy + R * 0.42); }
+  if (!drew) {
+    ctx.fillStyle = "#75bdd0"; ctx.font = "700 " + Math.round(R * 1.05) + "px system-ui,sans-serif"; ctx.textAlign = "center";
+    ctx.fillText((petName()[0] || "P").toUpperCase(), cx, cy + R * 0.36);
+  }
 }
 function buildSharePoster(mode) {
   const canvas = $("#share-canvas"); if (!canvas) return;
@@ -759,12 +779,11 @@ function applyLanguage() {
   $$("[data-i18n-placeholder]").forEach(el => el.placeholder = t(el.dataset.i18nPlaceholder));
   $$("[data-lang]").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
   renderAll();
-  if ($("#capture-slots")) renderCaptureSlots();
 }
 function renderAll() {
   renderIdentity(); renderSummary(); renderTasks(); renderInsights(); renderTimeline();
   updatePetMessage(); renderMbti(); renderEmotion(); renderStreak();
-  renderGrowth(); renderReminders();
+  renderGrowth(); renderReminders(); renderCloset(); renderSwatches();
   evaluateAchievements(); renderAchievements();
 }
 function renderIdentity() {
@@ -775,9 +794,11 @@ function renderIdentity() {
   $("#mini-avatar").textContent = (name[0] || "P").toUpperCase();
   const age = state.pet.age;
   $("#pet-meta").textContent = (en() ? "Cat" : "猫") + (age ? " · " + age + (en() ? " yr" : " 岁") : "");
-  $("#studio-orbit-name").textContent = name + " 3D";
+  const so = $("#studio-orbit-name"); if (so) so.textContent = name;
 }
-function moodEmoji(m) { return ["", "😿", "😾", "😺", "😸", "😻"][m] || "—"; }
+function moodEmoji(m) {
+  return (en() ? ["", "Low", "Meh", "Okay", "Good", "Great"] : ["", "很低", "偏低", "一般", "不错", "很好"])[m] || "—";
+}
 function prevLog() {
   for (let i = 1; i <= 30; i++) { const k = dkey(Date.now() - i * 864e5); if (state.checkIns[k]) return state.checkIns[k]; }
   return null;
@@ -897,8 +918,7 @@ function renderTimeline() {
   $("#timeline-list").innerHTML = items.map(x => `<article class="timeline-item"><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join("");
 }
 function updatePetMessage() {
-  const id = computeEmotion(), e = EMOTIONS[id];
-  $("#pet-message-text").textContent = e.emoji + " " + emotionMessage(id);
+  $("#pet-message-text").textContent = emotionMessage(computeEmotion());
 }
 
 /* Trend chart driven by real check-ins; needs 3+ logged days in range. */
@@ -1023,7 +1043,7 @@ $("#away-close").onclick = () => $("#away-overlay").classList.add("hidden");
 $("#away-overlay").onclick = e => { if (e.target === $("#away-overlay")) $("#away-overlay").classList.add("hidden"); };
 $("#away-hug").onclick = () => {
   addIx("pets");
-  if (window.PetFix) { window.PetFix.burst("💗", 8); window.PetFix.setAction("calm"); }
+  if (window.PetFix) { window.PetFix.burst("heart", 8); window.PetFix.setAction("calm"); }
   $("#away-overlay").classList.add("hidden");
   toast(t("purr"));
 };
@@ -1108,93 +1128,33 @@ $("#onb-start").onclick = () => {
 };
 $("#onb-name").addEventListener("keydown", e => { if (e.key === "Enter") $("#onb-start").click(); });
 
-/* === Capture quality + twin generation (visuals handled by PetFix) === */
-function renderCaptureSlots() {
-  const labels = en() ? requiredViews : ["正面", "左侧", "右侧", "背面"];
-  $("#capture-slots").innerHTML = labels.map((label, i) => {
-    const item = captureResults[i];
-    return `<div class="capture-slot ${item ? (item.pass ? "good" : "warn") : ""}">${item ? `<img src="${item.url}" alt="${label}">` : `<span>${label}</span>`}</div>`;
-  }).join("");
-  const passed = captureResults.slice(0, 4).filter(x => x.pass).length;
-  const ready = Math.min(95, Math.round((passed / 4) * 85 + Math.min(captureResults.length, 4) / 4 * 10));
-  $("#fidelity-score").textContent = ready + "%";
-  $("#quality-summary").textContent = `${passed} / 4`;
-  $("#generate-twin").disabled = passed < 4;
-  $("#scan-progress").style.setProperty("--progress", ready + "%");
-  $("#scan-progress span").textContent = passed >= 4
-    ? (en() ? "Four-view set passed. The twin has adapted to this pet." : "四视角素材已通过，分身已根据这只宠物调整。")
-    : (en() ? `${4 - passed} required view(s) still need a clear image` : `还有 ${4 - passed} 个必需视角需要清晰图片`);
-  const checks = en()
-    ? [["Resolution", captureResults.some(x => x.resolution)], ["Lighting", captureResults.some(x => x.brightness)], ["Sharpness", captureResults.some(x => x.sharp)], ["4 views", captureResults.length >= 4]]
-    : [["分辨率", captureResults.some(x => x.resolution)], ["光线", captureResults.some(x => x.brightness)], ["清晰度", captureResults.some(x => x.sharp)], ["四个视角", captureResults.length >= 4]];
-  $("#quality-checks").innerHTML = checks.map(([name, ok]) => `<span class="${ok ? "pass" : ""}">${ok ? "✓" : "○"} ${name}</span>`).join("");
-}
-function inspectImage(file) {
-  return new Promise(resolve => {
-    const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas"), size = 160;
-      canvas.width = canvas.height = size;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(img, 0, 0, size, size);
-      const data = ctx.getImageData(0, 0, size, size).data;
-      let light = 0, edges = 0;
-      for (let y = 1; y < size - 1; y += 2) for (let x = 1; x < size - 1; x += 2) {
-        const i = (y * size + x) * 4, l = (data[i] + data[i + 1] + data[i + 2]) / 3;
-        light += l;
-        const j = (y * size + x + 1) * 4;
-        edges += Math.abs(l - (data[j] + data[j + 1] + data[j + 2]) / 3);
-      }
-      const samples = Math.pow(Math.floor((size - 2) / 2), 2), avg = light / samples;
-      const sharp = edges / samples > 1.2, resolution = img.width >= 800 && img.height >= 800, brightness = avg > 42 && avg < 228;
-      resolve({ file, url, resolution, brightness, sharp, pass: resolution && brightness && sharp });
-    };
-    img.onerror = () => resolve({ file, url, resolution: false, brightness: false, sharp: false, pass: false });
-    img.src = url;
-  });
-}
+/* === Appearance — photos in, coat colours out. Nothing else to configure. === */
 $("#pet-photo").onchange = async event => {
-  captureResults.forEach(x => URL.revokeObjectURL(x.url));
-  captureResults = await Promise.all([...event.target.files].slice(0, 4).map(inspectImage));
-  if (captureResults.length) { state.flags.photo = true; save(); }
-  renderCaptureSlots();
+  const files = [...event.target.files];
+  if (!files.length) return;
+  $("#studio-result").textContent = en() ? "Reading photos…" : "正在读取照片……";
+  const look = window.PetFix ? await window.PetFix.readPhotos(files) : null;
+  if (!look) { $("#studio-result").textContent = en() ? "Could not read those photos — try clearer ones." : "读不出这些照片，换几张更清晰的试试。"; return; }
+  state.look = look;
+  state.flags.photo = true; state.flags.twin = true;
+  save();
+  window.PetFix.setLook(look);
+  window.PetFix.burst("spark", 5);
+  renderSwatches();
+  $("#studio-result").textContent = t("lookApplied");
   evaluateAchievements(); renderAchievements();
 };
-$("#generate-twin").onclick = async () => {
-  $("#generate-twin").disabled = true;
-  try {
-    if (await reconServiceAvailable()) {
-      $("#studio-result").textContent = en() ? "Reconstruction service connected. Uploading four views…" : "已连接重建服务，正在上传四个视角…";
-      const modelUrl = await runReconstruction(status => {
-        const pct = Math.max(10, Math.min(95, status.progress || 10));
-        $("#scan-progress").style.setProperty("--progress", pct + "%");
-        $("#studio-result").textContent = (en() ? "Reconstructing… " : "正在重建… ") + pct + "%";
-      });
-      if (window.PetFix) window.PetFix.load(modelUrl);
-      $("#model-source").textContent = en() ? "Reconstructed GLB" : "重建 GLB 模型";
-      state.flags.twin = true; save(); evaluateAchievements(); renderAchievements();
-      $("#generate-twin").disabled = false;
-      return;
-    }
-  } catch (e) {
-    $("#studio-result").textContent = (en() ? "Reconstruction unavailable, using adaptive preview. " : "重建服务不可用，改用自适应预览。 ") + (e && e.message ? e.message : "");
-  }
-  const stages = $$("#reconstruction-pipeline span");
-  stages.forEach(x => x.classList.remove("active"));
-  for (let i = 0; i < stages.length; i++) {
-    stages[i].classList.add("active");
-    $("#scan-progress").style.setProperty("--progress", (20 + i * 20) + "%");
-    $("#studio-result").textContent = en()
-      ? ["Reading four views…", "Adapting body proportions…", "Matching coat and light markings…", "Adding motion…", "Preparing preview…"][i]
-      : ["正在读取四个视角…", "正在调整身体比例…", "正在匹配主毛色和浅色花纹…", "正在添加动作…", "正在准备预览…"][i];
-    await new Promise(r => setTimeout(r, 320));
-  }
-  $("#studio-result").textContent = en()
-    ? `Twin preview updated for ${petName()}: coat colour and markings matched from your photos.`
-    : `${petName()}的分身预览已更新：毛色与花纹已按照片匹配。`;
-  state.flags.twin = true; save(); evaluateAchievements(); renderAchievements();
-  $("#generate-twin").disabled = false;
+$("#reset-look").onclick = () => {
+  state.look = null; save();
+  if (window.PetFix) window.PetFix.setLook({ coat: "#8f9aa6", cream: "#f6f1e7", dark: "#5d6570", pattern: "solid" });
+  renderSwatches();
+  $("#studio-result").textContent = "";
 };
+function renderSwatches() {
+  const box = $("#look-swatches"); if (!box) return;
+  const l = state.look || { coat: "#8f9aa6", cream: "#f6f1e7", dark: "#5d6570" };
+  box.innerHTML = [l.coat, l.cream, l.dark].map(c => `<span style="background:${c}"></span>`).join("");
+}
 
 /* Share overlay */
 if ($("#open-share")) $("#open-share").onclick = () => { buildSharePoster(); $("#share-overlay").classList.remove("hidden"); };
@@ -1215,15 +1175,16 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 
 /* Boot */
 applyLanguage();
-renderCaptureSlots();
 maybeOnboard();
 if (state.pet.name) maybeAwayReport();
-if (state.adornment && window.PetFix) window.PetFix.setAdornment(state.adornment);
-document.addEventListener("pt-model-ready", () => {
+function applySprite() {
   if (!window.PetFix) return;
-  if (state.adornment) window.PetFix.setAdornment(state.adornment);
+  if (state.look) window.PetFix.setLook(state.look);
+  window.PetFix.setAdornment(state.wardrobe.wearing);
   window.PetFix.setMood(window.__petMood || "content");
-});
+}
+applySprite();
+document.addEventListener("pt-model-ready", applySprite);
 if (!state.twinVisible) {
   $("#pet-sprite").classList.add("hidden");
   $("#pet-message").classList.add("hidden");

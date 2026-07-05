@@ -1,11 +1,11 @@
 /* PetTwin service worker — network-first with cache fallback so the app works offline
    but always picks up fresh deploys when online. */
-const CACHE = "pettwin-v1";
+const CACHE = "pettwin-v2";
 
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(["./", "./index.html", "./styles.css", "./pet-fix.css", "./app.js", "./pet-fix.js", "./assets/icon.svg"]))
+      .then(c => c.addAll(["./", "./index.html", "./styles.css", "./app.js", "./pet-sprite.js", "./assets/icon.svg"]))
       .then(() => self.skipWaiting())
   );
 });
