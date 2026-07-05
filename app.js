@@ -1,36 +1,23 @@
-/* PetTwin — daily check-in loop, streaks, evolving persona, achievements, share card.
-   3D rendering lives in pet-fix.js (window.PetFix). */
+/* PetTwin — daily check-in loop, growth system, streaks, evolving persona,
+   reminders, health self-checks, share cards. 3D rendering lives in pet-fix.js
+   (window.PetFix). */
 
 const copy = {
 en: {
   brandSub: "Your pet, understood",
-  navToday: "Today", navHome: "Home mode", navDevices: "Devices", navCare: "Care plan",
-  navInsights: "Insights", navTimeline: "Timeline", navAvatar: "3D twin studio",
+  navToday: "🏠 Today", navCare: "💚 Care", navInsights: "📈 Insights", navTimeline: "📖 Archive", navAvatar: "🐱 Twin",
   language: "Language", hideTwin: "Hide digital twin", showTwin: "Show digital twin",
   savedLocal: "Data stays on this device", quickCheck: "Daily check-in",
   hello: "Hello,", wellbeing: "Wellbeing",
-  seeHome: "See what happened at home", addObservation: "Check in now",
-  activity: "Activity", stress: "Stress", moodLabel: "Mood", water: "Appetite", baseline: "Baseline",
+  addObservation: "Check in now", monologueBtn: "Today's monologue",
+  activity: "Activity", stress: "Stress", moodLabel: "Mood", water: "Appetite",
   worthKnowing: "Worth knowing", smartFinding: "One useful finding",
   addCareTask: "Add care task", viewEvidence: "View evidence",
   todayPlan: "Today’s plan", smallActions: "Small actions that help",
-  workdayCompanion: "Workday Companion", homeWithoutWatching: "Know what matters without watching all day",
-  homeModeCopy: "PetTwin turns device events into a calm, useful home diary.",
-  quietMode: "Quiet", companionMode: "Companion", observeMode: "Observe",
-  liveDiary: "Home diary", todayAtHome: "Today at home", sampleTag: "SAMPLE",
-  remoteCare: "Remote care", connectGently: "Connect gently",
-  playVoice: "Play a familiar message", smallPortion: "Dispense a limited portion",
-  startToy: "Start a safe toy session", openCamera: "Check the living room",
-  beforeHome: "Before you get home",
-  deviceIntro: "Hardware integrations are coming. This page previews how passive data will flow in.",
-  discoverDevices: "Discover devices", catOnly: "Cat intelligence", litterAnalysis: "Smart litter-box analysis",
-  preview: "Preview", visitsToday: "Visits today", averageDuration: "Average duration",
-  latestWeight: "Latest weight", repeatEntries: "Repeat entries",
-  observeNotDiagnose: "Observation, not diagnosis",
-  careIntro: "Turn insights into actions, then learn what works for this pet.",
-  newTask: "New care task", activePlan: "Active plan", thisWeek: "This week", personalPlaybook: "Personal care playbook",
+  careIntro: "Tasks, health reminders and quick self-checks — all in one place.",
+  newTask: "New care task", activePlan: "Active plan", thisWeek: "This week",
   behaviorBaseline: "Behavior baseline", linkedSignals: "Logged signals",
-  environmentLinks: "Environment links", likelyTriggers: "Likely triggers (sample)",
+  weightTrend: "Weight trend", environmentLinks: "Environment links", likelyTriggers: "Likely triggers (sample)",
   lifeArchive: "Life archive", personalityTimeline: "Personality timeline", exportReport: "Export report",
   digitalTwinStudio: "Digital Twin Studio", buildLookalike: "Create a photo-matched digital twin",
   studioCopy: "Use four clear views. The twin adapts coat colour and markings to your pet. Photos stay on this device.",
@@ -46,47 +33,44 @@ en: {
   sharePoster: "Share card", shareTitle: "Your pet card", downloadPoster: "Save image",
   petCardTagline: "Understood, every day",
   feedPet: "Feed", shakePaw: "Shake paw", playPet: "Play", calmPet: "Calm", view360: "360 view",
-  comingSoonDevice: "Hardware pairing is coming soon — this page is a preview.",
-  comingSoonRemote: "Available once a real device is paired. Coming soon.",
-  modeSaved: "Preference saved. Notifications arrive with the full release.",
-  checkinTitle: "30-second check-in", checkinSub: "Three quick questions build your pet's real baseline.",
-  qMood: "Mood today", qAppetite: "Appetite", qLitter: "Litter box",
+  checkinTitle: "30-second check-in", checkinSub: "Quick questions build your pet's real baseline.",
+  qMood: "Mood today", qAppetite: "Appetite", qLitter: "Litter box", qWeight: "Weight (kg, optional)",
   appLess: "Less", appNormal: "Normal", appMore: "More",
   litterNormal: "Normal", litterOdd: "Unusual",
   notePh: "Anything worth remembering? (optional)",
   saveCheckin: "Save today's check-in", checkinThanks: "Saved! Your twin says thanks.",
   onbTitle: "Welcome to PetTwin", onbSub: "Tell us who we're getting to know.",
-  onbName: "Pet's name", onbNamePh: "e.g. Mochi", onbAge: "Age (years, optional)", onbStart: "Start"
+  onbName: "Pet's name", onbNamePh: "e.g. Mochi", onbAge: "Age (years, optional)", onbStart: "Start",
+  growthTitle: "Bond level", growthUnlocks: "Unlocked keepsakes", equipped: "Wearing",
+  remindersTitle: "Health reminders", addReminder: "Add reminder", exportIcs: "Add all to calendar",
+  remType: "Type", remDate: "Next due date", remRepeat: "Repeat",
+  remVaccine: "Vaccine", remDewormIn: "Deworming (internal)", remDewormOut: "Deworming (external)",
+  remCheckup: "Vet check-up", remCustom: "Custom", remCustomPh: "Reminder name",
+  remNone: "No repeat", remMonths1: "Monthly", remMonths3: "Every 3 months", remMonths12: "Yearly",
+  remSave: "Save reminder", remDone: "Done", remDelete: "Delete", remCal: "📅 Calendar",
+  remEmpty: "No reminders yet. Vaccines and deworming are the ones owners forget most.",
+  healthCheck: "Health self-check", healthTitle: "2-minute health self-check",
+  healthSub: "Look closely at each area and choose what you see.",
+  hEyes: "Eyes — clear, no discharge or redness?", hGums: "Gums — pink, no swelling or odour?", hSkin: "Skin & coat — no bald spots, flakes or bumps?",
+  hOk: "Looks normal", hWatch: "Needs watching",
+  healthSave: "Save check result", healthSaved: "Self-check saved to the archive.",
+  healthTaskEn: "Observe the flagged area for 3 days", healthWhyEn: "From today's health self-check"
 },
 zh: {
   brandSub: "更懂你的宠物",
-  navToday: "今日", navHome: "居家模式", navDevices: "设备中心", navCare: "照护计划",
-  navInsights: "行为洞察", navTimeline: "成长档案", navAvatar: "3D 分身工作室",
+  navToday: "🏠 今日", navCare: "💚 照护", navInsights: "📈 洞察", navTimeline: "📖 档案", navAvatar: "🐱 分身",
   language: "语言", hideTwin: "隐藏数字分身", showTwin: "显示数字分身",
   savedLocal: "数据保存在本设备", quickCheck: "今日打卡",
   hello: "你好，", wellbeing: "综合状态",
-  seeHome: "看看今天在家发生了什么", addObservation: "现在打卡",
-  activity: "活跃度", stress: "压力", moodLabel: "心情", water: "食欲", baseline: "接近基线",
+  addObservation: "现在打卡", monologueBtn: "今日独白",
+  activity: "活跃度", stress: "压力", moodLabel: "心情", water: "食欲",
   worthKnowing: "值得了解", smartFinding: "一个有用的发现",
   addCareTask: "加入照护任务", viewEvidence: "查看依据",
   todayPlan: "今日计划", smallActions: "能带来帮助的小行动",
-  workdayCompanion: "上班陪伴模式", homeWithoutWatching: "不用一直盯着，也能知道重要变化",
-  homeModeCopy: "PetTwin 将设备事件整理成安静而有用的居家日记。",
-  quietMode: "安静", companionMode: "陪伴", observeMode: "密切观察",
-  liveDiary: "居家日记", todayAtHome: "今天在家", sampleTag: "示例",
-  remoteCare: "远程照护", connectGently: "温和地保持连接",
-  playVoice: "播放熟悉的语音", smallPortion: "投放限量零食",
-  startToy: "开启安全玩具", openCamera: "查看客厅",
-  beforeHome: "回家之前",
-  deviceIntro: "硬件对接即将推出，本页展示被动数据未来的接入方式。",
-  discoverDevices: "发现设备", catOnly: "猫咪智能分析", litterAnalysis: "智能猫砂盆分析",
-  preview: "预览", visitsToday: "今日次数", averageDuration: "平均停留",
-  latestWeight: "最新体重", repeatEntries: "重复进入",
-  observeNotDiagnose: "只做观察，不作诊断",
-  careIntro: "把洞察变成行动，再学习什么方法真正适合它。",
-  newTask: "新建任务", activePlan: "正在执行", thisWeek: "本周计划", personalPlaybook: "专属照护手册",
+  careIntro: "照护任务、健康提醒和快速自查，都在这里。",
+  newTask: "新建任务", activePlan: "正在执行", thisWeek: "本周计划",
   behaviorBaseline: "行为基线", linkedSignals: "记录信号",
-  environmentLinks: "环境关联", likelyTriggers: "可能的触发因素（示例）",
+  weightTrend: "体重趋势", environmentLinks: "环境关联", likelyTriggers: "可能的触发因素（示例）",
   lifeArchive: "生命档案", personalityTimeline: "人格时间轴", exportReport: "导出报告",
   digitalTwinStudio: "数字分身工作室", buildLookalike: "创建照片匹配的 3D 数字分身",
   studioCopy: "拍摄四个清晰视角，分身会匹配主毛色和花纹。照片仅在本设备处理。",
@@ -102,17 +86,28 @@ zh: {
   sharePoster: "分享卡片", shareTitle: "你的宠物卡片", downloadPoster: "保存图片",
   petCardTagline: "每天，更懂它一点",
   feedPet: "喂食", shakePaw: "握手", playPet: "玩耍", calmPet: "安静", view360: "360 查看",
-  comingSoonDevice: "硬件配对即将推出，本页为界面预览。",
-  comingSoonRemote: "连接真实设备后可用，即将推出。",
-  modeSaved: "偏好已记住，正式版将联动通知。",
-  checkinTitle: "30 秒打卡", checkinSub: "三个小问题，建立它的真实基线。",
-  qMood: "今天的心情", qAppetite: "食欲", qLitter: "猫砂盆",
+  checkinTitle: "30 秒打卡", checkinSub: "几个小问题，建立它的真实基线。",
+  qMood: "今天的心情", qAppetite: "食欲", qLitter: "猫砂盆", qWeight: "体重（kg，选填）",
   appLess: "偏少", appNormal: "正常", appMore: "偏多",
   litterNormal: "正常", litterOdd: "有点异常",
   notePh: "有什么值得记下来的吗？（选填）",
   saveCheckin: "保存今日打卡", checkinThanks: "已保存！你的分身说谢谢。",
   onbTitle: "欢迎来到 PetTwin", onbSub: "告诉我们，要认识的是哪位小朋友。",
-  onbName: "宠物名字", onbNamePh: "例如：Mochi", onbAge: "年龄（岁，选填）", onbStart: "开始"
+  onbName: "宠物名字", onbNamePh: "例如：Mochi", onbAge: "年龄（岁，选填）", onbStart: "开始",
+  growthTitle: "羁绊等级", growthUnlocks: "已解锁的纪念物", equipped: "佩戴中",
+  remindersTitle: "健康提醒", addReminder: "新增提醒", exportIcs: "全部加入日历",
+  remType: "类型", remDate: "下次日期", remRepeat: "重复",
+  remVaccine: "疫苗", remDewormIn: "体内驱虫", remDewormOut: "体外驱虫",
+  remCheckup: "体检", remCustom: "自定义", remCustomPh: "提醒名称",
+  remNone: "不重复", remMonths1: "每月", remMonths3: "每 3 个月", remMonths12: "每年",
+  remSave: "保存提醒", remDone: "完成", remDelete: "删除", remCal: "📅 加入日历",
+  remEmpty: "还没有提醒。疫苗和驱虫是铲屎官最容易忘的两件事。",
+  healthCheck: "健康自查", healthTitle: "2 分钟健康自查",
+  healthSub: "仔细观察每个部位，选择你看到的情况。",
+  hEyes: "眼睛——清澈、无分泌物和红肿？", hGums: "牙龈——粉红色、无肿胀异味？", hSkin: "皮肤毛发——无秃斑、皮屑和肿块？",
+  hOk: "看起来正常", hWatch: "需要观察",
+  healthSave: "保存自查结果", healthSaved: "自查结果已存入档案。",
+  healthTaskEn: "连续 3 天观察标记的部位", healthWhyEn: "来自今日健康自查"
 }};
 
 let lang = localStorage.getItem("pt-lang") || "en";
@@ -120,11 +115,13 @@ let lang = localStorage.getItem("pt-lang") || "en";
 const defaultState = {
   pet: { name: "", age: "" },
   streak: 0, lastCheckIn: null, freezes: 1,
-  checkIns: {},               // "YYYY-MM-DD" -> {mood:1-5, appetite:"less|normal|more", litterOk:bool, note:""}
+  checkIns: {},               // "YYYY-MM-DD" -> {mood, appetite, litterOk, weight?, note}
   emaEnergy: null, emaStress: null,
-  flags: {},                  // one-off achievement events: photo, twin
-  achievements: {},
-  mode: "companion", twinVisible: true, coat: "#77bed2",
+  flags: {}, achievements: {},
+  adornment: null,            // equipped growth keepsake id
+  reminders: [],              // {id, type, label, date:"YYYY-MM-DD", repeatMonths}
+  healthChecks: {},           // "YYYY-MM-DD" -> {eyes, gums, skin}  true = normal
+  twinVisible: true, coat: "#77bed2",
   tasks: [
     { id: "play", done: false, en: "10-minute play session", zh: "互动玩耍 10 分钟", whyEn: "Play keeps the evening baseline steady", whyZh: "晚间互动有助于保持基线稳定" },
     { id: "water", done: false, en: "Check water level", zh: "检查饮水量", whyEn: "Fresh water supports normal litter habits", whyZh: "新鲜饮水有助于正常如厕" },
@@ -142,6 +139,8 @@ function loadState() {
     merged.checkIns = parsed.checkIns || {};
     merged.flags = parsed.flags || {};
     merged.achievements = parsed.achievements || {};
+    merged.reminders = Array.isArray(parsed.reminders) ? parsed.reminders : [];
+    merged.healthChecks = parsed.healthChecks || {};
     return merged;
   } catch (e) {
     console.warn("PetTwin: could not read saved state, resetting.", e);
@@ -198,25 +197,6 @@ async function runReconstruction(setStatus) {
 let captureResults = [];
 const requiredViews = ["Front", "Left side", "Right side", "Back"];
 
-const eventsEn = [
-  { time: "14:42", icon: "L", title: "Litter-box visit", detail: "54 seconds · weight 4.62 kg" },
-  { time: "13:18", icon: "Z", title: "Nap ended", detail: "Rested for 2h 06m" },
-  { time: "11:07", icon: "A", title: "Living-room activity", detail: "Movement returned to normal" },
-  { time: "09:36", icon: "W", title: "Drank water", detail: "Within the usual morning range" }
-];
-const eventsZh = [
-  { time: "14:42", icon: "砂", title: "猫砂盆记录", detail: "停留 54 秒 · 体重 4.62 kg" },
-  { time: "13:18", icon: "眠", title: "午睡结束", detail: "休息了 2 小时 06 分钟" },
-  { time: "11:07", icon: "动", title: "客厅活动", detail: "活动量恢复到正常范围" },
-  { time: "09:36", icon: "水", title: "饮水记录", detail: "处于日常早间范围" }
-];
-const deviceData = [
-  { icon: "LB", en: "Smart litter box", zh: "智能猫砂盆", enD: "Visits, weight and duration", zhD: "次数、体重和停留时间" },
-  { icon: "CM", en: "Home camera", zh: "家庭摄像头", enD: "Movement and rest zones", zhD: "活动和休息区域" },
-  { icon: "FD", en: "Smart feeder", zh: "智能喂食器", enD: "Meals and portion limits", zhD: "进食和份量限制" },
-  { icon: "CL", en: "Activity collar", zh: "活动项圈", enD: "Activity and sleep", zhD: "活动量和睡眠" }
-];
-
 /* === Derived wellbeing model (driven by check-ins) === */
 function energyOf(log) { return log.mood * 18 + 8; }
 function stressOf(log) { return (log.litterOk ? 16 : 44) + (log.mood <= 2 ? 18 : 0) + (log.appetite === "less" ? 10 : 0); }
@@ -224,6 +204,47 @@ function currentEnergy() { return state.emaEnergy == null ? 72 : state.emaEnergy
 function currentStress() { return state.emaStress == null ? 28 : state.emaStress; }
 function wellbeingScore() {
   return Math.max(40, Math.min(98, Math.round(currentEnergy() * 0.6 + (100 - currentStress()) * 0.4)));
+}
+
+/* === Growth / bond level (the Finch loop: records feed the twin) === */
+const GROWTH = [
+  { lv: 1, at: 0, en: "New Friends", zh: "初次见面", unlock: null },
+  { lv: 2, at: 3, en: "Warming Up", zh: "渐渐熟悉", unlock: { id: "hearts", ico: "💗", en: "Heart bubbles", zh: "爱心泡泡" } },
+  { lv: 3, at: 7, en: "Close Pals", zh: "亲密伙伴", unlock: { id: "collar", ico: "🎀", en: "Collar", zh: "项圈" } },
+  { lv: 4, at: 14, en: "Family", zh: "正式家人", unlock: { id: "cushion", ico: "🛋️", en: "Cushion", zh: "专属坐垫" } },
+  { lv: 5, at: 30, en: "Soul Bond", zh: "心有灵犀", unlock: { id: "sparkles", ico: "✨", en: "Sparkles", zh: "星光" } },
+  { lv: 6, at: 60, en: "Legend Duo", zh: "传奇搭档", unlock: { id: "halo", ico: "😇", en: "Halo", zh: "光环" } },
+  { lv: 7, at: 100, en: "Lifelong", zh: "一生挚友", unlock: { id: "crown", ico: "👑", en: "Crown", zh: "皇冠" } }
+];
+function growthNow() {
+  const n = logCount();
+  let cur = GROWTH[0], next = null;
+  for (const g of GROWTH) { if (n >= g.at) cur = g; else { next = g; break; } }
+  return { cur, next, n };
+}
+function renderGrowth() {
+  const box = $("#growth-card"); if (!box) return;
+  const { cur, next, n } = growthNow();
+  $("#growth-level-num").textContent = "Lv." + cur.lv;
+  $("#growth-level-name").textContent = en() ? cur.en : cur.zh;
+  const pctBase = next ? (n - cur.at) / (next.at - cur.at) : 1;
+  $("#growth-bar i").style.width = Math.round(Math.max(0.04, Math.min(1, pctBase)) * 100) + "%";
+  $("#growth-progress-text").textContent = next
+    ? (en() ? `${next.at - n} more check-in day${next.at - n > 1 ? "s" : ""} to Lv.${next.lv}` : `再打卡 ${next.at - n} 天升到 Lv.${next.lv}`)
+    : (en() ? "Max level — a lifelong friend" : "满级——一生挚友");
+  const grid = $("#adorn-grid");
+  grid.innerHTML = GROWTH.filter(g => g.unlock).map(g => {
+    const unlocked = n >= g.at, active = state.adornment === g.unlock.id;
+    return `<button class="adorn-item ${unlocked ? "unlocked" : "locked"} ${active ? "active" : ""}" data-adorn="${g.unlock.id}" ${unlocked ? "" : "disabled"}>
+      <span class="adorn-ico">${g.unlock.ico}</span><span class="adorn-name">${en() ? g.unlock.en : g.unlock.zh}</span>
+      <small>${unlocked ? (active ? t("equipped") : "Lv." + g.lv) : "Lv." + g.lv + " 🔒"}</small></button>`;
+  }).join("");
+  $$("[data-adorn]").forEach(b => b.onclick = () => {
+    state.adornment = state.adornment === b.dataset.adorn ? null : b.dataset.adorn;
+    save();
+    if (window.PetFix) window.PetFix.setAdornment(state.adornment);
+    renderGrowth();
+  });
 }
 
 /* === Check-in === */
@@ -234,6 +255,7 @@ function openCheckIn() {
     ? { mood: existing.mood, appetite: existing.appetite, litter: existing.litterOk ? "normal" : "odd" }
     : { mood: 0, appetite: "", litter: "" };
   $("#checkin-note").value = existing ? (existing.note || "") : "";
+  $("#checkin-weight").value = existing && existing.weight ? existing.weight : "";
   renderCheckInForm();
   $("#checkin-overlay").classList.remove("hidden");
 }
@@ -243,15 +265,21 @@ function renderCheckInForm() {
   $$('[data-field="litter"] button').forEach(b => b.classList.toggle("active", b.dataset.value === ciDraft.litter));
   $("#checkin-save").disabled = !(ciDraft.mood && ciDraft.appetite && ciDraft.litter);
 }
+function toast(msg) {
+  const note = $("#checkin-toast");
+  if (note) { note.textContent = msg; note.classList.add("show"); setTimeout(() => note.classList.remove("show"), 2600); }
+}
 function submitCheckIn() {
   const today = dkey();
   const firstToday = !state.checkIns[today];
+  const weight = parseFloat($("#checkin-weight").value);
   const log = {
     mood: ciDraft.mood,
     appetite: ciDraft.appetite,
     litterOk: ciDraft.litter === "normal",
     note: $("#checkin-note").value.trim()
   };
+  if (!isNaN(weight) && weight > 0 && weight < 60) log.weight = weight;
   state.checkIns[today] = log;
   if (firstToday) {
     const y1 = dkey(Date.now() - 864e5), y2 = dkey(Date.now() - 2 * 864e5);
@@ -268,8 +296,7 @@ function submitCheckIn() {
   $("#checkin-overlay").classList.add("hidden");
   renderAll();
   if (window.PetFix) window.PetFix.setAction("feed");
-  const note = $("#checkin-toast");
-  if (note) { note.textContent = t("checkinThanks"); note.classList.add("show"); setTimeout(() => note.classList.remove("show"), 2600); }
+  toast(t("checkinThanks"));
 }
 
 /* === Persona (slow evolution via EMA + record count) === */
@@ -316,88 +343,23 @@ function renderStreak() {
 /* === Whispers (state-aware pools, rotate by date) === */
 const WHISPERS = {
   base: {
-    en: [
-      "I saved you the sunny spot by the window today.",
-      "I knocked something off the shelf. Purely scientific curiosity.",
-      "Your chair smells like you. I approve.",
-      "I pretended not to hear you, but I did.",
-      "I watched a bird for 40 minutes. Riveting stuff.",
-      "The red dot returned. I let it live — this time.",
-      "I did my rounds. Every room is exactly where we left it.",
-      "Three naps today. Each one strategically located.",
-      "The vacuum monster slept all day. I kept watch anyway.",
-      "I sat in the empty box. It needed supervising.",
-      "A leaf moved outside. I handled it.",
-      "Your keyboard was warm. Someone had to sit on it.",
-      "I groomed my tail for 20 minutes. Perfection takes time.",
-      "The water bowl reflected a very handsome cat today.",
-      "I meowed at the fridge. It ignored me. Rude.",
-      "Dust particles danced in the light. I supervised them."
-    ],
-    zh: [
-      "今天我帮你把窗边最晒的位置占好了。",
-      "我把架子上的东西推下去了，纯粹出于科学好奇。",
-      "你的椅子有你的味道，我批准了。",
-      "我假装没听见你叫我，其实听见了。",
-      "我盯着一只鸟看了 40 分钟，非常精彩。",
-      "红点又出现了。这次我放了它一马。",
-      "巡逻完毕，每个房间都在原位。",
-      "今天睡了三觉，每一觉的选址都很讲究。",
-      "吸尘器怪兽睡了一整天，我还是盯着它。",
-      "我坐进了那个空纸箱，它需要有人看管。",
-      "窗外有片叶子动了，我已经处理好了。",
-      "你的键盘是温的，总得有猫坐上去。",
-      "我给尾巴做了 20 分钟护理，完美需要时间。",
-      "水碗里今天倒映着一只特别好看的猫。",
-      "我对着冰箱喵了一声，它不理我，没礼貌。",
-      "灰尘在阳光里跳舞，我全程监督。"
-    ]
+    en: ["I saved you the sunny spot by the window today.", "I knocked something off the shelf. Purely scientific curiosity.", "Your chair smells like you. I approve.", "I pretended not to hear you, but I did.", "I watched a bird for 40 minutes. Riveting stuff.", "The red dot returned. I let it live — this time.", "I did my rounds. Every room is exactly where we left it.", "Three naps today. Each one strategically located.", "The vacuum monster slept all day. I kept watch anyway.", "I sat in the empty box. It needed supervising.", "A leaf moved outside. I handled it.", "Your keyboard was warm. Someone had to sit on it.", "I groomed my tail for 20 minutes. Perfection takes time.", "The water bowl reflected a very handsome cat today.", "I meowed at the fridge. It ignored me. Rude.", "Dust particles danced in the light. I supervised them."],
+    zh: ["今天我帮你把窗边最晒的位置占好了。", "我把架子上的东西推下去了，纯粹出于科学好奇。", "你的椅子有你的味道，我批准了。", "我假装没听见你叫我，其实听见了。", "我盯着一只鸟看了 40 分钟，非常精彩。", "红点又出现了。这次我放了它一马。", "巡逻完毕，每个房间都在原位。", "今天睡了三觉，每一觉的选址都很讲究。", "吸尘器怪兽睡了一整天，我还是盯着它。", "我坐进了那个空纸箱，它需要有人看管。", "窗外有片叶子动了，我已经处理好了。", "你的键盘是温的，总得有猫坐上去。", "我给尾巴做了 20 分钟护理，完美需要时间。", "水碗里今天倒映着一只特别好看的猫。", "我对着冰箱喵了一声，它不理我，没礼貌。", "灰尘在阳光里跳舞，我全程监督。"]
   },
   stressed: {
-    en: [
-      "Today felt a bit much. Sit with me for a while?",
-      "Too many strange sounds today. I stayed close to your side of the bed.",
-      "I hid for a bit today. The blanket cave is excellent, by the way.",
-      "A quiet evening would be lovely. Just us."
-    ],
-    zh: [
-      "今天有点累，陪我坐一会儿好吗？",
-      "今天奇怪的声音有点多，我一直待在你那侧的床边。",
-      "我今天躲了一小会儿。顺便说，毯子洞穴非常优秀。",
-      "今晚安静一点就好，只有我们俩。"
-    ]
+    en: ["Today felt a bit much. Sit with me for a while?", "Too many strange sounds today. I stayed close to your side of the bed.", "I hid for a bit today. The blanket cave is excellent, by the way.", "A quiet evening would be lovely. Just us."],
+    zh: ["今天有点累，陪我坐一会儿好吗？", "今天奇怪的声音有点多，我一直待在你那侧的床边。", "我今天躲了一小会儿。顺便说，毯子洞穴非常优秀。", "今晚安静一点就好，只有我们俩。"]
   },
   checkedIn: {
-    en: [
-      "You wrote about me today. I noticed. I always notice.",
-      "Check-in received. Payment accepted in chin scratches.",
-      "Another day documented. My biography is coming along nicely.",
-      "Thanks for keeping up with me. I'd do the same if I had thumbs."
-    ],
-    zh: [
-      "你今天记录了我的事，我注意到了。我什么都注意得到。",
-      "打卡已收到，报酬请用挠下巴支付。",
-      "又记录了一天，我的传记进展顺利。",
-      "谢谢你坚持记录我。要是我有大拇指，我也会这么做的。"
-    ]
+    en: ["You wrote about me today. I noticed. I always notice.", "Check-in received. Payment accepted in chin scratches.", "Another day documented. My biography is coming along nicely.", "Thanks for keeping up with me. I'd do the same if I had thumbs."],
+    zh: ["你今天记录了我的事，我注意到了。我什么都注意得到。", "打卡已收到，报酬请用挠下巴支付。", "又记录了一天，我的传记进展顺利。", "谢谢你坚持记录我。要是我有大拇指，我也会这么做的。"]
   },
   weekend: {
-    en: [
-      "You're home today? Excellent. Assume your position on the couch.",
-      "Weekend rule: every nap is better with you nearby.",
-      "I have planned our day: nap, snack, nap, window, nap.",
-      "No leaving today. I checked the calendar. It says 'cat time'."
-    ],
-    zh: [
-      "你今天在家？很好，请就位到沙发上。",
-      "周末规则：你在旁边，每一觉都更香。",
-      "我安排好今天的日程了：睡觉、零食、睡觉、看窗外、睡觉。",
-      "今天不许出门，我看过日历了，上面写着「猫的时间」。"
-    ]
+    en: ["You're home today? Excellent. Assume your position on the couch.", "Weekend rule: every nap is better with you nearby.", "I have planned our day: nap, snack, nap, window, nap.", "No leaving today. I checked the calendar. It says 'cat time'."],
+    zh: ["你今天在家？很好，请就位到沙发上。", "周末规则：你在旁边，每一觉都更香。", "我安排好今天的日程了：睡觉、零食、睡觉、看窗外、睡觉。", "今天不许出门，我看过日历了，上面写着「猫的时间」。"]
   }
 };
-function renderWhisper() {
-  const el = $("#daily-whisper"); if (!el) return;
+function pickWhisper() {
   const day = Number(dkey().replace(/-/g, ""));
   const wd = new Date().getDay();
   let pool;
@@ -406,7 +368,34 @@ function renderWhisper() {
   else if (wd === 0 || wd === 6) pool = WHISPERS.weekend;
   else pool = WHISPERS.base;
   const list = pool[lang] || pool.en;
-  el.textContent = list[day % list.length];
+  return list[day % list.length];
+}
+function renderWhisper() {
+  const el = $("#daily-whisper"); if (!el) return;
+  el.textContent = pickWhisper();
+}
+
+/* === Monologue (the MeowTalk hook: what your cat would say today) === */
+const MONO_OPEN = {
+  en: ["Dear human,", "Attention, staff:", "Report from the windowsill HQ:", "Memo from the fluff department:"],
+  zh: ["亲爱的人类：", "全体铲屎官请注意：", "来自窗台指挥部的报告：", "毛茸茸事务部备忘录："]
+};
+const MONO_MOOD = {
+  en: { 1: "Today was hard. I need extra gentleness and maybe the warm blanket.", 2: "I was a bit off today. Keep an eye on me, quietly.", 3: "A perfectly acceptable day. The service met expectations.", 4: "Today was good. The sunbeam was punctual and so were you.", 5: "Today was magnificent. I am thriving and mildly famous." },
+  zh: { 1: "今天有点难熬，我需要额外的温柔，最好还有那条暖毯子。", 2: "我今天状态一般，请安静地多留意我一下。", 3: "完全合格的一天，服务符合预期。", 4: "今天很不错，阳光准时到岗，你也是。", 5: "今天棒极了，本喵茁壮成长，且略有名气。" }
+};
+const MONO_NOLOG = {
+  en: "You haven't checked in on me today. I am officially curious about what you'd say.",
+  zh: "你今天还没打卡记录我，本喵对你会写什么表示官方级好奇。"
+};
+function buildMonologue() {
+  const day = Number(dkey().replace(/-/g, ""));
+  const open = (MONO_OPEN[lang] || MONO_OPEN.en)[day % MONO_OPEN.en.length];
+  const log = todayLog();
+  const mid = log ? (MONO_MOOD[lang] || MONO_MOOD.en)[log.mood] : (en() ? MONO_NOLOG.en : MONO_NOLOG.zh);
+  const p = window.__persona || computePersona();
+  const close = "“" + (en() ? p.qEn : p.qZh) + "”";
+  return { open, mid, close };
 }
 
 /* === Achievements (long tail) === */
@@ -421,8 +410,8 @@ const ACHIEVEMENTS = [
   { id: "logs30", ico: "📚", en: "30 Days Logged", zh: "累计 30 天", test: () => logCount() >= 30 },
   { id: "photo", ico: "📷", en: "First Photos", zh: "首组照片", test: () => !!state.flags.photo },
   { id: "twin", ico: "✨", en: "Twin Created", zh: "生成分身", test: () => !!state.flags.twin },
-  { id: "caretaker", ico: "💚", en: "Caretaker", zh: "贴心照护", test: () => state.tasks.filter(x => x.done).length >= 2 },
-  { id: "calmKeeper", ico: "🧘", en: "Calm Keeper", zh: "稳定守护", test: () => state.emaStress != null && state.emaStress <= 25 }
+  { id: "weight", ico: "⚖️", en: "Weight Logged", zh: "记录体重", test: () => Object.values(state.checkIns).some(l => l.weight) },
+  { id: "healthCheck", ico: "🩺", en: "First Self-check", zh: "首次自查", test: () => Object.keys(state.healthChecks).length >= 1 }
 ];
 function evaluateAchievements() {
   let changed = false;
@@ -438,14 +427,112 @@ function renderAchievements() {
   $("#ach-progress").textContent = ACHIEVEMENTS.filter(a => state.achievements[a.id]).length + "/" + ACHIEVEMENTS.length;
 }
 
-/* === Share poster (real twin snapshot + real pet name) === */
+/* === Reminders (vaccines / deworming — the retention channel owners accept) === */
+const REM_TYPES = ["vaccine", "dewormIn", "dewormOut", "checkup", "custom"];
+function remLabel(r) {
+  const key = { vaccine: "remVaccine", dewormIn: "remDewormIn", dewormOut: "remDewormOut", checkup: "remCheckup" }[r.type];
+  return key ? t(key) : (r.label || t("remCustom"));
+}
+function daysUntil(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return Math.round((new Date(y, m - 1, d) - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 864e5);
+}
+function renderReminders() {
+  const list = $("#reminder-list"); if (!list) return;
+  if (!state.reminders.length) { list.innerHTML = `<p class="rem-empty">${t("remEmpty")}</p>`; return; }
+  const sorted = [...state.reminders].sort((a, b) => a.date.localeCompare(b.date));
+  list.innerHTML = sorted.map(r => {
+    const d = daysUntil(r.date);
+    const chip = d < 0 ? `<span class="rem-chip overdue">${en() ? "Overdue" : "已逾期"} ${-d}${en() ? "d" : "天"}</span>`
+      : d <= 7 ? `<span class="rem-chip soon">${d === 0 ? (en() ? "Today" : "今天") : d + (en() ? "d left" : "天后")}</span>`
+      : `<span class="rem-chip">${d}${en() ? "d left" : "天后"}</span>`;
+    return `<div class="rem-item"><div><strong>${remLabel(r)}</strong><small>${r.date}${r.repeatMonths ? " · " + (en() ? "every " + r.repeatMonths + "mo" : "每 " + r.repeatMonths + " 个月") : ""}</small></div>${chip}
+      <div class="rem-actions"><button data-rem-done="${r.id}">${t("remDone")}</button><button data-rem-cal="${r.id}">${t("remCal")}</button><button data-rem-del="${r.id}" class="danger">✕</button></div></div>`;
+  }).join("");
+  $$("[data-rem-done]").forEach(b => b.onclick = () => {
+    const r = state.reminders.find(x => x.id === b.dataset.remDone);
+    if (!r) return;
+    if (r.repeatMonths) {
+      const [y, m, d] = r.date.split("-").map(Number);
+      const next = new Date(y, m - 1 + r.repeatMonths, d);
+      r.date = dkey(next);
+    } else state.reminders = state.reminders.filter(x => x.id !== r.id);
+    save(); renderReminders();
+  });
+  $$("[data-rem-del]").forEach(b => b.onclick = () => { state.reminders = state.reminders.filter(x => x.id !== b.dataset.remDel); save(); renderReminders(); });
+  $$("[data-rem-cal]").forEach(b => b.onclick = () => {
+    const r = state.reminders.find(x => x.id === b.dataset.remCal);
+    if (r) downloadIcs([r]);
+  });
+}
+function icsEvent(r) {
+  const dt = r.date.replace(/-/g, "");
+  const rrule = r.repeatMonths ? `\r\nRRULE:FREQ=MONTHLY;INTERVAL=${r.repeatMonths}` : "";
+  return `BEGIN:VEVENT\r\nUID:pettwin-${r.id}@pettwin\r\nDTSTAMP:${dt}T090000\r\nDTSTART;VALUE=DATE:${dt}\r\nSUMMARY:${petName()} · ${remLabel(r)}${rrule}\r\nBEGIN:VALARM\r\nTRIGGER:-PT12H\r\nACTION:DISPLAY\r\nDESCRIPTION:${remLabel(r)}\r\nEND:VALARM\r\nEND:VEVENT`;
+}
+function downloadIcs(reminders) {
+  if (!reminders.length) return;
+  const body = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PetTwin//EN\r\n" + reminders.map(icsEvent).join("\r\n") + "\r\nEND:VCALENDAR";
+  const blob = new Blob([body], { type: "text/calendar;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "pettwin-reminders.ics";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* === Health self-check === */
+let hcDraft = {};
+function openHealthCheck() {
+  hcDraft = {};
+  $$("#health-overlay [data-hval]").forEach(b => b.classList.remove("active"));
+  $("#health-save").disabled = true;
+  $("#health-overlay").classList.remove("hidden");
+}
+function renderHealthButtons() {
+  $$("#health-overlay [data-hval]").forEach(b => {
+    b.classList.toggle("active", hcDraft[b.dataset.hfield] === (b.dataset.hval === "ok"));
+  });
+  $("#health-save").disabled = !(("eyes" in hcDraft) && ("gums" in hcDraft) && ("skin" in hcDraft));
+}
+function submitHealthCheck() {
+  state.healthChecks[dkey()] = { ...hcDraft };
+  const flagged = Object.values(hcDraft).filter(v => !v).length;
+  if (flagged && !state.tasks.some(x => x.id === "hcwatch")) {
+    state.tasks.push({ id: "hcwatch", done: false, en: t("healthTaskEn"), zh: "连续 3 天观察标记的部位", whyEn: "From today's health self-check", whyZh: "来自今日健康自查" });
+  }
+  save();
+  $("#health-overlay").classList.add("hidden");
+  renderAll();
+  toast(t("healthSaved"));
+}
+
+/* === Share poster === */
 function roundedPath(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 function wrapText(ctx, text, x, y, maxW, lh) {
-  const chars = text.split(""); let line = "", ly = y;
-  for (const ch of chars) { const test = line + ch; if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, x, ly); line = ch; ly += lh; } else line = test; }
-  ctx.fillText(line, x, ly);
+  // Wrap by words for spaced (latin) text, by characters for CJK.
+  const parts = /\s/.test(text.trim()) ? text.split(" ").map((w, i, a) => i < a.length - 1 ? w + " " : w) : text.split("");
+  let line = "", ly = y;
+  for (const ch of parts) { const test = line + ch; if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line.trimEnd(), x, ly); line = ch; ly += lh; } else line = test; }
+  ctx.fillText(line.trimEnd(), x, ly);
+  return ly;
 }
-function buildSharePoster() {
+function drawTwinPortrait(ctx, cx, cy, R, fallbackEmoji) {
+  ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.beginPath(); ctx.arc(cx, cy, R + 8, 0, 7); ctx.fill();
+  let drew = false;
+  const pc = document.querySelector("#pet-sprite canvas");
+  if (pc && pc.width > 0) {
+    try {
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.clip();
+      const side = Math.min(pc.width, pc.height) * 0.72;
+      ctx.drawImage(pc, (pc.width - side) / 2, (pc.height - side) / 2 + pc.height * 0.05, side, side, cx - R, cy - R, R * 2, R * 2);
+      ctx.restore();
+      drew = true;
+    } catch (e) { ctx.restore(); }
+  }
+  if (!drew) { ctx.font = Math.round(R * 1.15) + "px system-ui,sans-serif"; ctx.textAlign = "center"; ctx.fillText(fallbackEmoji, cx, cy + R * 0.42); }
+}
+function buildSharePoster(mode) {
   const canvas = $("#share-canvas"); if (!canvas) return;
   const ctx = canvas.getContext("2d"), W = canvas.width, H = canvas.height;
   const p = window.__persona || computePersona();
@@ -456,29 +543,36 @@ function buildSharePoster() {
   ctx.textAlign = "center";
   ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.font = "600 30px system-ui,sans-serif";
   ctx.fillText("PetTwin", W / 2, 90);
-  // Twin portrait: snapshot of the live 3D twin, falling back to the persona emoji.
-  const cx = W / 2, cy = 250, R = 130;
-  ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.beginPath(); ctx.arc(cx, cy, R + 8, 0, 7); ctx.fill();
-  let drewTwin = false;
-  const pc = document.querySelector("#pet-sprite canvas");
-  if (pc && pc.width > 0) {
-    try {
-      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.clip();
-      const side = Math.min(pc.width, pc.height) * 0.72;
-      ctx.drawImage(pc, (pc.width - side) / 2, (pc.height - side) / 2 + pc.height * 0.05, side, side, cx - R, cy - R, R * 2, R * 2);
-      ctx.restore();
-      drewTwin = true;
-    } catch (e) { ctx.restore(); }
+  if (mode === "monologue") {
+    drawTwinPortrait(ctx, W / 2, 230, 110, p.emoji);
+    ctx.fillStyle = "#fff"; ctx.font = "700 54px system-ui,sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(petName(), W / 2, 420);
+    ctx.font = "500 26px system-ui,sans-serif"; ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fillText(dkey(), W / 2, 462);
+    const m = buildMonologue();
+    ctx.fillStyle = "rgba(255,255,255,.18)"; roundedPath(ctx, 50, 500, W - 100, 400, 26); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+    ctx.font = "700 32px system-ui,sans-serif";
+    let y = wrapText(ctx, m.open, W / 2, 560, W - 150, 44);
+    ctx.font = "500 30px system-ui,sans-serif";
+    y = wrapText(ctx, m.mid, W / 2, y + 62, W - 150, 44);
+    ctx.font = "italic 28px system-ui,sans-serif"; ctx.fillStyle = "rgba(255,255,255,.92)";
+    wrapText(ctx, m.close, W / 2, y + 60, W - 150, 40);
+    ctx.font = "500 28px system-ui,sans-serif"; ctx.fillStyle = "rgba(255,255,255,.9)";
+    ctx.fillText((en() ? "— sincerely, " : "——真诚的，") + petName(), W / 2, 960);
+    ctx.fillText(t("petCardTagline"), W / 2, 1020);
+    return;
   }
-  if (!drewTwin) { ctx.font = "150px system-ui,sans-serif"; ctx.fillText(p.emoji, cx, cy + 55); }
-  ctx.fillStyle = "#fff"; ctx.font = "700 58px system-ui,sans-serif";
+  drawTwinPortrait(ctx, W / 2, 250, 130, p.emoji);
+  ctx.fillStyle = "#fff"; ctx.font = "700 58px system-ui,sans-serif"; ctx.textAlign = "center";
   ctx.fillText(petName(), W / 2, 470);
   ctx.font = "600 40px system-ui,sans-serif"; ctx.fillStyle = "rgba(255,255,255,.95)";
   ctx.fillText(en() ? p.en : p.zh, W / 2, 528);
   ctx.fillStyle = "rgba(255,255,255,.18)"; roundedPath(ctx, 60, 560, W - 120, 150, 24); ctx.fill();
   ctx.fillStyle = "#fff"; ctx.font = "italic 30px system-ui,sans-serif";
   wrapText(ctx, "“" + (en() ? p.qEn : p.qZh) + "”", W / 2, 612, W - 140, 40);
-  const stats = [[state.streak || 0, en() ? "Streak" : "连续"], [logCount(), en() ? "Days logged" : "累计记录"], [wellbeingScore(), en() ? "Wellbeing" : "综合状态"]];
+  const { cur } = growthNow();
+  const stats = [[state.streak || 0, en() ? "Streak" : "连续"], ["Lv." + cur.lv, en() ? "Bond" : "羁绊"], [wellbeingScore(), en() ? "Wellbeing" : "综合状态"]];
   stats.forEach((s, i) => {
     const sx = W / 2 + (i - 1) * 200;
     ctx.fillStyle = "#fff"; ctx.font = "700 52px system-ui,sans-serif"; ctx.fillText(s[0], sx, 830);
@@ -498,9 +592,10 @@ function applyLanguage() {
   if ($("#capture-slots")) renderCaptureSlots();
 }
 function renderAll() {
-  renderIdentity(); renderSummary(); renderTasks(); renderEvents(); renderDevices();
-  renderInsights(); renderTimeline(); renderPlaybook(); updatePetMessage();
-  renderPersona(); renderStreak(); renderWhisper(); evaluateAchievements(); renderAchievements();
+  renderIdentity(); renderSummary(); renderTasks(); renderInsights(); renderTimeline();
+  updatePetMessage(); renderPersona(); renderStreak(); renderWhisper();
+  renderGrowth(); renderReminders();
+  evaluateAchievements(); renderAchievements();
 }
 function renderIdentity() {
   const name = petName();
@@ -517,6 +612,11 @@ function prevLog() {
   for (let i = 1; i <= 30; i++) { const k = dkey(Date.now() - i * 864e5); if (state.checkIns[k]) return state.checkIns[k]; }
   return null;
 }
+function latestWeight() {
+  const keys = Object.keys(state.checkIns).sort().reverse();
+  for (const k of keys) { if (state.checkIns[k].weight) return { date: k, kg: state.checkIns[k].weight }; }
+  return null;
+}
 function renderSummary() {
   const log = todayLog(), name = petName();
   $("#wellbeing-score").textContent = wellbeingScore();
@@ -528,20 +628,15 @@ function renderSummary() {
   $("#activity-delta").textContent = log && prev ? (energyOf(log) >= energyOf(prev) ? "▲" : "▼") : "";
   $("#stress-delta").textContent = log && prev ? (stressOf(log) <= stressOf(prev) ? "▼" : "▲") : "";
   $("#status-chip").textContent = log ? (en() ? "Logged today" : "今日已记录") : (en() ? "Not logged yet" : "今天还没打卡");
+  const w = latestWeight();
   $("#daily-summary").textContent = log
     ? (en()
-      ? `Today you logged: mood ${moodEmoji(log.mood)}, appetite ${log.appetite}, litter ${log.litterOk ? "normal" : "unusual"}.${log.note ? " Note: " + log.note : ""}`
-      : `今天的记录：心情 ${moodEmoji(log.mood)}，食欲${log.appetite === "less" ? "偏少" : log.appetite === "more" ? "偏多" : "正常"}，猫砂盆${log.litterOk ? "正常" : "有点异常"}。${log.note ? "备注：" + log.note : ""}`)
+      ? `Today you logged: mood ${moodEmoji(log.mood)}, appetite ${log.appetite}, litter ${log.litterOk ? "normal" : "unusual"}${log.weight ? ", " + log.weight + "kg" : ""}.${log.note ? " Note: " + log.note : ""}`
+      : `今天的记录：心情 ${moodEmoji(log.mood)}，食欲${log.appetite === "less" ? "偏少" : log.appetite === "more" ? "偏多" : "正常"}，猫砂盆${log.litterOk ? "正常" : "有点异常"}${log.weight ? "，体重 " + log.weight + "kg" : ""}。${log.note ? "备注：" + log.note : ""}`)
     : (en()
-      ? `No check-in yet today. A 30-second log keeps ${name}'s baseline accurate.`
-      : `今天还没打卡。30 秒记录，让${name}的基线更准确。`);
+      ? `No check-in yet today. A 30-second log keeps ${name}'s baseline accurate.${w ? " Last weight: " + w.kg + "kg." : ""}`
+      : `今天还没打卡。30 秒记录，让${name}的基线更准确。${w ? "上次体重 " + w.kg + "kg。" : ""}`);
   renderFinding();
-  $("#litter-note").textContent = en()
-    ? `Sample device data. Once a litter box is paired, ${name}'s real visits appear here.`
-    : `示例设备数据。接入猫砂盆后，这里会显示${name}的真实记录。`;
-  $("#workday-summary").textContent = en()
-    ? `Sample summary. With devices paired, PetTwin will recap ${name}'s day before you get home.`
-    : `示例摘要。接入设备后，PetTwin 会在你回家前汇总${name}的一天。`;
 }
 function renderFinding() {
   const n = logCount(), name = petName();
@@ -577,23 +672,24 @@ function renderTasks() {
     save(); renderAll();
   });
 }
-function renderEvents() {
-  const data = en() ? eventsEn : eventsZh;
-  $("#event-feed").innerHTML = data.map(e => `<div class="event-item"><span class="event-icon">${e.icon}</span><div><strong>${e.title}</strong><small>${e.time} · ${e.detail}</small></div></div>`).join("");
-}
-function renderDevices() {
-  $("#device-grid").innerHTML = deviceData.map((d, i) => `<article class="device-card"><div class="device-top"><i>${d.icon}</i><span class="device-online">${t("preview")}</span></div><h3>${en() ? d.en : d.zh}</h3><p>${en() ? d.enD : d.zhD}</p><button data-device="${i}">${en() ? "Notify me" : "上线提醒我"}</button></article>`).join("");
-  $$("[data-device]").forEach(b => b.onclick = () => { $("#device-result").textContent = t("comingSoonDevice"); });
-}
 function renderInsights() {
   const data = en()
     ? [["Visitors → hiding", "sample"], ["Rain → lower activity", "sample"], ["Late return → vocalising", "sample"], ["Clean litter → normal visits", "sample"]]
     : [["来客 → 躲藏", "示例"], ["下雨 → 活跃度下降", "示例"], ["主人晚归 → 叫声增加", "示例"], ["清理猫砂 → 如厕恢复", "示例"]];
   $("#correlation-list").innerHTML = data.map(x => `<div class="correlation-item"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join("");
   drawTrend(+($(".insight-tabs button.active")?.dataset.range || 7));
+  drawWeight();
 }
 function renderTimeline() {
   const items = [];
+  const hcKeys = Object.keys(state.healthChecks).sort().reverse();
+  if (hcKeys.length) {
+    const hc = state.healthChecks[hcKeys[0]];
+    const flagged = Object.entries(hc).filter(([k, v]) => !v).map(([k]) => en() ? { eyes: "eyes", gums: "gums", skin: "skin & coat" }[k] : { eyes: "眼睛", gums: "牙龈", skin: "皮肤毛发" }[k]);
+    items.push([hcKeys[0],
+      en() ? "Health self-check" : "健康自查",
+      flagged.length ? (en() ? "Needs watching: " + flagged.join(", ") : "需要观察：" + flagged.join("、")) : (en() ? "All areas looked normal." : "各部位看起来都正常。")]);
+  }
   const keys = Object.keys(state.checkIns).sort();
   if (keys.length) {
     items.push([en() ? "Since " + keys[0] : "自 " + keys[0],
@@ -604,12 +700,6 @@ function renderTimeline() {
     en() ? (todayLog() ? "Check-in complete" : "Waiting for today's check-in") : (todayLog() ? "今日打卡完成" : "等待今日打卡"),
     en() ? "Daily logs become the personality timeline over time." : "每日记录会逐渐沉淀为人格时间轴。"]);
   $("#timeline-list").innerHTML = items.map(x => `<article class="timeline-item"><span>${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p></article>`).join("");
-}
-function renderPlaybook() {
-  const data = en()
-    ? [["Quiet hiding space", "Helps"], ["10-minute evening play", "Helps"], ["Owner voice playback", "Mixed"], ["Forced visitor interaction", "Avoid"]]
-    : [["安静躲藏空间", "有效"], ["晚间玩耍 10 分钟", "有效"], ["播放主人语音", "效果不定"], ["强迫接触来客", "避免"]];
-  $("#playbook").innerHTML = data.map(x => `<div class="playbook-item"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join("");
 }
 function updatePetMessage() {
   const text = currentStress() > 40
@@ -634,6 +724,7 @@ function drawTrend(range = 7) {
   if (points < 3) {
     x.fillStyle = "#697680"; x.font = "600 15px Inter,system-ui,sans-serif"; x.textAlign = "center";
     x.fillText(en() ? `Check in on ${3 - points} more day${3 - points > 1 ? "s" : ""} to unlock the real trend` : `再打卡 ${3 - points} 天，解锁真实趋势图`, c.width / 2, c.height / 2);
+    x.textAlign = "left";
     return;
   }
   [["#75bdd0", "energy"], ["#e88470", "stress"]].forEach(([color, key]) => {
@@ -652,6 +743,37 @@ function drawTrend(range = 7) {
   });
   x.lineWidth = 1; x.textAlign = "left";
 }
+/* Weight mini-chart from logged weights (last 90 days). */
+function drawWeight() {
+  const c = $("#weight-chart"); if (!c) return;
+  const x = c.getContext("2d"), pad = 40, w = c.width - pad * 2, h = c.height - pad * 2;
+  x.clearRect(0, 0, c.width, c.height);
+  const entries = Object.keys(state.checkIns).sort().filter(k => state.checkIns[k].weight).slice(-30)
+    .map(k => ({ k, kg: state.checkIns[k].weight }));
+  if (entries.length < 2) {
+    x.fillStyle = "#697680"; x.font = "600 14px Inter,system-ui,sans-serif"; x.textAlign = "center";
+    x.fillText(en() ? "Log weight in 2+ check-ins to see the curve" : "在打卡中记录 2 次以上体重即可看到曲线", c.width / 2, c.height / 2);
+    x.textAlign = "left";
+    return;
+  }
+  const kgs = entries.map(e => e.kg);
+  const min = Math.min(...kgs) - 0.2, max = Math.max(...kgs) + 0.2;
+  x.strokeStyle = "#dce5e3";
+  for (let i = 0; i < 3; i++) { const y = pad + i * h / 2; x.beginPath(); x.moveTo(pad, y); x.lineTo(c.width - pad, y); x.stroke(); }
+  x.beginPath();
+  entries.forEach((e, i) => {
+    const px = pad + i * w / Math.max(1, entries.length - 1), py = pad + h - (e.kg - min) / (max - min) * h;
+    i ? x.lineTo(px, py) : x.moveTo(px, py);
+  });
+  x.strokeStyle = "#a9a0d8"; x.lineWidth = 3; x.stroke();
+  entries.forEach((e, i) => {
+    const px = pad + i * w / Math.max(1, entries.length - 1), py = pad + h - (e.kg - min) / (max - min) * h;
+    x.beginPath(); x.arc(px, py, 4, 0, 7); x.fillStyle = "#a9a0d8"; x.fill();
+    x.fillStyle = "#697680"; x.font = "600 11px Inter,system-ui,sans-serif"; x.textAlign = "center";
+    x.fillText(e.kg + "", px, py - 10);
+  });
+  x.lineWidth = 1; x.textAlign = "left";
+}
 
 /* Export a plain-text report of the real check-in history. */
 function exportReport() {
@@ -664,8 +786,16 @@ function exportReport() {
   ];
   keys.forEach(k => {
     const l = state.checkIns[k];
-    lines.push(`${k}  ${en() ? "mood" : "心情"} ${l.mood}/5 · ${en() ? "appetite" : "食欲"} ${l.appetite} · ${en() ? "litter" : "猫砂盆"} ${l.litterOk ? "OK" : (en() ? "unusual" : "异常")}${l.note ? " · " + l.note : ""}`);
+    lines.push(`${k}  ${en() ? "mood" : "心情"} ${l.mood}/5 · ${en() ? "appetite" : "食欲"} ${l.appetite} · ${en() ? "litter" : "猫砂盆"} ${l.litterOk ? "OK" : (en() ? "unusual" : "异常")}${l.weight ? " · " + l.weight + "kg" : ""}${l.note ? " · " + l.note : ""}`);
   });
+  const hc = Object.keys(state.healthChecks).sort();
+  if (hc.length) {
+    lines.push("", en() ? "Health self-checks" : "健康自查");
+    hc.forEach(k => {
+      const v = state.healthChecks[k];
+      lines.push(`${k}  ${en() ? "eyes" : "眼睛"} ${v.eyes ? "OK" : "!"} · ${en() ? "gums" : "牙龈"} ${v.gums ? "OK" : "!"} · ${en() ? "skin" : "皮肤"} ${v.skin ? "OK" : "!"}`);
+    });
+  }
   if (!keys.length) lines.push(en() ? "No check-ins yet." : "还没有打卡记录。");
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");
@@ -675,26 +805,20 @@ function exportReport() {
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
-/* === Navigation & simple bindings === */
+/* === Navigation & bindings === */
 let activeView = "today";
 function navigate(view) {
   activeView = view;
   $$(".view").forEach(v => v.classList.toggle("active", v.id === view));
   $$(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.view === view));
-  const nav = $(`[data-view="${view}"]`);
-  $("#page-title").textContent = nav ? nav.textContent : view;
-  $("#section-eyebrow").textContent = view === "home" ? "WORKDAY COMPANION" : "PETTWIN";
+  const nav = $(`.nav [data-view="${view}"]`) || $(`[data-view="${view}"]`);
+  $("#page-title").textContent = nav ? nav.textContent.replace(/^[^\s]+\s/, "") : view;
+  $("#section-eyebrow").textContent = "PETTWIN";
   const hideMsg = view === "avatar" || !state.twinVisible;
   $("#pet-message").classList.toggle("hidden", hideMsg);
 }
 $$("[data-view], [data-view-jump]").forEach(b => b.onclick = () => navigate(b.dataset.view || b.dataset.viewJump));
 $$("[data-lang]").forEach(b => b.onclick = () => { lang = b.dataset.lang; localStorage.setItem("pt-lang", lang); applyLanguage(); });
-$$("[data-mode]").forEach(b => b.onclick = () => {
-  state.mode = b.dataset.mode;
-  $$("[data-mode]").forEach(x => x.classList.toggle("active", x === b));
-  save();
-  $("#remote-result").textContent = t("modeSaved");
-});
 $$("[data-signal]").forEach(b => b.onclick = () => { $$("[data-signal]").forEach(x => x.classList.toggle("active", x === b)); navigate("insights"); });
 $$("[data-answer]").forEach(b => b.onclick = () => {
   const delta = b.dataset.answer === "yes" ? 2 : -2;
@@ -702,8 +826,6 @@ $$("[data-answer]").forEach(b => b.onclick = () => {
   save(); renderAll();
   $("#pet-message").classList.add("hidden");
 });
-$$("[data-remote]").forEach(b => b.onclick = () => { $("#remote-result").textContent = t("comingSoonRemote"); });
-$("#discover-devices").onclick = () => { $("#device-result").textContent = t("comingSoonDevice"); };
 $("#new-task").onclick = () => {
   state.tasks.push({ id: "task" + Date.now(), done: false, en: "Observe evening litter visits", zh: "观察今晚猫砂盆使用情况", whyEn: "Added from care plan", whyZh: "从照护计划添加" });
   save(); renderTasks();
@@ -722,6 +844,44 @@ $$('[data-field="appetite"] button').forEach(b => b.onclick = () => { ciDraft.ap
 $$('[data-field="litter"] button').forEach(b => b.onclick = () => { ciDraft.litter = b.dataset.value; renderCheckInForm(); });
 $("#checkin-save").onclick = submitCheckIn;
 $$('[data-i18n="exportReport"]').forEach(b => b.onclick = exportReport);
+
+/* Reminder modal */
+$("#add-reminder").onclick = () => {
+  $("#rem-date").value = dkey(Date.now() + 7 * 864e5);
+  $("#rem-label").value = "";
+  $("#rem-type").value = "vaccine";
+  $("#rem-repeat").value = "12";
+  $("#rem-label-row").style.display = "none";
+  $("#reminder-overlay").classList.remove("hidden");
+};
+$("#rem-type").onchange = () => { $("#rem-label-row").style.display = $("#rem-type").value === "custom" ? "" : "none"; };
+$("#rem-close").onclick = () => $("#reminder-overlay").classList.add("hidden");
+$("#reminder-overlay").onclick = e => { if (e.target === $("#reminder-overlay")) $("#reminder-overlay").classList.add("hidden"); };
+$("#rem-save").onclick = () => {
+  const date = $("#rem-date").value;
+  if (!date) { $("#rem-date").focus(); return; }
+  state.reminders.push({
+    id: "r" + Date.now(),
+    type: $("#rem-type").value,
+    label: $("#rem-label").value.trim().slice(0, 30),
+    date,
+    repeatMonths: +$("#rem-repeat").value || 0
+  });
+  save();
+  $("#reminder-overlay").classList.add("hidden");
+  renderReminders();
+};
+$("#export-ics-all").onclick = () => downloadIcs(state.reminders);
+
+/* Health check modal */
+$("#health-open").onclick = openHealthCheck;
+$("#health-close").onclick = () => $("#health-overlay").classList.add("hidden");
+$("#health-overlay").onclick = e => { if (e.target === $("#health-overlay")) $("#health-overlay").classList.add("hidden"); };
+$$("#health-overlay [data-hval]").forEach(b => b.onclick = () => {
+  hcDraft[b.dataset.hfield] = b.dataset.hval === "ok";
+  renderHealthButtons();
+});
+$("#health-save").onclick = submitHealthCheck;
 
 $("#pet-toggle").onclick = () => {
   state.twinVisible = !state.twinVisible;
@@ -837,6 +997,7 @@ $("#generate-twin").onclick = async () => {
 
 /* Share overlay */
 if ($("#open-share")) $("#open-share").onclick = () => { buildSharePoster(); $("#share-overlay").classList.remove("hidden"); };
+if ($("#monologue-btn")) $("#monologue-btn").onclick = () => { buildSharePoster("monologue"); $("#share-overlay").classList.remove("hidden"); };
 if ($("#share-close")) $("#share-close").onclick = () => $("#share-overlay").classList.add("hidden");
 if ($("#share-overlay")) $("#share-overlay").onclick = e => { if (e.target === $("#share-overlay")) $("#share-overlay").classList.add("hidden"); };
 if ($("#download-poster")) $("#download-poster").onclick = () => {
@@ -855,6 +1016,8 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
 applyLanguage();
 renderCaptureSlots();
 maybeOnboard();
+if (state.adornment && window.PetFix) window.PetFix.setAdornment(state.adornment);
+document.addEventListener("pt-model-ready", () => { if (state.adornment && window.PetFix) window.PetFix.setAdornment(state.adornment); });
 if (!state.twinVisible) {
   $("#pet-sprite").classList.add("hidden");
   $("#pet-message").classList.add("hidden");

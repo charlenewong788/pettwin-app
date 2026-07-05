@@ -14,6 +14,12 @@ PetTwin is a static MVP prototype for a pet digital personality and behavior ins
 - Personality persona that evolves slowly from real check-in history (EMA), with a progress hint
 - State-aware daily whispers (different pools for stressed days, checked-in days and weekends)
 - Long-tail milestones (12 achievements from first check-in to a 100-day streak)
+- Bond levels: check-in days level up the twin and unlock wearable 3D keepsakes (collar, cushion, halo, crown…)
+- "Today's monologue" share card — what your pet would say today, signed and shareable
+- Health reminders (vaccine / deworming / check-up) with repeat cycles and one-tap .ics calendar export
+- Weight logging in check-ins with a real weight trend chart
+- Guided 2-minute health self-check (eyes / gums / skin) that feeds the care plan and archive
+- Mobile-first bottom tab navigation
 - Share card rendered from the live 3D twin snapshot with real stats
 - Real trend chart and findings computed from logged check-ins (unlocks after 3 days)
 - Plain-text report export of the full check-in history

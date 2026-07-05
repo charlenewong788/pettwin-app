@@ -136,6 +136,65 @@ function tint(root){
   });
   applyVertexCoat(root);
 }
+/* Growth keepsakes — y-axis symmetric or ambient shapes, attached to the scene
+   so they stay put while the user drag-rotates the model. */
+let adorn=null;
+function clearAdorn(){if(!ctx)return;const old=ctx.scene.getObjectByName("pt-adorn");if(old)ctx.scene.remove(old)}
+function buildAdorn(id){
+  const g=new THREE.Group();g.name="pt-adorn";
+  const gold=()=>new THREE.MeshStandardMaterial({color:0xe7c678,roughness:.32,metalness:.4,emissive:0xe7c678,emissiveIntensity:.16});
+  const pink=()=>new THREE.MeshStandardMaterial({color:0xef7d94,roughness:.42,emissive:0xef7d94,emissiveIntensity:.22,transparent:true,opacity:.9});
+  const bob=(mesh,amp,speed,phase)=>{mesh.userData.bob={amp,speed,phase};mesh.userData.baseY=mesh.position.y};
+  if(id==="hearts"){
+    [[-.72,.5,.32],[.78,.72,.12],[.2,1.08,-.18],[-.45,.95,-.1]].forEach((p,i)=>{
+      const h=new THREE.Mesh(new THREE.SphereGeometry(.075+(i%2)*.03,24,16),pink());
+      h.position.set(...p);bob(h,.07,.0014+i*.0004,i*1.7);g.add(h);
+    });
+  }
+  if(id==="collar"){
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.4,.05,24,64),new THREE.MeshStandardMaterial({color:0x75bdd0,roughness:.45}));
+    ring.position.y=.48;ring.rotation.x=Math.PI/2;g.add(ring);
+    const bell=new THREE.Mesh(new THREE.SphereGeometry(.07,24,16),gold());
+    bell.position.set(0,.38,.4);g.add(bell);
+  }
+  if(id==="cushion"){
+    const pad=new THREE.Mesh(new THREE.CylinderGeometry(.88,.98,.17,48),new THREE.MeshStandardMaterial({color:0xf0b7c3,roughness:.7}));
+    pad.position.y=-.95;g.add(pad);
+    const trim=new THREE.Mesh(new THREE.TorusGeometry(.93,.045,20,64),new THREE.MeshStandardMaterial({color:0xd98ba0,roughness:.6}));
+    trim.position.y=-.9;trim.rotation.x=Math.PI/2;g.add(trim);
+  }
+  if(id==="sparkles"){
+    [[-.85,.25,.2],[.9,.45,-.1],[.55,1.05,.15],[-.55,1.15,-.15],[.1,.15,.75],[-.2,.7,-.6]].forEach((p,i)=>{
+      const s=new THREE.Mesh(new THREE.OctahedronGeometry(.06),gold());
+      s.position.set(...p);bob(s,.05,.0016+i*.0003,i*1.3);s.userData.spin=.012+i*.002;g.add(s);
+    });
+  }
+  if(id==="halo"){
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.3,.035,20,64),new THREE.MeshStandardMaterial({color:0xf5d87a,roughness:.25,metalness:.45,emissive:0xf5d87a,emissiveIntensity:.45}));
+    ring.position.y=1.12;ring.rotation.x=Math.PI/2;bob(ring,.04,.0012,0);g.add(ring);
+    g.userData.spin=.006;
+  }
+  if(id==="crown"){
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.19,.22,.1,32),gold());
+    base.position.y=1.02;g.add(base);
+    for(let i=0;i<5;i++){
+      const a=i/5*Math.PI*2;
+      const spike=new THREE.Mesh(new THREE.ConeGeometry(.045,.13,12),gold());
+      spike.position.set(Math.cos(a)*.18,1.13,Math.sin(a)*.18);g.add(spike);
+      const gem=new THREE.Mesh(new THREE.SphereGeometry(.022,12,8),new THREE.MeshStandardMaterial({color:0xef7d94,roughness:.3,emissive:0xef7d94,emissiveIntensity:.3}));
+      gem.position.set(Math.cos(a)*.18,1.2,Math.sin(a)*.18);g.add(gem);
+    }
+    g.children.forEach(ch=>{ch.userData.baseY=ch.position.y});
+    g.userData.bobAll=true;
+  }
+  return g;
+}
+function setAdornment(id){
+  adorn=id||null;
+  clearAdorn();
+  if(!ctx||!window.THREE||!adorn)return;
+  ctx.scene.add(buildAdorn(adorn));
+}
 function prop(type){
   const g=new THREE.Group();g.name="action-prop";
   if(type==="feed"){
@@ -173,7 +232,7 @@ function fit(root){
 }
 function load(url="assets/sitting_blue_cat.glb"){
   if(!ctx||!window.THREE||!THREE.GLTFLoader)return;
-  new THREE.GLTFLoader().load(url,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false)},undefined,()=>setLabel("Fallback"));
+  new THREE.GLTFLoader().load(url,gltf=>{if(ctx.model)ctx.scene.remove(ctx.model);ctx.model=fit(gltf.scene);ctx.scene.add(ctx.model);if(adorn)setAdornment(adorn);setLabel("Sitting");move(innerWidth*.7,innerHeight*.52,false);document.dispatchEvent(new CustomEvent("pt-model-ready"))},undefined,()=>setLabel("Fallback"));
 }
 function init(pet){
   if(ctx||!window.THREE)return;
@@ -201,6 +260,16 @@ function init(pet){
       ctx.model.rotation.x+=(tx-ctx.model.rotation.x)*.035;ctx.model.rotation.z+=(tz-ctx.model.rotation.z)*.045;
       ctx.model.children.forEach(c=>{if(c.name==="action-prop"){const b=c.getObjectByName("action-ball"),p=c.getObjectByName("action-paw");if(b){b.position.x=-.78+Math.sin(t*.009)*.18;b.position.y=-.65+Math.abs(Math.sin(t*.012))*.12}if(p)p.position.y=-.44+Math.sin(t*.02)*.055}});
       if(!live&&action!=="idle"){action="idle";clearProps()}
+    }
+    const ag=scene.getObjectByName("pt-adorn");
+    if(ag){
+      ag.children.forEach(ch=>{
+        const b=ch.userData.bob;
+        if(b)ch.position.y=ch.userData.baseY+Math.sin(t*b.speed+b.phase)*b.amp;
+        if(ch.userData.spin)ch.rotation.y+=ch.userData.spin;
+      });
+      if(ag.userData.spin)ag.rotation.y+=ag.userData.spin;
+      if(ag.userData.bobAll){const dy=Math.sin(t*.0013)*.03;ag.children.forEach(ch=>{if(ch.userData.baseY!=null&&!ch.userData.bob)ch.position.y=ch.userData.baseY+dy})}
     }
     renderer.render(scene,camera);requestAnimationFrame(frame);
   }
@@ -301,6 +370,6 @@ function bind(){
   $("#glb-file")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)load(URL.createObjectURL(f))});
   $("#generate-twin")?.addEventListener("click",()=>setTimeout(()=>setAction("spin"),700));
 }
-window.PetFix={load,setCoat,setCream,setLook,setAction,move,readPhotos};
+window.PetFix={load,setCoat,setCream,setLook,setAction,setAdornment,move,readPhotos};
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind();
 })();
