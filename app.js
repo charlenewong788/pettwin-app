@@ -124,8 +124,9 @@ Object.assign(copy.en, {
   appearanceSub: "Upload 1–4 photos and the twin matches your pet's coat. Photos never leave this device.",
   resetLook: "Reset colours", lookApplied: "Coat colours updated from your photos.",
   wear: "Wear", takeOff: "Take off", buyFor: "Unlock ·", lvLockA: "Reaches Lv.", lvLockB: "to unlock",
-  ownedTag: "Owned", coinShort: "c"
+  ownedTag: "Owned", coinShort: "c", quizTitle: "Pet behavior test"
 });
+copy.zh.quizTitle = "宠物行为测试";
 Object.assign(copy.zh, {
   emotionTitle: "它现在的感觉", mbtiTitle: "宠物 MBTI", mbtiSub: "由真实打卡与互动推断——不做问卷",
   axisEI: "E · 外向 — 独处 · I", axisSN: "S · 务实 — 爱幻想 · N", axisTF: "T · 独立 — 黏人 · F", axisJP: "J · 规律 — 随性 · P",
@@ -183,6 +184,7 @@ function loadState() {
     merged.healthChecks = parsed.healthChecks || {};
     merged.ixTotal = Object.assign({ pets: 0, plays: 0, talks: 0, feeds: 0 }, parsed.ixTotal || {});
     merged.wardrobe = Object.assign({ owned: [], wearing: null }, parsed.wardrobe || {});
+    if (merged.model === "toon" || merged.model === "lowpoly") merged.model = "sitting";
     return merged;
   } catch (e) {
     console.warn("PetTwin: could not read saved state, resetting.", e);
@@ -404,9 +406,63 @@ function computeMbti() {
   const N = clamp01(28 + sd * 36 + noteRatio * 22);
   const F = clamp01(22 + Math.min(42, tot.pets * 4 + tot.talks * 2) + (100 - currentStress()) * 0.24);
   const J = n ? clamp01(logs.filter(l => l.litterOk).length / n * 58 + logs.filter(l => l.appetite === "normal").length / n * 42) : 50;
-  const type = (E >= 50 ? "E" : "I") + (N >= 50 ? "N" : "S") + (F >= 50 ? "F" : "T") + (J >= 50 ? "J" : "P");
-  const conf = Math.min(95, 15 + n * 6 + Math.min(20, ixAll));
-  return { type, E, N, F, J, conf, n, ixAll };
+  let E2 = E, N2 = N, F2 = F, J2 = J, conf = Math.min(95, 15 + n * 6 + Math.min(20, ixAll));
+  if (state.mbtiQuiz) { // 60% owner-answered behavior quiz, 40% ongoing records
+    E2 = Math.round(state.mbtiQuiz.E * .6 + E * .4);
+    N2 = Math.round(state.mbtiQuiz.N * .6 + N * .4);
+    F2 = Math.round(state.mbtiQuiz.F * .6 + F * .4);
+    J2 = Math.round(state.mbtiQuiz.J * .6 + J * .4);
+    conf = Math.min(98, conf + 30);
+  }
+  const type = (E2 >= 50 ? "E" : "I") + (N2 >= 50 ? "N" : "S") + (F2 >= 50 ? "F" : "T") + (J2 >= 50 ? "J" : "P");
+  return { type, E: E2, N: N2, F: F2, J: J2, conf, n, ixAll };
+}
+/* Behavior quiz — 12 scenario questions the owner answers by observing the pet.
+   Result blends 60% quiz + 40% ongoing daily records. */
+const QUIZ = [
+  { ax: "E", zh: "家里来了陌生人，它通常？", en: "A stranger visits. Your pet usually…", a: ["主动凑上去查看", "先躲起来远远观察"], ae: ["Comes up to investigate", "Hides and watches from afar"] },
+  { ax: "E", zh: "面对新纸箱或新玩具？", a: ["立刻冲上去研究", "确认安全才慢慢靠近"], en: "A new box or toy appears…", ae: ["Charges in immediately", "Approaches only when it feels safe"] },
+  { ax: "E", zh: "它更常待在哪里？", a: ["你所在的房间", "自己找的安静角落"], en: "Where does it usually stay?", ae: ["Whichever room you are in", "A quiet corner of its own"] },
+  { ax: "N", zh: "家具挪动位置后，它？", a: ["沿着老路线照常走", "立刻兴奋地探索新布局"], en: "After you move the furniture…", ae: ["Sticks to its old routes", "Excitedly explores the new layout"] },
+  { ax: "N", zh: "玩耍时它更爱？", a: ["熟悉的老玩具", "永远追着新鲜东西"], en: "At playtime it prefers…", ae: ["The same familiar toys", "Whatever is newest"] },
+  { ax: "N", zh: "每天的饭点，它？", a: ["准时催饭像个闹钟", "想起来才慢悠悠去吃"], en: "At mealtimes it…", ae: ["Demands food right on time", "Wanders over whenever it remembers"] },
+  { ax: "F", zh: "你心情低落时，它会？", a: ["该干嘛干嘛", "凑过来安静陪着你"], en: "When you are sad, it…", ae: ["Carries on with its day", "Comes over and stays near you"] },
+  { ax: "F", zh: "被你说了一句之后？", a: ["无动于衷继续作案", "明显委屈，躲开一会儿"], en: "After being told off…", ae: ["Completely unbothered", "Visibly sulks and keeps distance"] },
+  { ax: "F", zh: "它找你的方式通常是？", a: ["有需求才叫你", "经常来蹭你求摸摸"], en: "It seeks you out…", ae: ["Only when it needs something", "Often, just for petting"] },
+  { ax: "J", zh: "它睡觉的地方？", a: ["固定的几个窝轮换", "每天睡的地方都不一样"], en: "Where does it sleep?", ae: ["The same few spots", "Somewhere different every day"] },
+  { ax: "J", zh: "它的作息？", a: ["规律得可以对表", "全看当天心情"], en: "Its daily rhythm is…", ae: ["Clockwork regular", "Entirely mood-based"] },
+  { ax: "J", zh: "对猫砂盆和食盆？", a: ["很讲究，脏了就抗议", "比较随性不挑剔"], en: "About its litter and bowls…", ae: ["Fussy — protests if dirty", "Easy-going, not picky"] }
+];
+let quizIdx = 0, quizScore = {};
+function openQuiz() {
+  quizIdx = 0; quizScore = { E: 0, N: 0, F: 0, J: 0 };
+  renderQuizQ();
+  $("#quiz-overlay").classList.remove("hidden");
+}
+function renderQuizQ() {
+  const q = QUIZ[quizIdx];
+  $("#quiz-progress").textContent = (quizIdx + 1) + " / " + QUIZ.length;
+  $("#quiz-question").textContent = en() ? q.en : q.zh;
+  const opts = en() ? q.ae : q.a;
+  $("#quiz-options").innerHTML = opts.map((o, i) => `<button data-qopt="${i}">${o}</button>`).join("");
+  $$("[data-qopt]").forEach(b => b.onclick = () => {
+    // option 0 scores toward the axis letter for E; for N/F/J option 1 is the letter side
+    const q2 = QUIZ[quizIdx];
+    const first = q2.ax === "E" ? 0 : 1;
+    if (+b.dataset.qopt === first) quizScore[q2.ax]++;
+    quizIdx++;
+    if (quizIdx < QUIZ.length) renderQuizQ();
+    else {
+      state.mbtiQuiz = { E: quizScore.E / 3 * 100, N: quizScore.N / 3 * 100, F: quizScore.F / 3 * 100, J: quizScore.J / 3 * 100, date: dkey() };
+      save();
+      $("#quiz-overlay").classList.add("hidden");
+      renderMbti();
+      const m = computeMbti(), info = MBTI_TYPES[m.type];
+      toast(m.type + " · " + (en() ? info.en : info.zh));
+      if (window.PetFix) window.PetFix.burst("spark", 8);
+      addCoins(20);
+    }
+  });
 }
 function mbtiPersona() { return PERSONAS[(MBTI_TYPES[computeMbti().type] || { p: 2 }).p]; }
 function computePersona() { return mbtiPersona(); }
@@ -419,7 +475,8 @@ function renderMbti() {
   $("#mbti-axes").innerHTML = axes.map(([key, v]) =>
     `<div class="mbti-axis"><span>${t(key)}</span><div class="mbti-bar"><i style="left:${100 - v}%"></i></div></div>`).join("");
   $("#mbti-conf").textContent = m.conf + "% " + t("confLabel");
-  $("#mbti-basis").textContent = `${t("basedOnA")} ${m.n} ${t("basedOnB")} ${m.ixAll} ${t("basedOnC")}`;
+  $("#mbti-basis").textContent = `${t("basedOnA")} ${m.n} ${t("basedOnB")} ${m.ixAll} ${t("basedOnC")}${state.mbtiQuiz ? (en() ? " + quiz" : " + 行为测试") : ""}`;
+  const qb = $("#quiz-btn"); if (qb) qb.textContent = state.mbtiQuiz ? (en() ? "Retake test" : "重新测试") : (en() ? "Behavior test" : "行为测试");
   window.__persona = mbtiPersona();
 }
 
@@ -1039,6 +1096,8 @@ $$("[data-view], [data-view-jump]").forEach(b => b.onclick = () => navigate(b.da
 $$("[data-lang]").forEach(b => b.onclick = () => { lang = b.dataset.lang; localStorage.setItem("pt-lang", lang); applyLanguage(); });
 $$("[data-signal]").forEach(b => b.onclick = () => { $$("[data-signal]").forEach(x => x.classList.toggle("active", x === b)); navigate("insights"); });
 $$("[data-emo-act]").forEach(b => b.onclick = () => doEmoAct(b.dataset.emoAct));
+$("#quiz-btn").onclick = openQuiz;
+$("#quiz-close").onclick = () => $("#quiz-overlay").classList.add("hidden");
 document.addEventListener("pt-petted", () => { addIx("pets"); toast(t("purr")); });
 $("#talk-close").onclick = () => $("#talk-overlay").classList.add("hidden");
 $("#talk-overlay").onclick = e => { if (e.target === $("#talk-overlay")) $("#talk-overlay").classList.add("hidden"); };
@@ -1159,7 +1218,19 @@ function renderSwatches() {
   const box = $("#look-swatches"); if (!box) return;
   const l = state.look || { coat: "#8f9aa6", cream: "#f6f1e7", dark: "#5d6570" };
   box.innerHTML = [l.coat, l.cream, l.dark].map(c => `<span style="background:${c}"></span>`).join("");
-  renderModels();
+  renderModels(); renderColors();
+}
+const COAT_COLORS = ["#8f9aa6", "#f3ede2", "#e0954f", "#3a3d42", "#a5825f", "#f0b7c3", "#9b8fc9", "#7fb08a"];
+function renderColors() {
+  const grid = $("#color-grid"); if (!grid) return;
+  const cur = (state.look && state.look.coat) || "#8f9aa6";
+  grid.innerHTML = COAT_COLORS.map(c => `<button class="color-dot ${cur === c ? "active" : ""}" data-coat="${c}" style="background:${c}"></button>`).join("");
+  $$("[data-coat]").forEach(b => b.onclick = () => {
+    state.look = Object.assign({}, state.look || {}, { coat: b.dataset.coat });
+    save();
+    if (window.PetFix) { window.PetFix.setLook(state.look); window.PetFix.burst("spark", 4); }
+    renderColors(); renderSwatches();
+  });
 }
 function renderModels() {
   const grid = $("#model-grid"); if (!grid || !window.PetFix || !window.PetFix.MODELS) return;

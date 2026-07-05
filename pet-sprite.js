@@ -7,8 +7,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const MODELS = {
     sitting: { file: "assets/sitting.glb", zh: "英短", en: "Shorthair", tint: true },
-    dingus: { file: "assets/dingus.glb", zh: "丁格斯", en: "Dingus", tint: false },
-    toon: { file: "assets/toon.glb", zh: "卡通猫", en: "Toon cat", tint: false }
+    dingus: { file: "assets/dingus.glb", zh: "丁格斯", en: "Dingus", tint: true }
   };
   let look = { coat: "#8f9aa6" };
   let modelId = "sitting", wearing = null, tier = 1;

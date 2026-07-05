@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="styles.css?v=10" />
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="app.js?v=18" defer></script>
-    <script src="pet-sprite.js?v=2" defer></script>
+    <script src="app.js?v=19" defer></script>
+    <script src="pet-sprite.js?v=3" defer></script>
   </head>
   <body>
     <div id="pet-sprite" aria-hidden="true"></div>
@@ -56,6 +56,7 @@
               </div>
               <div class="mbti-axes" id="mbti-axes"></div>
               <div class="mbti-foot"><span id="mbti-conf"></span><span id="mbti-basis"></span></div>
+              <button class="persona-share" id="quiz-btn" style="margin-top:12px">Behavior test</button>
               <p class="persona-progress" data-i18n="mbtiSub">Inferred from real check-ins and interactions — no quizzes</p>
             </article>
             <div class="engage-side">
@@ -132,6 +133,7 @@
               <div class="section-heading"><div><span data-i18n="appearanceTitle">Appearance</span><h2 data-i18n="appearanceTitle">Appearance</h2></div><span id="studio-orbit-name" class="muted-tag"></span></div>
               <p class="page-sub" data-i18n="appearanceSub">Upload 1–4 photos and the twin matches your pet's coat.</p>
               <div class="closet-grid" id="model-grid"></div>
+              <div class="color-grid" id="color-grid"></div>
               <label class="capture-dropzone"><input id="pet-photo" type="file" accept="image/*" multiple><strong data-i18n="uploadPhotos">Add pet photos</strong><span data-i18n="uploadHint">Clear, even light works best.</span></label>
               <div class="look-row"><div class="look-swatches" id="look-swatches"></div><button class="text-action" id="reset-look" data-i18n="resetLook">Reset colours</button></div>
               <p class="result-line" id="studio-result"></p>
@@ -267,6 +269,16 @@
         <label data-i18n="onbAge">Age (years, optional)</label>
         <input type="number" id="onb-age" min="0" max="40" step="1" />
         <button class="primary-action full" id="onb-start" data-i18n="onbStart">Start</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="quiz-overlay">
+      <div class="modal">
+        <button class="share-close" id="quiz-close" aria-label="Close">×</button>
+        <h3 data-i18n="quizTitle">Pet behavior test</h3>
+        <p class="modal-sub" id="quiz-progress"></p>
+        <p class="quiz-question" id="quiz-question"></p>
+        <div class="quiz-options" id="quiz-options"></div>
       </div>
     </div>
 
