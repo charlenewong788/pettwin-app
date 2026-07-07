@@ -1,12 +1,12 @@
 {
-  "name": "PetTwin",
-  "short_name": "PetTwin",
-  "description": "Your pet, understood — daily check-ins, a real behavior baseline and a digital twin.",
+  "name": "宠格 PetPersona",
+  "short_name": "宠格",
+  "description": "通过主人观察问卷和在家小实验，为你的猫狗生成一张科学化的 MBTI 风格人格卡。",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#f5f7f2",
-  "theme_color": "#f5f7f2",
+  "background_color": "#faf6f0",
+  "theme_color": "#faf6f0",
   "icons": [
     { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]

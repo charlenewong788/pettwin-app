@@ -1,4 +1,4 @@
-name: Deploy PetTwin to GitHub Pages
+name: Deploy PetPersona to GitHub Pages
 
 on:
   push:

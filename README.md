@@ -1,30 +1,51 @@
-﻿# PetTwin
+# 宠格 PetPersona
 
-## Live Demo
+> 读懂你的毛孩子 —— 一款以「宠物 MBTI 性格测评」为核心的养宠陪伴应用
 
-[Open PetTwin](https://charlenewong788.github.io/pettwin-app/)
+[在线体验 PetPersona](https://charlenewong788.github.io/pettwin-app/)
 
-PetTwin is a pet companion app: a living desktop pet with real emotions, a behavior-inferred pet MBTI, daily check-ins that build a true health baseline, and a coin-powered closet.
+## 这是什么
 
-## Features
+宠格 PetPersona 把动物行为学量表（Feline Five、C-BARQ / Fe-BARQ）和 Dognition 式的在家认知游戏，包装成一次轻松的测评：主人先答几道**日常观察问卷**，再陪宠物玩几个**在家小实验**（招牌是「零食纸杯测试」），系统就能生成一张 MBTI 风格的**宠物人格卡**，并给出相处指南、易踩雷点、主宠契合度等解读。
 
-- Living desktop pet (SVG sprite): blinks, watches your cursor, swishes its tail, wanders the page, naps, chases the pointer, and purrs with hearts when stroked
-- Coat colours matched from your pet's photos (processed on-device, background-aware)
-- Emotion engine: eight human-readable feelings computed from real data, each shown with its reason
-- Pet MBTI: sixteen types inferred continuously from check-ins and interactions - never a questionnaire
-- 30-second daily check-ins (mood, appetite, litter, weight, notes) driving wellbeing, trends, findings and alerts
-- Streaks with timezone-safe tracking and streak-freeze tokens; bond levels that grow with check-in days
-- Coins earned by care, spent in a closet of wearables (bow, bell collar, scarf, glasses, flower crown, crown)
-- Remote companionship: away reports, talk-to-pet with spoken replies, remote treat/play actions
-- Health reminders (vaccine, deworming, check-up) with repeat cycles and .ics calendar export
-- Guided health self-checks and real health-signal alerts - observation, not diagnosis
-- Monologue and profile share cards drawn from the live sprite
-- PWA (installable, offline-capable), bilingual EN/中文, mobile-first bottom navigation
+## 核心功能
 
-## How To Run
+- **双输入性格测评**：主人观察问卷（猫/狗分库）＋ 在家小实验（12 个，含零食纸杯、指向跟随、陌生物品、延迟满足等），加权算出四字母人格类型
+- **四维行为模型**：外向亲人 E/I、务实警觉 S/N、冷静自主 T/F、规律稳定 J/P，另含隐藏的敏感度轴
+- **16 型宠物人格**：每型含昵称、金句、性格综述、闪光点、小怪癖、第一人称心声、相处指南、易踩雷点，以及猫 / 狗的分别表现（中英双语）
+- **可分享人格卡**：SVG 生成、可导出 PNG，适合社交分享
+- **主宠契合度**：设置主人自己的 MBTI，生成逐维度的契合报告
+- **人格成长记录**：保留每次测评历史，支持复测对比
+- **健康提醒**：疫苗 / 驱虫 / 体检提醒，支持导出到日历（.ics）
+- **双语界面**（中文 / English），零后端，数据仅存本地
 
-Zero-dependency static project. Open `index.html` in a browser. All data stays in the browser (localStorage).
+## 产品边界
 
-## Structure
+宠格是行为观察工具，不提供任何医疗诊断。若宠物的饮食、饮水、排泄、精神状态出现持续异常，请及时就医。测评为「MBTI 风格」，与官方 Myers-Briggs Type Indicator® 无关，结果反映主人视角下的行为倾向，不是绝对定论。
 
-`index.html` + `styles.css` + `app.js` (product logic) + `pet-sprite.js` (desktop pet) + `sw.js` / `manifest.webmanifest` (PWA)
+## 技术说明
+
+零依赖的纯静态前端。所有档案、照片与测评数据只保存在浏览器本地存储（localStorage），不上传任何服务器，可随时在「我的」页面导出 / 导入 / 删除。
+
+## 运行方式
+
+直接用浏览器打开 `index.html` 即可，无需安装或构建。
+
+## 文件结构
+
+```text
+pettwin-app/
+  index.html
+  styles.css
+  manifest.webmanifest
+  assets/icon.svg
+  js/
+    i18n.js            双语文案
+    store.js           本地存储
+    data-types.js      16 型人格内容
+    data-questions.js  观察问卷题库
+    data-experiments.js 在家小实验题库
+    engine.js          计分引擎
+    card.js            人格卡（SVG → PNG）
+    app.js             应用与路由
+```
