@@ -91,6 +91,8 @@
       typeCode: code,
       axes: axes,        // {EI,SN,TF,JP,NEU} each 0..100 toward first letter / high sensitivity
       borderline: borderline,
+      // 3+ axes hovering at the midline -> the ultra-rare hidden trait easter egg
+      hidden: borderline.length >= 3,
       sensitivity: sens,
       sensitivityPct: neu,
       confidence: stars,

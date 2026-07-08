@@ -36,6 +36,7 @@
     calendar: svg('<rect x="4" y="5.5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 3.5v4M16 3.5v4M4 10h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'),
     empty: svg('<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M8.5 14c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8M9 9.5h.01M15 9.5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'),
     share: svg('<path d="M8 12a3 3 0 1 1-3-3 3 3 0 0 1 3 3zm11-6a3 3 0 1 1-3-3 3 3 0 0 1 3 3zm0 12a3 3 0 1 1-3-3 3 3 0 0 1 3 3zM7.7 10.7l6.6-3.4M7.7 13.3l6.6 3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'),
+    mail: svg('<rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>'),
     heart2: svg('<path d="M12 20S3.5 14.5 3.5 8.8C3.5 6 5.6 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14 4 15.8 4c2.6 0 4.7 2 4.7 4.8C20.5 14.5 12 20 12 20z" fill="currentColor"/>'),
   };
   var EXP_ICON = { cup: 'cup', hand: 'hand', wave: 'wave', box: 'box', ball: 'ball', towel: 'towel', heart: 'heart', sound: 'sound', clock: 'clock', door: 'door', mirror: 'mirror', calendar: 'calendar' };
@@ -97,6 +98,7 @@
   function go(route, opts) {
     app.route = route;
     app.sub = (opts && opts.sub) || null;
+    if (route !== 'result') app.reveal = false;
     if (opts && opts.petId !== undefined) app.petId = opts.petId;
     if (opts && opts.quizIndex !== undefined) app.quizIndex = opts.quizIndex;
     render();
@@ -137,24 +139,69 @@
     return '<div class="avatar ' + (cls || '') + '">' + (p && p.species === 'dog' ? ICON.dog : ICON.cat) + '</div>';
   }
 
+  function sec(txt, extra) {
+    return '<div class="section-title"><span>' + txt + '</span>' + (extra || '') + '</div>';
+  }
+
+  var DOODLES = '<svg class="hero-doodles" viewBox="0 0 80 60" fill="none" aria-hidden="true">' +
+    '<path d="M12 14 l3.5 7 7 1.5 -5 5.5 1 7.5 -6.5 -3.5 -6.5 3.5 1 -7.5 -5 -5.5 7 -1.5z" stroke="#35291c" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M52 8 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#f08a4c"/>' +
+    '<path d="M40 44 c6 -8 14 -8 20 0" stroke="#35291c" stroke-width="2" stroke-linecap="round"/>' +
+    '<circle cx="68" cy="30" r="3" stroke="#35291c" stroke-width="2"/></svg>';
+  var DOODLE_LINE = '<svg class="doodle-line" viewBox="0 0 150 12" aria-hidden="true">' +
+    '<path d="M3 8 C 30 2, 55 12, 80 6 S 130 4, 147 7" fill="none" stroke="#d96f31" stroke-width="3.5" stroke-linecap="round"/></svg>';
+
+  function fortuneCardHTML(p, a) {
+    var f = PP.fun.fortuneFor(p.id, a.result.typeCode, todayStr());
+    return '<div class="fortune-card">' +
+      '<div class="f-head"><span class="f-title">' + t('fortune.title', { name: petName(p) }) + '</span>' +
+      '<span class="f-date">' + todayStr().slice(5).replace('-', ' / ') + '</span></div>' +
+      '<div class="fortune-grid">' +
+      '<div class="fortune-cell yi"><span class="k">' + t('fortune.yi') + '</span><div class="v">' + pick(f.yi) + '</div></div>' +
+      '<div class="fortune-cell ji"><span class="k">' + t('fortune.ji') + '</span><div class="v">' + pick(f.ji) + '</div></div>' +
+      '<div class="fortune-cell lk"><span class="k">' + t('fortune.lucky') + '</span><div class="v">' + pick(f.lucky) + '</div></div>' +
+      '<div class="fortune-cell md"><span class="k">' + t('fortune.mood') + ' ' + f.mood + '</span>' +
+      '<div class="fortune-mood-bar"><div style="width:' + f.mood + '%"></div></div></div>' +
+      '</div>' +
+      '<div class="row between" style="margin-top:10px"><span class="tiny grow">' + pick(f.moodText) + '</span>' +
+      '<button class="btn btn-ghost btn-sm" data-action="copy-fortune" data-id="' + p.id + '">' + t('fortune.share') + '</button></div>' +
+      '</div>';
+  }
+
   function viewHome() {
     var pets = store.state.pets;
-    var hero = '<section class="hero">' +
-      '<h1>' + t('home.heroTitle').replace('\n', '<br>') + '</h1>' +
+    var hero = '<section class="hero">' + DOODLES +
+      '<h1>' + t('home.heroTitle').replace('\n', '<br>') + '</h1>' + DOODLE_LINE +
       '<p>' + t('home.heroSub') + '</p>' +
       '<button class="btn btn-primary" data-action="hero-cta">' + t('home.heroCta') + '</button>' +
       '<div class="hero-paw">' + ICON.paw + '</div></section>';
 
-    var petsHTML = '<div class="section-title">' + t('home.myPets') + '</div>';
+    // daily fortune stickers for assessed pets — the reason to open the app every day
+    var fortuneHTML = '';
+    var assessed = pets.filter(function (p) { return !!store.latestAssessment(p.id); });
+    if (assessed.length) {
+      fortuneHTML = '<div class="stack" style="margin-top:18px">' + assessed.map(function (p) {
+        return fortuneCardHTML(p, store.latestAssessment(p.id));
+      }).join('') + '</div>';
+    } else if (pets.length) {
+      fortuneHTML = '<div class="card tape tape-sky center" style="margin-top:20px"><p class="muted">' + t('fortune.locked') + '</p></div>';
+    }
+
+    var petsHTML = sec(t('home.myPets'));
     if (!pets.length) {
       petsHTML += '<button class="add-pet" data-action="add-pet">' + ICON.plus + '<div style="margin-top:6px">' + t('home.addPet') + '</div></button>';
     } else {
       petsHTML += '<div class="stack">';
       pets.forEach(function (p) {
         var a = store.latestAssessment(p.id);
-        var right = a
-          ? '<div class="type-tag">' + a.result.typeCode + '</div><div class="tiny">' + pick(PP.getType(a.result.typeCode) ? { zh: PP.getType(a.result.typeCode).nickname_zh, en: PP.getType(a.result.typeCode).nickname_en } : { zh: '', en: '' }) + '</div>'
-          : '<span class="chip">' + t('home.untested') + '</span>';
+        var right;
+        if (a) {
+          var rar = PP.fun.rarity(p.species, a.result.typeCode);
+          right = '<div class="type-tag">' + a.result.typeCode + '</div>' +
+            '<span class="rarity-badge rarity-' + rar.tier + '" style="margin-top:4px;padding:1px 8px;font-size:0.68rem"><span class="tier">' + rar.tier.toUpperCase() + '</span></span>';
+        } else {
+          right = '<span class="chip">' + t('home.untested') + '</span>';
+        }
         petsHTML += '<button class="pet-card" data-action="open-pet" data-id="' + p.id + '">' +
           avatarHTML(p) +
           '<div class="grow"><div class="name">' + petName(p) + '</div><div class="tiny">' + speciesLabel(p.species) +
@@ -165,15 +212,15 @@
       petsHTML += '</div>';
     }
 
-    var info = '<div class="section-title">' + t('home.whatIs') + '</div>' +
-      '<div class="card"><p class="muted">' + t('home.whatIsBody') + '</p>' +
+    var info = sec(t('home.whatIs')) +
+      '<div class="card tape tape-mint"><p class="muted">' + t('home.whatIsBody') + '</p>' +
       '<button class="btn btn-soft btn-sm" style="margin-top:12px" data-action="methodology">' + t('result.methodology') + '</button></div>';
 
-    return hero + petsHTML + info;
+    return hero + fortuneHTML + petsHTML + info;
   }
 
   function viewOnboard() {
-    return '<div class="section-title">' + t('onboard.title') + '</div>' +
+    return sec(t('onboard.title')) +
       '<div class="card">' +
       '<div class="field"><label>' + t('onboard.name') + '</label>' +
       '<input type="text" id="f-name" placeholder="' + t('onboard.namePh') + '" autocomplete="off"></div>' +
@@ -206,7 +253,7 @@
   function viewAssessHub() {
     var pets = store.state.pets;
     if (!pets.length) {
-      return '<div class="section-title">' + t('assess.title') + '</div>' +
+      return sec(t('assess.title')) +
         '<div class="empty">' + ICON.empty + '<p>' + t('toast.needPet') + '</p>' +
         '<button class="btn btn-primary" style="margin-top:16px" data-action="add-pet">' + t('home.addPet') + '</button></div>';
     }
@@ -243,7 +290,7 @@
       t('assess.genResult') + '</button>';
     var hint = quizComplete ? '' : '<p class="tiny center" style="margin-top:8px">' + t('assess.needQuiz') + '</p>';
 
-    return '<div class="section-title">' + t('assess.title') + '</div>' + petSelector +
+    return sec(t('assess.title')) + petSelector +
       '<div class="pet-card" style="margin-bottom:14px">' + avatarHTML(p) +
       '<div class="grow"><div class="name">' + petName(p) + '</div><div class="tiny">' + speciesLabel(species) + '</div></div></div>' +
       '<div class="stack">' + quizCard + expCard + '</div>' +
@@ -350,12 +397,42 @@
     var sens = r.sensitivity;
     var sensText = t('result.sens.' + sens);
 
+    // rarity + hidden trait + soul twin
+    var rar = PP.fun.rarity(p.species, r.typeCode);
+    var spLab = isZh ? speciesLabel(p.species) : speciesLabel(p.species).toLowerCase();
+    var rarityHTML = '<div><span class="rarity-badge rarity-' + rar.tier + '">' +
+      '<span class="tier">' + rar.tier.toUpperCase() + '</span>' + t('rarity.' + rar.tier) +
+      ' · ' + t('rarity.per', { sp: spLab, n: rar.pct }) + '</span></div>' +
+      '<div class="tiny" style="margin-top:5px">' + t('rarity.note') + '</div>';
+    var hiddenBadge = r.hidden ? '<div><span class="hidden-badge">' + ICON.spark + t('hidden.badge') + '</span></div>' : '';
+    var hiddenCard = r.hidden ? '<div class="card tape" style="margin-top:14px"><p class="muted">' + t('hidden.desc') + '</p></div>' : '';
+    var twin = PP.fun.twin(r.typeCode);
+    var twinFig = isZh ? twin.figure_zh : twin.figure_en.split(' ').map(function (w) { return w[0]; }).join('');
+    var twinHTML = sec(t('twin.title')) +
+      '<div class="twin-card"><div class="twin-fig">' + twinFig + '</div>' +
+      '<div class="grow"><div class="who">' + t('twin.same', { figure: isZh ? twin.figure_zh : twin.figure_en }) + '</div>' +
+      '<div class="why">' + (isZh ? twin.line_zh : twin.line_en) + '</div></div></div>';
+
+    // blind-box reveal overlay (shown right after generating a new result)
+    var revealHTML = '';
+    if (app.reveal) {
+      revealHTML = '<div class="reveal-overlay" id="reveal-overlay">' +
+        '<div class="reveal-scene"><div class="flip-card" data-action="reveal-flip">' +
+        '<div class="flip-face flip-back">' + ICON.paw + '<div class="q">?</div></div>' +
+        '<div class="flip-face flip-front"><div class="code">' + r.typeCode + '</div>' +
+        '<div class="nick">' + (isZh ? type.nickname_zh : type.nickname_en) + '</div>' +
+        '<span class="rarity-badge rarity-' + rar.tier + '" style="margin-top:6px"><span class="tier">' + rar.tier.toUpperCase() + '</span>' + t('rarity.' + rar.tier) + '</span>' +
+        '</div></div></div>' +
+        '<div class="reveal-hint" id="reveal-hint">' + t('reveal.hint') + '</div>' +
+        '</div>';
+    }
+
     // pairing
     var owner = store.state.ownerMbti;
     var pairHTML;
     if (owner) {
       var pr = engine.pairing(owner, r.typeCode);
-      pairHTML = '<div class="card" style="margin-top:14px"><div class="section-title" style="margin-top:0">' + t('result.pairing') + '</div>' +
+      pairHTML = '<div class="card" style="margin-top:14px"><div class="section-title" style="margin-top:0"><span>' + t('result.pairing') + '</span></div>' +
         '<div class="pair-score">' + pr.score + '%</div>' +
         '<div class="tiny center" style="margin-bottom:10px">' + t('result.pairingScore') + ' · ' + owner + ' × ' + r.typeCode + '</div>' +
         pr.perAxis.map(function (pa) {
@@ -375,20 +452,26 @@
       '<div class="type-nickname">' + (isZh ? type.nickname_zh : type.nickname_en) + '</div>' +
       '<div class="type-tagline">“' + (isZh ? type.tagline_zh : type.tagline_en) + '”</div>' +
       '<div class="stars">' + stars + '</div>' +
-      '<div class="tiny" style="margin-top:6px">' + t('result.starsHint', { n: r.confidence }) + '</div></div>' +
+      '<div class="tiny" style="margin-top:6px">' + t('result.starsHint', { n: r.confidence }) + '</div>' +
+      rarityHTML + hiddenBadge + '</div>' +
 
-      '<div id="card-preview-wrap" style="margin:8px 0 16px"></div>' +
+      hiddenCard +
+
+      '<div id="card-preview-wrap" style="margin:14px 0 16px"></div>' +
       '<button class="btn btn-primary btn-block" data-action="save-card">' + ICON.share + ' ' + t('result.saveCard') + '</button>' +
       '<p class="tiny center" style="margin:8px 0 4px">' + t('result.shareHint') + '</p>' +
+      '<button class="btn btn-soft btn-block letter-btn" data-action="open-letter">' + ICON.mail + ' ' + t('letter.btn') + '</button>' +
 
-      '<div class="section-title">' + t('result.axes') + '</div><div class="card">' + axesHTML + borderNote + '</div>' +
+      sec(t('result.axes')) + '<div class="card">' + axesHTML + borderNote + '</div>' +
 
-      '<div class="section-title">' + t('result.summary') + '</div>' +
-      '<div class="card"><p>' + (isZh ? type.summary_zh : type.summary_en) + '</p></div>' +
+      sec(t('result.summary')) +
+      '<div class="card tape"><p>' + (isZh ? type.summary_zh : type.summary_en) + '</p></div>' +
 
-      '<div class="voice-quote" style="margin-top:14px">' + ICON.chat + ' “' + (isZh ? type.voice_zh : type.voice_en) + '”</div>' +
+      '<div class="voice-quote" style="margin-top:16px">' + ICON.chat + ' “' + (isZh ? type.voice_zh : type.voice_en) + '”</div>' +
 
-      '<div class="section-title">' + t('result.speciesNote') + '</div>' +
+      twinHTML +
+
+      sec(t('result.speciesNote')) +
       '<div class="card"><p>' + speciesNote + '</p></div>' +
 
       '<div class="card" style="margin-top:14px">' +
@@ -397,12 +480,14 @@
       list(type.guide, ICON.compass, t('result.guide')) +
       list(type.pitfalls, ICON.alert, t('result.pitfalls')) + '</div>' +
 
-      '<div class="section-title">' + t('result.sensitivity') + '</div>' +
+      sec(t('result.sensitivity')) +
       '<div class="card"><p class="muted">' + sensText + '</p></div>' +
 
       pairHTML +
 
-      '<div style="margin:18px 0 4px"><button class="btn btn-ghost btn-block btn-sm" data-action="methodology">' + t('result.methodology') + '</button></div>';
+      '<div style="margin:18px 0 4px"><button class="btn btn-ghost btn-block btn-sm" data-action="methodology">' + t('result.methodology') + '</button></div>' +
+
+      revealHTML;
   }
 
   function viewRecords() {
@@ -454,8 +539,8 @@
         '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:10px" data-action="export-ics">' + t('records.ics') + '</button>';
     }
 
-    return '<div class="section-title">' + t('records.history') + '</div>' + histHTML +
-      '<div class="section-title">' + t('records.reminders') + '<button class="more" data-action="add-reminder">＋ ' + t('records.addReminder') + '</button></div>' + remHTML;
+    return sec(t('records.history')) + histHTML +
+      sec(t('records.reminders'), '<button class="more" data-action="add-reminder">＋ ' + t('records.addReminder') + '</button>') + remHTML;
   }
 
   function viewMe() {
@@ -464,7 +549,7 @@
       return '<div class="me-row"><div><div class="lab">' + petName(p) + '</div><div class="val">' + speciesLabel(p.species) + '</div></div>' +
         '<button class="btn btn-danger btn-sm" data-action="del-pet" data-id="' + p.id + '">' + t('common.delete') + '</button></div>';
     }).join('');
-    return '<div class="section-title">' + t('me.title') + '</div>' +
+    return sec(t('me.title')) +
       '<div class="stack">' +
       '<button class="me-row" data-action="owner-mbti"><div><div class="lab">' + t('me.ownerMbti') + '</div><div class="val">' + t('me.ownerMbtiDesc') + '</div></div>' +
       '<div class="type-tag">' + (owner || t('me.notSet')) + '</div></button>' +
@@ -475,7 +560,7 @@
       '<input type="file" id="import-file" accept="application/json" style="display:none">' +
       '<button class="me-row" data-action="about"><div class="lab">' + t('me.about') + '</div><div class="val">›</div></button>' +
       '</div>' +
-      (petsManage ? '<div class="section-title">' + t('me.managePets') + '</div><div class="stack">' + petsManage + '</div>' : '');
+      (petsManage ? sec(t('me.managePets')) + '<div class="stack">' + petsManage + '</div>' : '');
   }
 
   /* ---------------- post-render hooks ---------------- */
@@ -576,6 +661,7 @@
       experiments: Object.assign({}, draft.experiments),
       result: result,
     });
+    app.reveal = true; // blind-box reveal overlay on the result page
     go('result', { petId: p.id });
   }
 
@@ -633,6 +719,89 @@
     downloadDataURL('petpersona-backup.json', URL.createObjectURL(blob));
   }
 
+  /* ---------------- fun hooks ---------------- */
+  function spawnConfetti(container) {
+    var colors = ['#f08a4c', '#ffd9a0', '#9fd6b4', '#a7cbe8', '#f5b8c4', '#c4b5ec'];
+    for (var i = 0; i < 46; i++) {
+      var b = document.createElement('i');
+      b.className = 'confetti-bit';
+      b.style.left = (Math.random() * 100) + '%';
+      b.style.background = colors[i % colors.length];
+      b.style.animationDelay = (Math.random() * 0.6) + 's';
+      b.style.animationDuration = (1.4 + Math.random() * 0.9) + 's';
+      if (i % 3 === 0) b.style.borderRadius = '50%';
+      container.appendChild(b);
+      (function (bit) { setTimeout(function () { bit.remove(); }, 3200); })(b);
+    }
+  }
+
+  function copyText(s) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = s;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); toast(t('toast.copied')); } catch (e) { /* ignore */ }
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(s).then(function () { toast(t('toast.copied')); }, fallback);
+    } else fallback();
+  }
+
+  function copyFortune(petId) {
+    var p = store.getPet(petId);
+    var a = p && store.latestAssessment(p.id);
+    if (!p || !a) return;
+    var f = PP.fun.fortuneFor(p.id, a.result.typeCode, todayStr());
+    copyText(t('fortune.copyTpl', {
+      name: petName(p), code: a.result.typeCode,
+      yi: pick(f.yi), ji: pick(f.ji), lucky: pick(f.lucky),
+      mood: f.mood, moodText: pick(f.moodText),
+    }));
+  }
+
+  function openLetter() {
+    var p = currentPet();
+    var a = store.latestAssessment(p.id);
+    if (!a) return;
+    app._letterText = PP.fun.letterFor(a.result.typeCode, petName(p), i18n.lang);
+    openModal('<div class="modal-title">' + t('letter.title', { name: petName(p) }) + '</div>' +
+      '<div class="letter-paper"><span id="letter-text"></span><span class="type-cursor" id="letter-cursor"></span>' +
+      '<div class="letter-sign" id="letter-sign" style="opacity:0">' + t('letter.sign', { name: petName(p) }) + '</div></div>' +
+      '<div class="row" style="margin-top:16px;justify-content:center">' +
+      '<button class="btn btn-ghost btn-sm" data-action="replay-letter">' + t('letter.replay') + '</button>' +
+      '<button class="btn btn-soft btn-sm" data-action="close-modal">' + t('common.close') + '</button></div>');
+    typeLetter(app._letterText);
+  }
+
+  function typeLetter(text) {
+    if (app._letterTimer) clearInterval(app._letterTimer);
+    var i = 0;
+    var el = document.getElementById('letter-text');
+    var sign = document.getElementById('letter-sign');
+    var cursor = document.getElementById('letter-cursor');
+    if (!el) return;
+    el.textContent = '';
+    if (sign) sign.style.opacity = '0';
+    if (cursor) cursor.style.display = 'inline-block';
+    var step = i18n.lang === 'zh' ? 1 : 2; // en letters are longer; type 2 chars a tick
+    app._letterTimer = setInterval(function () {
+      var elNow = document.getElementById('letter-text');
+      if (!elNow) { clearInterval(app._letterTimer); return; } // modal closed mid-typing
+      i += step;
+      elNow.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        clearInterval(app._letterTimer);
+        var s = document.getElementById('letter-sign');
+        var c = document.getElementById('letter-cursor');
+        if (s) s.style.opacity = '1';
+        if (c) c.style.display = 'none';
+      }
+    }, i18n.lang === 'zh' ? 62 : 30);
+  }
+
   function importData(file) {
     var reader = new FileReader();
     reader.onload = function (e) {
@@ -685,6 +854,30 @@
         break;
       case 'generate': generateResult(); break;
       case 'save-card': saveCard(); break;
+      case 'reveal-flip': {
+        if (elm.classList.contains('flipped')) break;
+        elm.classList.add('flipped');
+        var ov = document.getElementById('reveal-overlay');
+        if (ov) {
+          spawnConfetti(ov);
+          var hint = document.getElementById('reveal-hint');
+          if (hint) {
+            setTimeout(function () {
+              hint.innerHTML = '<button class="btn btn-primary reveal-cta" data-action="reveal-close">' + t('reveal.open') + '</button>';
+            }, 750);
+          }
+        }
+        break;
+      }
+      case 'reveal-close': {
+        app.reveal = false;
+        var ov2 = document.getElementById('reveal-overlay');
+        if (ov2) ov2.remove();
+        break;
+      }
+      case 'open-letter': openLetter(); break;
+      case 'replay-letter': typeLetter(app._letterText || ''); break;
+      case 'copy-fortune': copyFortune(elm.getAttribute('data-id')); break;
       case 'retest':
         store.clearDraft(currentPet().id); go('assess');
         break;

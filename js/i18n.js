@@ -211,6 +211,50 @@
     'oq.8a': { zh: '整齐有序，各归其位', en: 'tidy - everything in its place' },
     'oq.8b': { zh: '乱中有序，我自己能找到就行', en: 'organized chaos - I know where things are' },
 
+    /* fortune */
+    'fortune.title': { zh: '{name}的今日运势', en: "{name}'s fortune today" },
+    'fortune.yi': { zh: '宜', en: 'Do' },
+    'fortune.ji': { zh: '忌', en: 'Avoid' },
+    'fortune.lucky': { zh: '幸运零食', en: 'Lucky treat' },
+    'fortune.mood': { zh: '心情指数', en: 'Mood' },
+    'fortune.locked': { zh: '完成测评，解锁它的专属每日运势', en: 'Finish the test to unlock daily fortunes' },
+    'fortune.share': { zh: '复制运势', en: 'Copy' },
+    'fortune.copyTpl': {
+      zh: '【宠格】{name}（{code}）今日运势：宜{yi}，忌{ji}。幸运零食：{lucky}。心情指数 {mood}：{moodText}',
+      en: '[PetPersona] {name} ({code}) today: Do {yi}. Avoid {ji}. Lucky treat: {lucky}. Mood {mood}: {moodText}',
+    },
+    'toast.copied': { zh: '已复制，快去分享吧', en: 'Copied - go share it' },
+
+    /* reveal */
+    'reveal.hint': { zh: '点击卡片，揭晓它的人格', en: 'Tap the card to reveal' },
+    'reveal.open': { zh: '查看完整报告', en: 'See full report' },
+
+    /* rarity */
+    'rarity.label': { zh: '图鉴收录率', en: 'Collection rate' },
+    'rarity.per': { zh: '每 100 只{sp}中约有 {n} 只', en: 'about {n} in every 100 {sp}s' },
+    'rarity.note': { zh: '收录率来自宠格类型分布模型，仅供收藏玩乐', en: "Rates come from PetPersona's own distribution model - collection fun only" },
+    'rarity.c': { zh: '常见', en: 'Common' },
+    'rarity.r': { zh: '少见', en: 'Uncommon' },
+    'rarity.sr': { zh: '稀有', en: 'Rare' },
+    'rarity.ssr': { zh: '传说', en: 'Legendary' },
+
+    /* hidden trait */
+    'hidden.badge': { zh: '隐藏体质 · 薛定谔的毛孩子', en: "Hidden trait: Schrödinger's Fluffball" },
+    'hidden.desc': {
+      zh: '四个维度全部徘徊在中线附近——它可能同时拥有所有人格，也可能一个都不承认。这是触发率极低的隐藏体质，过段时间复测，也许会看到它的另一面。',
+      en: 'All four dimensions hover at the midline - your pet may hold every personality at once, or deny all of them. This hidden trait is extremely rare; retest later and you may meet its other side.',
+    },
+
+    /* letter */
+    'letter.btn': { zh: '拆开它写给你的信', en: 'Open the letter it wrote you' },
+    'letter.title': { zh: '来自{name}的一封信', en: 'A letter from {name}' },
+    'letter.sign': { zh: '—— 你的{name}', en: '- Your {name}' },
+    'letter.replay': { zh: '再读一遍', en: 'Read again' },
+
+    /* twin */
+    'twin.title': { zh: '世另我', en: 'Soul twin' },
+    'twin.same': { zh: '和{figure}是同款人格', en: 'Same type as {figure}' },
+
     /* misc */
     'toast.saved': { zh: '已保存', en: 'Saved' },
     'toast.cardSaved': { zh: '人格卡已保存到相册/下载', en: 'Card image saved' },

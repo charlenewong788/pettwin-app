@@ -75,11 +75,26 @@
     // nickname
     svg += '<text x="540" y="770" text-anchor="middle" font-size="52" font-weight="700" fill="#2e2a25">' + esc(nickname) + '</text>';
     // tagline
-    svg += '<text x="540" y="838" text-anchor="middle" font-size="34" fill="#6b6259">“' + esc(tagline) + '”</text>';
+    svg += '<text x="540" y="836" text-anchor="middle" font-size="34" fill="#6b6259">“' + esc(tagline) + '”</text>';
+
+    // collection rarity
+    var TIER_COLOR = { c: '#8d9aa5', r: '#5b8dd4', sr: '#8a76d8', ssr: '#c8951a' };
+    var rar = window.PP.fun ? window.PP.fun.rarity(pet.species, type.code) : null;
+    if (rar) {
+      var spLab2 = isZh ? (pet.species === 'dog' ? '狗' : '猫') : (pet.species === 'dog' ? 'dog' : 'cat');
+      var rarText = rar.tier.toUpperCase() + ' ' + i18n.t('rarity.' + rar.tier) + ' · ' +
+        i18n.t('rarity.per', { sp: spLab2, n: rar.pct });
+      svg += '<text x="540" y="886" text-anchor="middle" font-size="28" font-weight="700" fill="' +
+        TIER_COLOR[rar.tier] + '">' + esc(rarText) + '</text>';
+    }
+    if (result.hidden) {
+      svg += '<text x="540" y="924" text-anchor="middle" font-size="25" font-weight="700" fill="#8a76d8">' +
+        esc(i18n.t('hidden.badge')) + '</text>';
+    }
 
     // axis rows
     var axisKeys = ['EI', 'SN', 'TF', 'JP'];
-    var yStart = 960, gap = 96;
+    var yStart = result.hidden ? 978 : 962, gap = 94;
     axisKeys.forEach(function (ax, i) {
       var first = ax[0], second = ax[1];
       var pct = result.axes[ax];
