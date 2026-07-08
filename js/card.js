@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — shareable personality card (SVG -> PNG) */
+/* PetPersona — shareable personality card (SVG -> PNG) */
 (function () {
   var W = 1080, H = 1440;
 

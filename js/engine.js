@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — scoring engine
+/* PetPersona — scoring engine
    Turns questionnaire answers + experiment results into a 4-letter type,
    per-axis percentages, a hidden sensitivity score, and a confidence star rating. */
 (function () {

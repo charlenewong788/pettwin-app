@@ -1,7 +1,7 @@
-/* 宠格 PetPersona — fun hooks data & generators:
+/* PetPersona — fun hooks data & generators:
    collection rarity (C/R/SR/SSR), daily fortune, soul twins, pet letters. */
 (function () {
-  /* ---- 图鉴收录率 (per species, sums to 100) — PetPersona's own distribution
+  /* ---- Collection rarity (per species, sums to 100) — PetPersona's own distribution
      model, for collection fun only; not a real-world statistic. ---- */
   var RARITY = {
     cat: {
@@ -31,7 +31,7 @@
     return { pct: pct, tier: tierOf(pct) };
   }
 
-  /* ---- 每日运势 content pool ---- */
+  /* ---- Daily fortune content pool ---- */
   var YI = [
     { zh: '追着太阳挪窝', en: 'Migrate with the sun patch' },
     { zh: '偷袭主人的脚踝', en: 'Ambush an unsuspecting ankle' },
@@ -144,7 +144,7 @@
     };
   }
 
-  /* ---- 世另我 soul twins ---- */
+  /* ---- Soul twins ---- */
   var TWINS = {
     INTJ: { figure_zh: '诸葛亮', figure_en: 'Zhuge Liang', line_zh: '同款神机妙算，只不过它的空城计专骗你开罐头。', line_en: 'A grandmaster strategist at heart - except every scheme it hatches ends with you opening a can.' },
     INTP: { figure_zh: '爱因斯坦', figure_en: 'Albert Einstein', line_zh: '盯墙两小时不是发呆，是在验证饭点的相对论。', line_en: "Two hours staring at the wall isn't zoning out - it's fieldwork proving that dinnertime is relative." },
@@ -164,7 +164,7 @@
     ESFP: { figure_zh: '莫扎特', figure_en: 'Wolfgang Amadeus Mozart', line_zh: '人越多它越来劲，即兴演出从不缺安可返场。', line_en: 'The bigger the crowd, the bigger the show - a born prodigy who always plays the encore.' },
   };
 
-  /* ---- 它写给你的一封信 (per temperament group, {name} slot) ---- */
+  /* ---- Letters from your pet (per temperament group, {name} slot) ---- */
   var LETTERS = {
     NT: {
       zh: '你有没有发现，每次你对着电脑皱眉，我都会准时出现在键盘旁边？别误会，我不是来撒娇的，我是来巡逻的。虽然平时懒得理你，但你叹第三口气的时候我就知道：今天的班，加得不太顺。{name}的高冷是真的，可偷偷观察你也是真的——毕竟全世界这么无聊，只有你，值得我反复研究。',

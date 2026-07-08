@@ -1,11 +1,11 @@
-/* 宠格 PetPersona — owner observation questionnaire
+/* PetPersona — owner observation questionnaire
    axis: EI | SN | TF | JP | NEU
    dir +1 = agreement scores toward the FIRST letter (E/S/T/J) or higher sensitivity (NEU);
    dir -1 = reverse-scored.
    species: 'both' | 'cat' | 'dog' */
 (function () {
   const Q = [
-    /* ---- E/I 外向亲人 ↔ 独立高冷 ---- */
+    /* ---- E/I social vs independent ---- */
     { id: 'q_e1', axis: 'EI', dir: +1, species: 'both',
       zh: '我回家时，它会主动跑来迎接我。',
       en: 'When I come home, my pet rushes over to greet me.' },
@@ -19,7 +19,7 @@
       zh: '它更喜欢自己待着，被打扰时会起身走开。',
       en: 'My pet prefers being alone and walks away when disturbed.' },
 
-    /* ---- S/N 务实警觉 ↔ 好奇探索 ---- */
+    /* ---- S/N grounded vs curious ---- */
     { id: 'q_s1', axis: 'SN', dir: -1, species: 'both',
       zh: '遇到没见过的新物品，它会主动上前研究。',
       en: 'Facing a brand-new object, my pet goes up to investigate.' },
@@ -36,7 +36,7 @@
       zh: '对陌生的声音或气味，它会立刻警觉起来。',
       en: 'My pet instantly goes on alert at unfamiliar sounds or smells.' },
 
-    /* ---- T/F 冷静自主 ↔ 敏感共情 ---- */
+    /* ---- T/F self-reliant vs empathic ---- */
     { id: 'q_t1', axis: 'TF', dir: -1, species: 'both',
       zh: '当我情绪低落时，它似乎能察觉，并主动靠近陪我。',
       en: 'When I feel down, my pet seems to notice and comes to stay near me.' },
@@ -50,7 +50,7 @@
       zh: '它想做什么就去做，很少在意我的反应。',
       en: 'My pet does whatever it wants, rarely checking my reaction.' },
 
-    /* ---- J/P 规律稳定 ↔ 随性贪玩 ---- */
+    /* ---- J/P routine vs playful ---- */
     { id: 'q_j1', axis: 'JP', dir: +1, species: 'both',
       zh: '它每天吃饭、睡觉、活跃的时间点都很固定。',
       en: 'My pet eats, sleeps and gets active at fixed times every day.' },
@@ -64,7 +64,7 @@
       zh: '它有雷打不动的小习惯，比如固定的睡觉位置或巡逻路线。',
       en: 'My pet keeps unshakeable little rituals - a fixed sleeping spot or patrol route.' },
 
-    /* ---- NEU 敏感度（隐藏轴） ---- */
+    /* ---- NEU sensitivity (hidden axis) ---- */
     { id: 'q_n1', axis: 'NEU', dir: +1, species: 'both',
       zh: '突然的巨响会让它躲藏很久才恢复。',
       en: 'A sudden loud noise sends my pet into hiding for a long while.' },

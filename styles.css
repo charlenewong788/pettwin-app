@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — hand-journal / sticker design language
+/* PetPersona — hand-journal / sticker design language
    Ink outlines, hard offset shadows, paper textures, washi tape, doodles.
    No-emoji UI. Mobile-first. */
 
@@ -681,7 +681,7 @@ a { color: var(--accent-deep); }
 }
 .voice-quote svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; }
 
-/* twin (世另我) */
+/* soul twin */
 .twin-card {
   display: flex;
   gap: 13px;
@@ -724,7 +724,7 @@ a { color: var(--accent-deep); }
 .pair-axis:last-child { border-bottom: none; }
 .pair-axis .pair-head { font-weight: 800; font-size: 0.85rem; margin-bottom: 3px; }
 
-/* ---------- reveal overlay (盲盒) ---------- */
+/* ---------- reveal overlay (blind box) ---------- */
 .reveal-overlay {
   position: fixed;
   inset: 0;
@@ -795,7 +795,7 @@ a { color: var(--accent-deep); }
   100% { opacity: 0.9; transform: translateY(105vh) rotate(560deg); }
 }
 
-/* ---------- letter (拆信) ---------- */
+/* ---------- letter from your pet ---------- */
 .letter-btn { margin-top: 14px; }
 .letter-paper {
   background:

@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — i18n dictionary (zh / en) */
+/* PetPersona — i18n dictionary (en / zh) */
 (function () {
   const D = {
     'app.name': { zh: '宠格', en: 'PetPersona' },

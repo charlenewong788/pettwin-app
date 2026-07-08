@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — 16 personality types + axis metadata.
+/* PetPersona — 16 personality types + axis metadata.
    Content generated for PetPersona; 3 consistency fixes applied
    (INFJ tagline, ISTP nickname, ESTJ english title). */
 (function () {

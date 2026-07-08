@@ -1,51 +1,69 @@
-# 宠格 PetPersona
+# PetPersona
 
-> 读懂你的毛孩子 —— 一款以「宠物 MBTI 性格测评」为核心的养宠陪伴应用
+> Understand your furry friend — an MBTI-style pet personality test with viral hooks, wrapped in a hand-journal design
 
-[在线体验 PetPersona](https://charlenewong788.github.io/pettwin-app/)
+[Live demo](https://charlenewong788.github.io/pettwin-app/)
 
-## 这是什么
+## What it is
 
-宠格 PetPersona 把动物行为学量表（Feline Five、C-BARQ / Fe-BARQ）和 Dognition 式的在家认知游戏，包装成一次轻松的测评：主人先答几道**日常观察问卷**，再陪宠物玩几个**在家小实验**（招牌是「零食纸杯测试」），系统就能生成一张 MBTI 风格的**宠物人格卡**，并给出相处指南、易踩雷点、主宠契合度等解读。
+PetPersona packages animal-behavior science (the Feline Five personality model, the C-BARQ / Fe-BARQ behavior questionnaires) and Dognition-style at-home cognition games into one playful assessment: the owner answers a short **observation quiz**, then runs a few **at-home mini experiments** with their pet (the signature one is the treat-cup test). The app scores both inputs into an MBTI-style **persona card** with strengths, quirks, a care guide, and an owner-pet match report.
 
-## 核心功能
+## Features
 
-- **双输入性格测评**：主人观察问卷（猫/狗分库）＋ 在家小实验（12 个，含零食纸杯、指向跟随、陌生物品、延迟满足等），加权算出四字母人格类型
-- **四维行为模型**：外向亲人 E/I、务实警觉 S/N、冷静自主 T/F、规律稳定 J/P，另含隐藏的敏感度轴
-- **16 型宠物人格**：每型含昵称、金句、性格综述、闪光点、小怪癖、第一人称心声、相处指南、易踩雷点，以及猫 / 狗的分别表现（中英双语）
-- **可分享人格卡**：SVG 生成、可导出 PNG，适合社交分享
-- **主宠契合度**：设置主人自己的 MBTI，生成逐维度的契合报告
-- **人格成长记录**：保留每次测评历史，支持复测对比
-- **健康提醒**：疫苗 / 驱虫 / 体检提醒，支持导出到日历（.ics）
-- **双语界面**（中文 / English），零后端，数据仅存本地
+### Core assessment
+- **Two-input scoring**: owner observation quiz (separate cat / dog question banks) + at-home experiments (treat-cup, point-following, novel-object, delayed gratification, and more), weighted into a four-letter type with a hidden sensitivity axis
+- **Four behavior dimensions**: Social E/I, Grounded S/N, Self-reliant T/F, Routine-loving J/P — each mapped to observable behavior, not astrology
+- **16 pet personas**, fully bilingual (English / Chinese): nickname, tagline, overview, strengths, quirks, a first-person "word from your pet", care guide, pitfalls, and species-specific notes for cats and dogs
+- **Confidence stars**: the more experiments you run, the higher the rating
 
-## 产品边界
+### Hooks
+- **Blind-box reveal** — the result arrives as a floating mystery card that flips open with a confetti burst
+- **Collection rarity (C / R / SR / SSR)** — every type has a per-species collection rate ("about 2 in 100 cats"), shown on the result page, pet cards, and the shareable image; framed as PetPersona's own collection rate, for fun
+- **Daily pet fortune** — an almanac-style sticker on the home screen with a do / avoid / lucky treat / mood index, deterministic per pet per day, one-tap copy for sharing
+- **A letter from your pet** — a typewriter-animated first-person letter, written per temperament group
+- **Soul twin** — each type is paired with a historical figure (Zhuge Liang, Bao Zheng, Monet, Napoleon…) plus a one-liner
+- **Hidden trait easter egg** — when all four axes hover near the midline, the ultra-rare "Schrödinger's Fluffball" trait appears, inviting a retest
 
-宠格是行为观察工具，不提供任何医疗诊断。若宠物的饮食、饮水、排泄、精神状态出现持续异常，请及时就医。测评为「MBTI 风格」，与官方 Myers-Briggs Type Indicator® 无关，结果反映主人视角下的行为倾向，不是绝对定论。
+### Everything else
+- **Shareable persona card**: rendered as SVG, exported as PNG
+- **Owner-pet match**: set your own MBTI for a dimension-by-dimension compatibility report
+- **Persona history**: every assessment is kept, so you can watch the type evolve across retests
+- **Health reminders**: vaccine / deworming / check-up dates with calendar (.ics) export
+- **Bilingual UI** (English default, Chinese via one tap), zero backend, all data stays on-device
 
-## 技术说明
+## Design
 
-零依赖的纯静态前端。所有档案、照片与测评数据只保存在浏览器本地存储（localStorage），不上传任何服务器，可随时在「我的」页面导出 / 导入 / 删除。
+Hand-journal / sticker aesthetic: dot-grid paper background, ink outlines with hard offset shadows, washi tape, marker-highlight titles, doodles, and paw-stamp selected states. No emoji are used anywhere in the UI — all icons are inline SVG.
 
-## 运行方式
+## Boundaries
 
-直接用浏览器打开 `index.html` 即可，无需安装或构建。
+PetPersona is a behavior-observation toy, not a diagnostic tool. If your pet's eating, drinking, litter habits, or energy change persistently, see a veterinarian. The assessment is "MBTI-style" and is not affiliated with the official Myers-Briggs Type Indicator®; results reflect behavior tendencies as seen by the owner, not absolute truths. Collection rates come from PetPersona's own distribution model and are not real-world statistics.
 
-## 文件结构
+## Tech notes
+
+A zero-dependency static front end — plain HTML / CSS / JavaScript, no build step, no framework. All profiles, photos, and results live in the browser's localStorage and can be exported, imported, or deleted from the Me tab. Nothing is ever uploaded.
+
+## Run it
+
+Open `index.html` in a browser. That's all.
+
+## File structure
 
 ```text
 pettwin-app/
   index.html
   styles.css
   manifest.webmanifest
+  sw.js                  cache kill-switch for the previous app
   assets/icon.svg
   js/
-    i18n.js            双语文案
-    store.js           本地存储
-    data-types.js      16 型人格内容
-    data-questions.js  观察问卷题库
-    data-experiments.js 在家小实验题库
-    engine.js          计分引擎
-    card.js            人格卡（SVG → PNG）
-    app.js             应用与路由
+    i18n.js              UI strings (en / zh)
+    store.js             localStorage persistence
+    data-types.js        16 persona content
+    data-questions.js    observation quiz banks
+    data-experiments.js  at-home experiment banks
+    data-fun.js          rarity, daily fortune, soul twins, letters
+    engine.js            scoring engine
+    card.js              persona card (SVG to PNG)
+    app.js               app shell, router, views
 ```

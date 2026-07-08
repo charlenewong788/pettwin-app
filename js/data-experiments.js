@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — at-home experiments (Dognition-inspired)
+/* PetPersona — at-home experiments (Dognition-inspired)
    Each option maps to an axis and a signed weight (-2..+2 toward first letter / higher NEU).
    icon: key into PP.icons */
 (function () {

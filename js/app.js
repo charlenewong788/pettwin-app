@@ -1,4 +1,4 @@
-/* 宠格 PetPersona — app shell, router, and views */
+/* PetPersona — app shell, router, and views */
 (function () {
   var PP = window.PP;
   var store = PP.store, i18n = PP.i18n, engine = PP.engine;
@@ -968,7 +968,7 @@
   render = function () { applyStaticI18n(); _origRender(); };
 
   /* ---------------- init ---------------- */
-  i18n.setLang(store.state.lang || 'zh');
+  i18n.setLang(store.state.lang || 'en');
   setLangToggleLabel();
   render();
 })();

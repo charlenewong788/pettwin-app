@@ -1,9 +1,9 @@
-/* 宠格 PetPersona — local persistence (browser localStorage only) */
+/* PetPersona — local persistence (browser localStorage only) */
 (function () {
   const KEY = 'petpersona.v1';
 
   const defaults = () => ({
-    lang: 'zh',
+    lang: 'en',
     ownerMbti: null,
     pets: [],          // {id, name, species, breed, birthday, gender, neutered, photo}
     assessments: [],   // {id, petId, takenAt, answers:{qid:1..5}, experiments:{expId:optionIdx}, result:{...}}
