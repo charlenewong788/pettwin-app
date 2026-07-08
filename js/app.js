@@ -107,6 +107,7 @@
   }
   function baseTab() {
     if (app.route === 'onboard' || app.route === 'assess' || app.route === 'quiz' || app.route === 'experiments' || app.route === 'result') return 'assess';
+    if (app.route === 'discover') return 'discover';
     if (app.route === 'records') return 'records';
     if (app.route === 'me') return 'me';
     return 'home';
@@ -127,6 +128,7 @@
     else if (r === 'quiz') viewEl.innerHTML = viewQuiz();
     else if (r === 'experiments') viewEl.innerHTML = viewExperiments();
     else if (r === 'result') viewEl.innerHTML = viewResult();
+    else if (r === 'discover') viewEl.innerHTML = viewDiscover();
     else if (r === 'records') viewEl.innerHTML = viewRecords();
     else if (r === 'me') viewEl.innerHTML = viewMe();
     else viewEl.innerHTML = viewHome();
@@ -170,7 +172,7 @@
 
   function viewHome() {
     var pets = store.state.pets;
-    var hero = '<section class="hero">' + DOODLES +
+    var hero = '<section class="hero">' +
       '<h1>' + t('home.heroTitle').replace('\n', '<br>') + '</h1>' + DOODLE_LINE +
       '<p>' + t('home.heroSub') + '</p>' +
       '<button class="btn btn-primary" data-action="hero-cta">' + t('home.heroCta') + '</button>' +
@@ -485,9 +487,285 @@
 
       pairHTML +
 
+      petCpHTML(p, r) +
+
       '<div style="margin:18px 0 4px"><button class="btn btn-ghost btn-block btn-sm" data-action="methodology">' + t('result.methodology') + '</button></div>' +
 
       revealHTML;
+  }
+
+  // pet-pet duo match: shows when another pet in the household also has a result
+  function petCpHTML(p, r) {
+    var other = store.state.pets.filter(function (x) {
+      return x.id !== p.id && store.latestAssessment(x.id);
+    })[0];
+    if (!other) return '';
+    var ra = store.latestAssessment(other.id).result;
+    var pr = engine.pairing(r.typeCode, ra.typeCode);
+    if (!pr) return '';
+    return '<div class="card" style="margin-top:14px"><div class="section-title" style="margin-top:0"><span>' + t('cp.title') + '</span></div>' +
+      '<div class="tiny" style="margin-bottom:6px">' + t('cp.pick', { a: petName(p), b: petName(other) }) + '</div>' +
+      '<div class="pair-score">' + pr.score + '%</div>' +
+      '<div class="tiny center" style="margin-bottom:10px">' + r.typeCode + ' × ' + ra.typeCode + '</div>' +
+      pr.perAxis.map(function (pa) {
+        var head = t('axisFull.' + pa.axis[0]) + ' / ' + t('axisFull.' + pa.axis[1]);
+        return '<div class="pair-axis"><div class="pair-head">' + head + '</div>' + t('pp.' + pa.axis + '.' + (pa.same ? 'same' : 'diff')) + '</div>';
+      }).join('') + '</div>';
+  }
+
+  /* ---------------- discover: training / challenges / gear ---------------- */
+  function traitsOf(pet) {
+    var a = store.latestAssessment(pet.id);
+    if (!a) return [];
+    var r = a.result;
+    var tr = r.typeCode.split('');
+    if (r.sensitivity === 'high') tr.push('NEU_HIGH');
+    if (r.sensitivity === 'low') tr.push('NEU_LOW');
+    return tr;
+  }
+  function traitMatch(tags, traits) {
+    if (!tags || tags.indexOf('ALL') >= 0) return 0.5; // universal, ranks after personal matches
+    var n = 0;
+    tags.forEach(function (g) { if (traits.indexOf(g) >= 0) n++; });
+    return n;
+  }
+  function bi(obj, key) { return i18n.lang === 'zh' ? obj[key + '_zh'] : obj[key + '_en']; }
+
+  function courseProgress(petId, course) {
+    var tr = store.state.training[petId] && store.state.training[petId][course.id];
+    var done = tr ? Object.keys(tr.done).length : 0;
+    return { done: done, total: course.lessons.length };
+  }
+
+  function viewDiscover() {
+    var pets = store.state.pets;
+    if (!pets.length) {
+      return sec(t('nav.discover')) +
+        '<div class="empty">' + ICON.empty + '<p>' + t('toast.needPet') + '</p>' +
+        '<button class="btn btn-primary" style="margin-top:16px" data-action="add-pet">' + t('home.addPet') + '</button></div>';
+    }
+    var p = currentPet();
+    app.petId = p.id;
+    var tab = app.discTab || 'training';
+
+    var petSelector = '';
+    if (pets.length > 1) {
+      petSelector = '<div class="row" style="gap:8px;overflow-x:auto;padding-bottom:2px;margin-top:8px">';
+      pets.forEach(function (x) {
+        petSelector += '<button class="chip ' + (x.id === p.id ? 'accent' : '') + '" data-action="disc-pet" data-id="' + x.id + '">' + petName(x) + '</button>';
+      });
+      petSelector += '</div>';
+    }
+
+    var subtabs = '<div class="subtabs">' +
+      ['training', 'challenges', 'gear'].map(function (k) {
+        var lbl = k === 'training' ? t('disc.training') : k === 'challenges' ? t('disc.challenges') : t('disc.gear');
+        return '<button class="' + (tab === k ? 'on' : '') + '" data-action="disc-tab" data-tab="' + k + '">' + lbl + '</button>';
+      }).join('') + '</div>';
+
+    var body = tab === 'training' ? discTraining(p) : tab === 'challenges' ? discChallenges(p) : discGear(p);
+    return petSelector + subtabs + body;
+  }
+
+  function discTraining(p) {
+    var traits = traitsOf(p);
+    var courses = PP.CONTENT.courses
+      .filter(function (c) { return c.species === p.species; })
+      .slice()
+      .sort(function (a, b) { return traitMatch(b.traits, traits) - traitMatch(a.traits, traits); });
+    var html = '<div class="stack" style="margin-top:12px">';
+    courses.forEach(function (c, i) {
+      var pr = courseProgress(p.id, c);
+      var matched = traitMatch(c.traits, traits) >= 1;
+      html += '<button class="exp-item" data-action="open-course" data-id="' + c.id + '" style="align-items:center">' +
+        '<div class="course-cover cc-' + ((i % 3) + 1) + '">' + ICON.compass + '</div>' +
+        '<div class="grow"><h4>' + bi(c, 'title') +
+        (matched ? ' <span class="chip accent" style="vertical-align:middle">' + t('train.forTrait') + '</span>' : '') + '</h4>' +
+        '<div class="meta">' + t('train.lessons', { n: c.lessons.length }) + ' · ' + t('train.level') + ' ' + c.level + '</div>' +
+        '<div class="prog-track"><div style="width:' + Math.round(pr.done / pr.total * 100) + '%"></div></div>' +
+        '<div class="tiny" style="margin-top:4px">' + t('train.progress', { done: pr.done, total: pr.total }) + '</div>' +
+        '</div></button>';
+    });
+    return html + '</div>';
+  }
+
+  function openCourse(courseId) {
+    var p = currentPet();
+    var c = PP.CONTENT.courses.filter(function (x) { return x.id === courseId; })[0];
+    if (!c) return;
+    var tr = store.trainingFor(p.id, c.id);
+    var pr = courseProgress(p.id, c);
+    var lessons = c.lessons.map(function (L, idx) {
+      var done = !!tr.done[idx];
+      var steps = (i18n.lang === 'zh' ? L.steps_zh : L.steps_en).map(function (s) { return '<li>' + s + '</li>'; }).join('');
+      return '<div class="lesson-item ' + (done ? 'done' : '') + '">' +
+        '<button class="lesson-check" data-action="toggle-lesson" data-course="' + c.id + '" data-idx="' + idx + '">' + ICON.check + '</button>' +
+        '<div class="grow"><div class="lesson-title">' + bi(L, 'title') + '</div>' +
+        '<div class="lesson-meta">' + L.minutes + ' ' + t('common.minutes') + '</div>' +
+        '<ol class="steps" style="margin:10px 0 0">' + steps + '</ol>' +
+        '<div class="tip-box">' + t('train.tip') + '：' + bi(L, 'tip') + '</div>' +
+        '</div></div>';
+    }).join('');
+    var doneBanner = pr.done >= pr.total ? '<div class="chip green" style="margin-bottom:10px">' + t('train.completedCourse') + '</div>' : '';
+    openModal('<div class="modal-title">' + bi(c, 'title') + '</div>' +
+      doneBanner +
+      '<p class="muted" style="margin-bottom:8px">' + bi(c, 'desc') + '</p>' +
+      '<div class="card">' + lessons + '</div>' +
+      '<button class="btn btn-ghost btn-block" style="margin-top:14px" data-action="close-modal">' + t('common.close') + '</button>');
+  }
+
+  function discChallenges(p) {
+    var html = '<div class="stack" style="margin-top:12px">';
+    PP.CONTENT.challenges.forEach(function (ch) {
+      var st = store.challenge(ch.id);
+      var stPet = st && store.getPet(st.petId);
+      var n = st ? st.checks.length : 0;
+      var finished = n >= 7;
+      var status = !st ? '' : finished
+        ? '<span class="chip green">' + t('ch.finished') + '</span>'
+        : '<span class="chip accent">' + t('ch.progress', { n: n }) + '</span>';
+      html += '<button class="exp-item" data-action="open-challenge" data-id="' + ch.id + '" style="align-items:center">' +
+        '<div class="exp-icon">' + ICON.calendar + '</div>' +
+        '<div class="grow"><h4>' + bi(ch, 'title') + '</h4>' +
+        '<div class="meta">' + bi(ch, 'desc') + (stPet ? ' · ' + t('ch.forPet') + ' ' + petName(stPet) : '') + '</div></div>' +
+        status + '</button>';
+    });
+    return html + '</div>';
+  }
+
+  function openChallenge(chId) {
+    var ch = PP.CONTENT.challenges.filter(function (x) { return x.id === chId; })[0];
+    if (!ch) return;
+    var st = store.challenge(ch.id);
+    var today = todayStr();
+    var html = '<div class="modal-title">' + bi(ch, 'title') + '</div>' +
+      '<p class="muted" style="margin-bottom:6px">' + bi(ch, 'desc') + '</p>';
+    if (!st) {
+      var days = ch.days.map(function (d, i) {
+        return '<div class="lesson-item"><div class="day-dot" style="width:26px;height:26px;flex-shrink:0">' + (i + 1) + '</div>' +
+          '<div class="grow lesson-title" style="font-weight:500">' + (i18n.lang === 'zh' ? d.zh : d.en) + '</div></div>';
+      }).join('');
+      html += '<div class="card" style="margin-top:8px">' + days + '</div>' +
+        '<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="start-challenge" data-id="' + ch.id + '">' + t('ch.start') + '</button>';
+    } else {
+      var n = st.checks.length;
+      var finished = n >= 7;
+      var checkedToday = st.checks.indexOf(today) >= 0;
+      var dayIdx = Math.min(n, 6); // next task index
+      var grid = '<div class="day-grid">';
+      for (var i = 0; i < 7; i++) {
+        var cls = i < n ? 'done' : (i === n && !finished ? 'today' : '');
+        grid += '<div class="day-dot ' + cls + '">' + (i + 1) + '</div>';
+      }
+      grid += '</div>';
+      html += grid + '<div class="tiny center">' + t('ch.progress', { n: n }) + '</div>';
+      if (finished) {
+        html += '<div class="card center" style="margin-top:12px"><p style="font-weight:700">' + t('ch.finished') + '</p></div>' +
+          '<button class="btn btn-soft btn-block" style="margin-top:12px" data-action="start-challenge" data-id="' + ch.id + '">' + t('ch.restart') + '</button>';
+      } else {
+        var task = ch.days[dayIdx];
+        html += '<div class="challenge-task">' + t('ch.day', { n: dayIdx + 1 }) + ' · ' + t('ch.todayTask') + '<br>' +
+          (i18n.lang === 'zh' ? task.zh : task.en) + '</div>' +
+          (checkedToday
+            ? '<button class="btn btn-ghost btn-block" style="margin-top:12px" disabled>' + t('ch.checked') + '</button>'
+            : '<button class="btn btn-primary btn-block" style="margin-top:12px" data-action="checkin-challenge" data-id="' + ch.id + '">' + t('ch.checkin') + '</button>');
+      }
+    }
+    html += '<button class="btn btn-ghost btn-block" style="margin-top:10px" data-action="close-modal">' + t('common.close') + '</button>';
+    openModal(html);
+  }
+
+  function discGear(p) {
+    var traits = traitsOf(p);
+    var items = PP.CONTENT.gear
+      .filter(function (g) { return g.species === p.species; })
+      .slice()
+      .sort(function (a, b) { return traitMatch(b.traits, traits) - traitMatch(a.traits, traits); });
+    var listIds = store.state.shoplist;
+    var html = '';
+    if (traits.length) html += '<p class="tiny" style="margin:10px 2px 0">' + t('gear.matched', { name: petName(p) }) + '</p>';
+    html += '<div class="stack" style="margin-top:10px">';
+    items.forEach(function (g) {
+      var on = listIds.indexOf(g.id) >= 0;
+      html += '<div class="gear-item">' +
+        '<div class="grow"><div class="row" style="gap:8px"><h4>' + bi(g, 'name') + '</h4>' +
+        '<span class="gear-cat">' + t('gear.cat.' + g.category) + '</span></div>' +
+        '<div class="why">' + bi(g, 'reason') + '</div></div>' +
+        '<button class="gear-add ' + (on ? 'on' : '') + '" data-action="toggle-gear" data-id="' + g.id + '" aria-label="add">' + (on ? ICON.check : ICON.plus) + '</button>' +
+        '</div>';
+    });
+    html += '</div>';
+    // shopping list summary
+    var inList = PP.CONTENT.gear.filter(function (g) { return listIds.indexOf(g.id) >= 0; });
+    html += sec(t('gear.list'), inList.length ? '<button class="more" data-action="copy-shoplist">' + t('gear.copyList') + '</button>' : '');
+    html += inList.length
+      ? '<div class="card"><ul style="list-style:none">' + inList.map(function (g) {
+          return '<li class="row between" style="padding:5px 0"><span style="font-size:0.9rem;font-weight:600">' + bi(g, 'name') + '</span>' +
+            '<button class="btn btn-danger btn-sm" data-action="toggle-gear" data-id="' + g.id + '">' + t('common.delete') + '</button></li>';
+        }).join('') + '</ul></div>'
+      : '<div class="card center"><p class="tiny">' + t('gear.listEmpty') + '</p></div>';
+    html += '<p class="tiny" style="margin-top:10px">' + t('gear.note') + '</p>';
+    return html;
+  }
+
+  /* ---------------- care: weight ---------------- */
+  function weightChartSVG(ws) {
+    if (ws.length < 2) return '';
+    var W = 320, H = 110, padX = 8, padY = 14;
+    var kgs = ws.map(function (w) { return w.kg; });
+    var min = Math.min.apply(null, kgs), max = Math.max.apply(null, kgs);
+    if (max - min < 0.4) { max += 0.2; min -= 0.2; }
+    var pts = ws.map(function (w, i) {
+      var x = padX + (W - 2 * padX) * (ws.length === 1 ? 0.5 : i / (ws.length - 1));
+      var y = padY + (H - 2 * padY) * (1 - (w.kg - min) / (max - min));
+      return [x, y];
+    });
+    var line = pts.map(function (p2, i) { return (i ? 'L' : 'M') + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1); }).join(' ');
+    var area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (H - 4) + ' L' + pts[0][0].toFixed(1) + ' ' + (H - 4) + ' Z';
+    var dots = pts.map(function (p2) { return '<circle cx="' + p2[0].toFixed(1) + '" cy="' + p2[1].toFixed(1) + '" r="3.4" fill="#e0764a"/>'; }).join('');
+    var first = ws[0], last = ws[ws.length - 1];
+    return '<div class="chart-wrap"><svg viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' +
+      '<path d="' + area + '" fill="rgba(224,118,74,0.12)"/>' +
+      '<path d="' + line + '" fill="none" stroke="#e0764a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      dots +
+      '<text x="' + padX + '" y="' + (H - 1) + '" font-size="9" fill="#a3947e">' + first.at.slice(5) + '</text>' +
+      '<text x="' + (W - padX) + '" y="' + (H - 1) + '" font-size="9" fill="#a3947e" text-anchor="end">' + last.at.slice(5) + '</text>' +
+      '</svg></div>';
+  }
+
+  function careWeightSection(p) {
+    var ws = store.weightsFor(p.id);
+    var html = sec(t('weight.title'), '<button class="more" data-action="add-weight">＋ ' + t('weight.add') + '</button>');
+    if (!ws.length) {
+      html += '<div class="card center"><p class="tiny">' + t('weight.empty') + '</p></div>';
+      return html;
+    }
+    var last = ws[ws.length - 1];
+    var trend = '';
+    if (ws.length >= 2) {
+      var d = Math.round((last.kg - ws[ws.length - 2].kg) * 100) / 100;
+      trend = d > 0 ? t('weight.trendUp', { d: d }) : d < 0 ? t('weight.trendDown', { d: Math.abs(d) }) : t('weight.trendFlat');
+    }
+    html += '<div class="card">' +
+      '<div class="row between"><div><span class="weight-now">' + last.kg + ' <small>' + t('weight.kg') + '</small></span>' +
+      '<div class="tiny">' + t('weight.latest') + ' ' + last.at + (trend ? ' · ' + trend : '') + '</div></div></div>' +
+      weightChartSVG(ws.slice(-12)) + '</div>';
+    return html;
+  }
+
+  function weightModal() {
+    var pets = store.state.pets;
+    if (!pets.length) { toast(t('toast.needPet')); return; }
+    var cur = currentPet();
+    var petOpts = pets.map(function (p2) {
+      return '<option value="' + p2.id + '"' + (cur && p2.id === cur.id ? ' selected' : '') + '>' + petName(p2) + '</option>';
+    }).join('');
+    openModal('<div class="modal-title">' + t('weight.add') + '</div>' +
+      '<div class="field"><label>' + t('weight.needPet') + '</label><select id="w-pet">' + petOpts + '</select></div>' +
+      '<div class="field"><label>' + t('weight.title') + ' (' + t('weight.kg') + ')</label>' +
+      '<input type="number" id="w-kg" step="0.05" min="0.1" max="120" inputmode="decimal"></div>' +
+      '<div class="field"><label>' + t('records.due', { date: '' }) + '</label><input type="date" id="w-date" value="' + todayStr() + '"></div>' +
+      '<button class="btn btn-primary btn-block" data-action="save-weight">' + t('common.save') + '</button>');
   }
 
   function viewRecords() {
@@ -539,8 +817,10 @@
         '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:10px" data-action="export-ics">' + t('records.ics') + '</button>';
     }
 
-    return sec(t('records.history')) + histHTML +
-      sec(t('records.reminders'), '<button class="more" data-action="add-reminder">＋ ' + t('records.addReminder') + '</button>') + remHTML;
+    var weightHTML = pets.length ? careWeightSection(currentPet() || pets[0]) : '';
+    return weightHTML +
+      sec(t('records.reminders'), '<button class="more" data-action="add-reminder">＋ ' + t('records.addReminder') + '</button>') + remHTML +
+      sec(t('records.history')) + histHTML;
   }
 
   function viewMe() {
@@ -878,6 +1158,47 @@
       case 'open-letter': openLetter(); break;
       case 'replay-letter': typeLetter(app._letterText || ''); break;
       case 'copy-fortune': copyFortune(elm.getAttribute('data-id')); break;
+      case 'disc-tab': app.discTab = elm.getAttribute('data-tab'); render(); break;
+      case 'disc-pet': app.petId = elm.getAttribute('data-id'); render(); break;
+      case 'open-course': openCourse(elm.getAttribute('data-id')); break;
+      case 'toggle-lesson':
+        store.toggleLesson(currentPet().id, elm.getAttribute('data-course'), elm.getAttribute('data-idx'));
+        render(); // refresh the course list progress underneath the modal
+        openCourse(elm.getAttribute('data-course'));
+        break;
+      case 'open-challenge': openChallenge(elm.getAttribute('data-id')); break;
+      case 'start-challenge':
+        store.startChallenge(elm.getAttribute('data-id'), currentPet().id, todayStr());
+        openChallenge(elm.getAttribute('data-id'));
+        render();
+        break;
+      case 'checkin-challenge': {
+        var chId = elm.getAttribute('data-id');
+        var st = store.checkinChallenge(chId, todayStr());
+        openChallenge(chId);
+        render();
+        if (st && st.checks.length >= 7) toast(t('ch.finished'));
+        break;
+      }
+      case 'toggle-gear': store.toggleShopItem(elm.getAttribute('data-id')); render(); break;
+      case 'copy-shoplist': {
+        var names = PP.CONTENT.gear
+          .filter(function (g) { return store.state.shoplist.indexOf(g.id) >= 0; })
+          .map(function (g) { return '- ' + (i18n.lang === 'zh' ? g.name_zh : g.name_en); });
+        if (names.length) copyText(t('gear.list') + '\n' + names.join('\n'));
+        break;
+      }
+      case 'add-weight': weightModal(); break;
+      case 'save-weight': {
+        var kg = parseFloat(document.getElementById('w-kg').value);
+        if (!isFinite(kg) || kg <= 0 || kg > 120) break;
+        store.addWeight(document.getElementById('w-pet').value, Math.round(kg * 100) / 100,
+          document.getElementById('w-date').value || todayStr());
+        closeModal();
+        toast(t('toast.weightSaved'));
+        render();
+        break;
+      }
       case 'retest':
         store.clearDraft(currentPet().id); go('assess');
         break;

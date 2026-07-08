@@ -24,6 +24,13 @@ PetPersona packages animal-behavior science (the Feline Five personality model, 
 - **Soul twin** — each type is paired with a historical figure (Zhuge Liang, Bao Zheng, Monet, Napoleon…) plus a one-liner
 - **Hidden trait easter egg** — when all four axes hover near the midline, the ultra-rare "Schrödinger's Fluffball" trait appears, inviting a retest
 
+### Training, care & commerce (inspired by what actually earns money in top pet apps)
+- **Training studio** — six structured courses (Dogo-style): dog basics, socialization for anxious dogs, brain games, cat trust-building, confidence for sensitive cats, and indoor-hunt enrichment. Courses are ranked by your pet's personality, with lesson check-offs and progress tracking
+- **7-day challenges** — bonding, new-experiences, and healthy-habits challenges with a day grid and daily check-ins
+- **Personality-matched gear picks** — 30 curated gear categories (no brands) sorted by your pet's traits, with a shopping list you can copy — an affiliate-ready commerce surface
+- **Weight tracking** — log weights and see the trend curve in the Care tab (health monitoring is the industry's #1 upgrade direction)
+- **Pet duo match** — households with two assessed pets get a pet-to-pet compatibility report
+
 ### Everything else
 - **Shareable persona card**: rendered as SVG, exported as PNG
 - **Owner-pet match**: set your own MBTI for a dimension-by-dimension compatibility report
@@ -33,7 +40,7 @@ PetPersona packages animal-behavior science (the Feline Five personality model, 
 
 ## Design
 
-Hand-journal / sticker aesthetic: dot-grid paper background, ink outlines with hard offset shadows, washi tape, marker-highlight titles, doodles, and paw-stamp selected states. No emoji are used anywhere in the UI — all icons are inline SVG.
+Warm-professional: cream paper background, terracotta accent, 1px warm borders, soft shadows, and uniform radii. The playfulness lives in moments — paw-stamp selections, the blind-box reveal, confetti — not in the chrome. No emoji are used anywhere in the UI; all icons are inline SVG.
 
 ## Boundaries
 
@@ -63,6 +70,7 @@ pettwin-app/
     data-questions.js    observation quiz banks
     data-experiments.js  at-home experiment banks
     data-fun.js          rarity, daily fortune, soul twins, letters
+    data-content.js      training courses, gear picks, challenges
     engine.js            scoring engine
     card.js              persona card (SVG to PNG)
     app.js               app shell, router, views

@@ -9,6 +9,10 @@
     assessments: [],   // {id, petId, takenAt, answers:{qid:1..5}, experiments:{expId:optionIdx}, result:{...}}
     drafts: {},        // petId -> {answers, experiments} in-progress
     reminders: [],     // {id, petId, type, label, due, done}
+    weights: [],       // {id, petId, kg, at:'YYYY-MM-DD'}
+    training: {},      // petId -> courseId -> {done:{lessonIdx:true}}
+    challenges: {},    // challengeId -> {petId, start:'YYYY-MM-DD', checks:['YYYY-MM-DD']}
+    shoplist: [],      // gear item ids
   });
 
   let state = load();
@@ -92,6 +96,44 @@
 
     setOwnerMbti(code) { state.ownerMbti = code; save(); },
     setLang(l) { state.lang = l; save(); },
+
+    addWeight(petId, kg, at) {
+      state.weights.push({ id: uid(), petId: petId, kg: kg, at: at });
+      state.weights.sort(function (a, b) { return a.at < b.at ? -1 : 1; });
+      save();
+    },
+    weightsFor(petId) { return state.weights.filter(function (w) { return w.petId === petId; }); },
+    removeWeight(id) { state.weights = state.weights.filter(function (w) { return w.id !== id; }); save(); },
+
+    trainingFor(petId, courseId) {
+      if (!state.training[petId]) state.training[petId] = {};
+      if (!state.training[petId][courseId]) state.training[petId][courseId] = { done: {} };
+      return state.training[petId][courseId];
+    },
+    toggleLesson(petId, courseId, idx) {
+      var tr = this.trainingFor(petId, courseId);
+      if (tr.done[idx]) delete tr.done[idx]; else tr.done[idx] = true;
+      save();
+      return tr;
+    },
+
+    challenge(chId) { return state.challenges[chId] || null; },
+    startChallenge(chId, petId, today) {
+      state.challenges[chId] = { petId: petId, start: today, checks: [] };
+      save();
+      return state.challenges[chId];
+    },
+    checkinChallenge(chId, today) {
+      var c = state.challenges[chId];
+      if (c && c.checks.indexOf(today) < 0) { c.checks.push(today); save(); }
+      return c;
+    },
+
+    toggleShopItem(itemId) {
+      var i = state.shoplist.indexOf(itemId);
+      if (i >= 0) state.shoplist.splice(i, 1); else state.shoplist.push(itemId);
+      save();
+    },
 
     exportJSON() { return JSON.stringify(state, null, 2); },
     importJSON(text) {

@@ -6,7 +6,8 @@
 
     'nav.home': { zh: '首页', en: 'Home' },
     'nav.assess': { zh: '测评', en: 'Test' },
-    'nav.records': { zh: '记录', en: 'Records' },
+    'nav.discover': { zh: '发现', en: 'Discover' },
+    'nav.records': { zh: '照护', en: 'Care' },
     'nav.me': { zh: '我的', en: 'Me' },
 
     'common.cancel': { zh: '取消', en: 'Cancel' },
@@ -254,6 +255,69 @@
     /* twin */
     'twin.title': { zh: '世另我', en: 'Soul twin' },
     'twin.same': { zh: '和{figure}是同款人格', en: 'Same type as {figure}' },
+
+    /* discover: training */
+    'disc.training': { zh: '训练学院', en: 'Training' },
+    'disc.challenges': { zh: '7天挑战', en: 'Challenges' },
+    'disc.gear': { zh: '好物清单', en: 'Gear picks' },
+    'train.recommended': { zh: '为{name}推荐', en: 'Picked for {name}' },
+    'train.lessons': { zh: '{n} 节课', en: '{n} lessons' },
+    'train.level': { zh: '难度', en: 'Level' },
+    'train.progress': { zh: '已完成 {done}/{total}', en: '{done}/{total} done' },
+    'train.tip': { zh: '教练提示', en: 'Coach tip' },
+    'train.markDone': { zh: '完成这节课', en: 'Mark lesson done' },
+    'train.done': { zh: '已完成', en: 'Completed' },
+    'train.forTrait': { zh: '契合它的性格', en: 'Fits their personality' },
+    'train.completedCourse': { zh: '课程完成！它比昨天更棒了', en: 'Course complete - what a good student' },
+
+    /* challenges */
+    'ch.start': { zh: '开始挑战', en: 'Start challenge' },
+    'ch.day': { zh: '第 {n} 天', en: 'Day {n}' },
+    'ch.todayTask': { zh: '今日任务', en: "Today's task" },
+    'ch.checkin': { zh: '完成打卡', en: 'Check in' },
+    'ch.checked': { zh: '今天已打卡', en: 'Checked in today' },
+    'ch.progress': { zh: '已坚持 {n}/7 天', en: '{n}/7 days done' },
+    'ch.finished': { zh: '挑战完成！', en: 'Challenge complete!' },
+    'ch.restart': { zh: '再来一轮', en: 'Go again' },
+    'ch.missed': { zh: '进行中', en: 'In progress' },
+    'ch.forPet': { zh: '挑战对象', en: 'For' },
+
+    /* gear */
+    'gear.why': { zh: '推荐理由', en: 'Why' },
+    'gear.matched': { zh: '按{name}的性格排序', en: "Sorted for {name}'s personality" },
+    'gear.list': { zh: '我的购物清单', en: 'My shopping list' },
+    'gear.copyList': { zh: '复制清单', en: 'Copy list' },
+    'gear.listEmpty': { zh: '点右侧圆点，把合适的好物加进清单', en: 'Tap the dot to add items to your list' },
+    'gear.cat.food': { zh: '饮食', en: 'Food' },
+    'gear.cat.toy': { zh: '玩具', en: 'Toys' },
+    'gear.cat.home': { zh: '居家', en: 'Home' },
+    'gear.cat.outdoor': { zh: '外出', en: 'Outdoor' },
+    'gear.cat.care': { zh: '护理', en: 'Care' },
+    'gear.note': { zh: '好物按性格匹配推荐，只写品类不含品牌，请按需选购', en: 'Picks are personality-matched categories, not brands - shop as you see fit' },
+
+    /* care: weight */
+    'weight.title': { zh: '体重记录', en: 'Weight' },
+    'weight.add': { zh: '记一笔', en: 'Log weight' },
+    'weight.kg': { zh: '公斤', en: 'kg' },
+    'weight.empty': { zh: '记录体重，看它的健康曲线', en: 'Log weights to see the health curve' },
+    'weight.latest': { zh: '最近', en: 'Latest' },
+    'weight.trendUp': { zh: '比上次 +{d} kg', en: '+{d} kg vs last' },
+    'weight.trendDown': { zh: '比上次 -{d} kg', en: '-{d} kg vs last' },
+    'weight.trendFlat': { zh: '和上次持平', en: 'Same as last time' },
+    'toast.weightSaved': { zh: '体重已记录', en: 'Weight logged' },
+    'weight.needPet': { zh: '选择宠物', en: 'Pet' },
+
+    /* pet-pet match */
+    'cp.title': { zh: '毛孩子CP', en: 'Pet duo match' },
+    'cp.pick': { zh: '看看{a}和{b}处得来吗', en: 'How do {a} and {b} get along?' },
+    'pp.EI.same': { zh: '能量同频：要么一起疯，要么一起躺，互不打扰的默契。', en: 'Same energy: they rampage together or nap together, in perfect sync.' },
+    'pp.EI.diff': { zh: '一动一静：外向的追着内向的玩，记得给安静的那只留退路。', en: 'One chases, one retreats - give the quiet one an escape route.' },
+    'pp.SN.same': { zh: '对新事物步调一致，探索或警戒都有伴。', en: 'Same pace with novelty - they explore or stand guard as a team.' },
+    'pp.SN.diff': { zh: '一个先冲一个后到，勇敢的会带着谨慎的开路。', en: 'The bold one scouts ahead and shows the cautious one it is safe.' },
+    'pp.TF.same': { zh: '表达方式相似，很少产生误会。', en: 'Similar signals, few misunderstandings.' },
+    'pp.TF.diff': { zh: '一个独立一个黏人，争宠名场面在所难免。', en: 'One independent, one clingy - expect some jealousy theatre.' },
+    'pp.JP.same': { zh: '作息合拍，饭点觉点全同步。', en: 'Synced schedules: same meal times, same nap times.' },
+    'pp.JP.diff': { zh: '规律派会被随性派半夜拉起来跑酷，习惯就好。', en: 'The scheduler will be dragged into midnight zoomies. They adjust.' },
 
     /* misc */
     'toast.saved': { zh: '已保存', en: 'Saved' },
